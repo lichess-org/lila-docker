@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:5.0.15-focal
+    networks:
+      - lila-network
+    ports:
+      - 27017:27017
+
+  redis:
+    image: redis:alpine
+    networks:
+      - lila-network
+    ports:
+      - 6379:6379
+
+  lila:
+    image: sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.8.2_3.2.2
+    networks:
+      - lila-network
+    ports:
+      - 9663:9663
+    volumes:
+      - ./lila:/lila
+      - ./lila.conf:/lila/conf/application.conf
+
+  lila-ws:
+    image: sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.8.2_3.2.2
+    networks:
+      - lila-network
+    ports:
+      - 9664:9664
+    volumes:
+      - ./lila-ws:/lila-ws
+      - ./lila-ws.conf:/lila-ws.conf
+
+  lila-engine:
+    build:
+      context: .
+      dockerfile: lila-engine.Dockerfile
+    networks:
+      - lila-network
+    ports:
+      - 9666:9666
+    volumes:
+      - ./lila-engine:/lila-engine
+
+networks:
+  lila-network:
+    driver: bridge
