@@ -7,7 +7,7 @@
 
 ```
 git clone https://github.com/fitztrev/lichess-docker-compose.git
-cd lichess-docker
+cd lichess-docker-compose
 ./setup.sh
 docker-compose up
 ```
