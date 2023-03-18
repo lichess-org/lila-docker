@@ -6,7 +6,7 @@
 ## Terminal 1:
 
 ```
-git clone https://github.com/fitztrev/lichess-docker.git
+git clone https://github.com/fitztrev/lichess-docker-compose.git
 cd lichess-docker
 ./setup.sh
 docker-compose up
