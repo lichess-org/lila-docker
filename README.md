@@ -21,7 +21,7 @@ docker compose run --rm -v $(pwd)/lila:/lila mongodb bash -c "mongo --host host.
 
 docker run --rm -v $(pwd)/lila-db-seed:/lila-db-seed python:3.9-slim bash -c "pip install pymongo && python /lila-db-seed/spamdb/spamdb.py --uri=mongodb://host.docker.internal/lichess"
 
-docker compose run --rm -v $(pwd)/scripts:/scripts mongodb bash -c "mongosh --host host.docker.internal lichess --file docker/scripts/mongodb/users.js"
+docker compose run --rm -v $(pwd)/docker/scripts:/scripts mongodb bash -c "mongosh --host host.docker.internal lichess --file /scripts/mongodb/users.js"
 ```
 
 ## Development Site
