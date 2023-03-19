@@ -5,7 +5,7 @@ echo "Cloning repos..."
 repos=(lila lila-ws lila-db-seed lila-engine)
 
 for repo in "${repos[@]}"; do
-    [ ! -d $repo ] && git clone --depth 1 https://github.com/lichess-org/$repo.git
+    [ ! -d $repo ] && git clone https://github.com/lichess-org/$repo.git
 done
 
 echo "Compiling js/css..."
