@@ -9,6 +9,6 @@ for repo in "${repos[@]}"; do
 done
 
 echo "Compiling js/css..."
-docker run --rm -v $(pwd):/mnt node:latest bash -c "npm install -g pnpm && pnpm config set store-dir false && /mnt/lila/ui/build"
+docker run --rm -v $(pwd):/mnt node:latest bash -c "npm install -g pnpm && /mnt/lila/ui/build"
 
 echo "Done!"
