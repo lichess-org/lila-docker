@@ -16,7 +16,9 @@ services:
       - 6379:6379
 
   lila:
-    image: sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.8.2_3.2.2
+    build:
+      context: .
+      dockerfile: lila.Dockerfile
     networks:
       - lila-network
     ports:
@@ -24,9 +26,14 @@ services:
     volumes:
       - ./lila:/lila
       - ./lila.conf:/lila/conf/application.conf
+    depends_on:
+      - mongodb
+      - redis
 
   lila-ws:
-    image: sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.8.2_3.2.2
+    build:
+      context: .
+      dockerfile: lila-ws.Dockerfile
     networks:
       - lila-network
     ports:
@@ -34,6 +41,8 @@ services:
     volumes:
       - ./lila-ws:/lila-ws
       - ./lila-ws.conf:/lila-ws.conf
+    depends_on:
+      - mongodb
 
   lila-engine:
     build:
