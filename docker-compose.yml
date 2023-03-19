@@ -17,7 +17,7 @@ services:
 
   lila:
     build:
-      context: .
+      context: docker
       dockerfile: lila.Dockerfile
     networks:
       - lila-network
@@ -25,14 +25,14 @@ services:
       - 9663:9663
     volumes:
       - ./lila:/lila
-      - ./lila.conf:/lila/conf/application.conf
+      - ./docker/conf/lila.conf:/lila/conf/application.conf
     depends_on:
       - mongodb
       - redis
 
   lila-ws:
     build:
-      context: .
+      context: docker
       dockerfile: lila-ws.Dockerfile
     networks:
       - lila-network
@@ -40,13 +40,13 @@ services:
       - 9664:9664
     volumes:
       - ./lila-ws:/lila-ws
-      - ./lila-ws.conf:/lila-ws.conf
+      - ./docker/conf/lila-ws.conf:/lila-ws.conf
     depends_on:
       - mongodb
 
   lila-engine:
     build:
-      context: .
+      context: docker
       dockerfile: lila-engine.Dockerfile
     networks:
       - lila-network
