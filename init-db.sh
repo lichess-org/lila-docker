@@ -12,5 +12,5 @@ docker compose run --rm -v $(pwd)/lila:/lila mongodb bash -c \
 docker compose run --rm python bash -c \
     "pip install pymongo && python /lila-db-seed/spamdb/spamdb.py --uri=mongodb://mongodb/lichess --password=$password --su-password=$su_password"
 
-docker compose run --rm -v $(pwd)/docker/scripts:/scripts mongodb bash -c \
+docker compose run --rm -v $(pwd)/scripts:/scripts mongodb bash -c \
     "mongosh --host mongodb lichess --file /scripts/mongodb/users.js"
