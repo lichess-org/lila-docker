@@ -6,7 +6,6 @@ let users = db.user4
   .map((user) => {
     return {
       username: user._id,
-      password: 'password',
       roles: user.roles.join(', '),
       title: user.title || '',
       marks: user.marks.join(', '),

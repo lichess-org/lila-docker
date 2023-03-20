@@ -5,15 +5,11 @@ services:
     image: mongo:5.0.15-focal
     networks:
       - lila-network
-    ports:
-      - 27017:27017
 
   redis:
     image: redis:alpine
     networks:
       - lila-network
-    ports:
-      - 6379:6379
 
   lila:
     build:
@@ -25,12 +21,9 @@ services:
       - 9663:9663
     volumes:
       - ./lila:/lila
-      - ./docker/conf/lila.conf:/lila/conf/application.conf
-    depends_on:
-      - mongodb
-      - redis
+      - ./conf/lila.conf:/lila/conf/application.conf
 
-  lila-ws:
+  lila_ws:
     build:
       context: docker
       dockerfile: lila-ws.Dockerfile
@@ -40,11 +33,9 @@ services:
       - 9664:9664
     volumes:
       - ./lila-ws:/lila-ws
-      - ./docker/conf/lila-ws.conf:/lila-ws.conf
-    depends_on:
-      - mongodb
+      - ./conf/lila-ws.conf:/lila-ws.conf
 
-  lila-engine:
+  lila_engine:
     build:
       context: docker
       dockerfile: lila-engine.Dockerfile
@@ -54,6 +45,37 @@ services:
       - 9666:9666
     volumes:
       - ./lila-engine:/lila-engine
+
+  lila_fishnet:
+    build:
+      context: docker
+      dockerfile: lila-fishnet.Dockerfile
+    networks:
+      - lila-network
+    volumes:
+      - ./lila-fishnet:/lila-fishnet
+      - ./conf/lila-fishnet.conf:/lila-fishnet/conf/application.conf
+
+  fishnet_play:
+    image: niklasf/fishnet
+    entrypoint: /fishnet --endpoint http://lila_fishnet:9665/fishnet --max-backoff 5
+    networks:
+      - lila-network
+
+  fishnet_analysis:
+    image: niklasf/fishnet
+    entrypoint: /fishnet --endpoint http://lila:9663/fishnet --max-backoff 5
+    networks:
+      - lila-network
+
+  python:
+    build:
+      context: docker
+      dockerfile: python.Dockerfile
+    networks:
+      - lila-network
+    volumes:
+      - ./lila-db-seed:/lila-db-seed
 
 networks:
   lila-network:

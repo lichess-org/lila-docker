@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo "Choose a password for admin users:"
+read -s su_password
+
+echo "Choose a password for regular users:"
+read -s password
+
+docker compose run --rm -v $(pwd)/lila:/lila mongodb bash -c \
+    "mongo --host mongodb lichess /lila/bin/mongodb/indexes.js"
+
+docker compose run --rm python bash -c \
+    "pip install pymongo && python /lila-db-seed/spamdb/spamdb.py --uri=mongodb://mongodb/lichess --password=$password --su-password=$su_password"
+
+docker compose run --rm -v $(pwd)/docker/scripts:/scripts mongodb bash -c \
+    "mongosh --host mongodb lichess --file /scripts/mongodb/users.js"

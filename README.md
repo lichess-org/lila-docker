@@ -1,9 +1,8 @@
 # Lichess Local Development
 
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and have it running
-2. Open 2 terminals
 
-## Terminal 1:
+2. Run these commands in your terminal:
 
 ```
 git clone https://github.com/fitztrev/lichess-docker-compose.git
@@ -12,23 +11,13 @@ cd lichess-docker-compose
 docker-compose up
 ```
 
-## Terminal 2:
+Might take a few minutes. Lila will be the last service to complete, at which point you can visit http://localhost:9663/ to see the site.
 
-Seed your database with test data:
+3. (Optional) Seed your database with test data:
 
 ```
-docker compose run --rm -v $(pwd)/lila:/lila mongodb bash -c "mongo --host host.docker.internal lichess /lila/bin/mongodb/indexes.js"
-
-docker run --rm -v $(pwd)/lila-db-seed:/lila-db-seed python:3.9-slim bash -c "pip install pymongo && python /lila-db-seed/spamdb/spamdb.py --uri=mongodb://host.docker.internal/lichess"
-
-docker compose run --rm -v $(pwd)/docker/scripts:/scripts mongodb bash -c "mongosh --host host.docker.internal lichess --file /scripts/mongodb/users.js"
+./init-db.sh
 ```
-
-## Development Site
-
-Visit: http://localhost:9663/
-
-Can login with `lichess`/`password` or any of the other logins displayed in the 2nd terminal.
 
 ## Usage
 
