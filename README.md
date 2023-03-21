@@ -1,5 +1,7 @@
 # Lichess Local Development
 
+## Instructions
+
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and have it running
 
 2. Run these commands in your terminal:
@@ -11,9 +13,11 @@ cd lichess-docker-compose
 docker-compose up
 ```
 
-Might take a few minutes. Lila will be the last service to complete, at which point you can visit http://localhost:9663/ to see the site.
+Might take 5-10 minutes. Some services will start before others and you may see errors in the logs until everything comes online.
 
-3. (Optional) Seed your database with test data:
+Lila will be the last service to complete, at which point you can visit http://localhost:9663/ to see the site.
+
+1. (Optional) Seed your database with test data:
 
 ```
 ./init-db.sh

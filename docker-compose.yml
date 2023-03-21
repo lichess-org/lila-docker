@@ -77,6 +77,15 @@ services:
     volumes:
       - ./lila-db-seed:/lila-db-seed
 
+  lila_gif:
+    build:
+      context: docker
+      dockerfile: lila-gif.Dockerfile
+    networks:
+      - lila-network
+    volumes:
+      - ./lila-gif:/lila-gif
+
 networks:
   lila-network:
     driver: bridge
