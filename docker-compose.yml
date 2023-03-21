@@ -93,6 +93,35 @@ services:
       - lila-network
     volumes:
       - ./lila-gif:/lila-gif
+  
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.0
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    networks:
+      - lila-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.5.0
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - 5601:5601
+    networks:
+      - lila-network
+    depends_on:
+      - elasticsearch
+
+  lila_search:
+    build:
+      context: docker
+      dockerfile: lila-search.Dockerfile
+    networks:
+      - lila-network
+    volumes:
+      - ./lila-search:/lila-search
+      - ./conf/lila-search.conf:/lila-search/conf/application.conf
 
 networks:
   lila-network:

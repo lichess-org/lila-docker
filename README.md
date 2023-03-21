@@ -30,3 +30,6 @@ To restart lila (after making changes to any Scala code):
 ```
 docker compose restart lila
 ```
+
+Elasticsearch indexes can be seen managed: http://localhost:5601/
+
