@@ -123,6 +123,13 @@ services:
       - ./lila-search:/lila-search
       - ./conf/lila-search.conf:/lila-search/conf/application.conf
 
+  picfit:
+    build:
+      context: docker
+      dockerfile: picfit.Dockerfile
+    networks:
+      - lila-network
+
 networks:
   lila-network:
     driver: bridge
