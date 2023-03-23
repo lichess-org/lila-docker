@@ -4,13 +4,28 @@
 
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and have it running
 
-2. Run these commands in your terminal:
+1. Set up the repos:
 
     ```
     git clone https://github.com/fitztrev/lichess-docker-compose.git
     cd lichess-docker-compose
     ./setup.sh
-    docker-compose up
+    ```
+
+1. Start the services:
+
+    ```
+    ## start the basic services (lila, lila-ws, mongodb, redis)
+    docker compose up
+
+    ## include stockfish services (for playing and analyzing)
+    COMPOSE_PROFILES=stockfish docker compose up
+
+    ## include external engine service
+    COMPOSE_PROFILES=external-engine docker compose up
+
+    ## include all optional services
+    COMPOSE_PROFILES=stockfish,external-engine,search,images docker compose up
     ```
 
     Might take 5-10 minutes. Some services will start before others and you may see errors in the logs until everything comes online.
