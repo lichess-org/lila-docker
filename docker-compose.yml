@@ -150,11 +150,11 @@ services:
       - images
 
   mailpit:
-      image: axllent/mailpit
-      ports:
-          - 8025:8025
-      networks:
-          - lila-network
+    image: axllent/mailpit
+    ports:
+      - 8025:8025
+    networks:
+      - lila-network
 
 networks:
   lila-network:
