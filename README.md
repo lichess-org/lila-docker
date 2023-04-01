@@ -47,3 +47,5 @@ docker compose restart lila
 ```
 
 Elasticsearch indexes can be managed at http://localhost:5601/
+
+Emails can be viewed at http://localhost:8025/
