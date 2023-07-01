@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   mongodb:
-    image: mongo:5.0.15-focal
+    image: mongo:5.0.18-focal
     networks:
       - lila-network
 
