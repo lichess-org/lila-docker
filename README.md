@@ -52,6 +52,8 @@ To restart lila (after making changes to any Scala code):
 docker compose restart lila
 ```
 
+Mongodb database indexes and records can be viewed at http://localhost:8081/
+
 Elasticsearch indexes can be managed at http://localhost:5601/
 
 Emails can be viewed at http://localhost:8025/

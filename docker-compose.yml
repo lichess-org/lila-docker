@@ -156,6 +156,18 @@ services:
       - 8025:8025
     networks:
       - lila-network
+  
+  mongo_express:
+    image: mongo-express
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_MONGODB_PORT=27017
+    networks:
+      - lila-network
+    depends_on:
+      - mongodb
 
 networks:
   lila-network:
