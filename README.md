@@ -36,7 +36,7 @@
 
     Lila will be the last service to complete, at which point you can visit http://localhost:8080/ to see the site.
 
-1. (Optional) Seed your database with test data:
+1. (Optional, but recommended) Seed your database with test data (users, games, etc):
 
     ```
     ./init-db.sh
@@ -56,8 +56,11 @@ To restart lila (after making changes to any Scala code):
 docker compose restart lila
 ```
 
-Mongodb database indexes and records can be viewed at http://localhost:8081/
-
-Elasticsearch indexes can be managed at http://localhost:5601/
-
-Emails can be viewed at http://localhost:8025/
+| Service               | URL                                                                                      |
+| --------------------- | ---------------------------------------------------------------------------------------- |
+| Main Lichess instance | http://localhost:8080/                                                                   |
+| lila-gif              | http://localhost:6175/image.gif http://localhost:6175/image.gif?fen=4k3/6KP/8/8/8/8/7p/8 |
+| Picfit                | http://localhost:3001/healthcheck                                                        |
+| Mongodb manager       | http://localhost:8081/                                                                   |
+| Elasticsearch manager | http://localhost:5601/                                                                   |
+| Email inbox           | http://localhost:8025/                                                                   |

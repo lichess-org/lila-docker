@@ -134,6 +134,8 @@ services:
     build:
       context: docker
       dockerfile: lila-gif.Dockerfile
+    ports:
+      - 6175:6175
     networks:
       - lila-network
     volumes:
@@ -145,6 +147,8 @@ services:
     build:
       context: docker
       dockerfile: picfit.Dockerfile
+    ports:
+      - 3001:3001
     networks:
       - lila-network
     profiles:
