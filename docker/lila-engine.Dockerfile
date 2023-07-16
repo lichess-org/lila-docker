@@ -1,4 +1,4 @@
-FROM rust:latest
+FROM rust:1.71
 
 ENV LILA_ENGINE_LOG=lila_engine=debug,tower_http=debug
 

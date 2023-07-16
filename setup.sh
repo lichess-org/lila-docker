@@ -15,6 +15,6 @@ cd ..
 echo "Compiling js/css..."
 docker run --rm -v $(pwd):/mnt node:latest bash -c "npm install -g pnpm && /mnt/lila/ui/build"
 
-docker-compose build
+COMPOSE_PROFILES=$(docker-compose config --profiles | xargs | sed -e 's/ /,/g') docker-compose build
 
 echo "Done!"
