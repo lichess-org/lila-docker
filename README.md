@@ -17,14 +17,18 @@
     ```
     ## start the basic services (lila, lila-ws, mongodb, redis)
     docker compose up
+    ```
 
+    Or to include optional services, depending on what you're working on, apply the appropriate profile(s):
+
+    ```
     ## include stockfish services (for playing and analyzing)
     COMPOSE_PROFILES=stockfish docker compose up
 
     ## include external engine service
     COMPOSE_PROFILES=external-engine docker compose up
 
-    ## include all optional services
+    ## include ALL optional services
     COMPOSE_PROFILES=stockfish,external-engine,search,images docker compose up
     ```
 
