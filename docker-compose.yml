@@ -45,6 +45,15 @@ services:
       - lila
       - lila_ws
 
+  api_docs:
+    build:
+      context: docker
+      dockerfile: api-docs.Dockerfile
+    ports:
+      - 8089:8089
+    volumes:
+      - ./api:/api
+
   lila_engine:
     build:
       context: docker

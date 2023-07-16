@@ -1,5 +1,6 @@
 .pnpm-store
 
+api
 lila
 lila-db-seed
 lila-engine

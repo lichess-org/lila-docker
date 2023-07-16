@@ -59,6 +59,7 @@ docker compose restart lila
 | Service               | URL                                                                                      |
 | --------------------- | ---------------------------------------------------------------------------------------- |
 | Main Lichess instance | http://localhost:8080/                                                                   |
+| API docs              | http://localhost:8089/                                                                   |
 | lila-gif              | http://localhost:6175/image.gif http://localhost:6175/image.gif?fen=4k3/6KP/8/8/8/8/7p/8 |
 | Picfit                | http://localhost:3001/healthcheck                                                        |
 | Mongodb manager       | http://localhost:8081/                                                                   |
