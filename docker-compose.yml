@@ -54,6 +54,15 @@ services:
     volumes:
       - ./api:/api
 
+  pgn_viewer:
+    build:
+      context: docker
+      dockerfile: pgn-viewer.Dockerfile
+    ports:
+      - 8090:8080
+    volumes:
+      - ./pgn-viewer:/pgn-viewer
+
   lila_engine:
     build:
       context: docker
