@@ -8,7 +8,7 @@ read -s password
 
 echo "Adding test data..."
 
-docker compose run --rm -v $(pwd)/lila:/lila mongodb bash -c \
+docker compose run --rm -v $(pwd)/repos/lila:/lila mongodb bash -c \
     "mongo --host mongodb lichess /lila/bin/mongodb/indexes.js"
 
 docker compose run --rm python bash -c \
