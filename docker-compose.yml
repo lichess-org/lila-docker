@@ -113,6 +113,8 @@ services:
       - lila-network
     volumes:
       - ./repos/lila-db-seed:/lila-db-seed
+    profiles:
+      - utils
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.5.0
