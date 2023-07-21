@@ -52,6 +52,7 @@
 | Service               | URL                                                      |
 | --------------------- | -------------------------------------------------------- |
 | Main lila instance    | http://localhost:8080/                                   |
+| Chessground demo      | http://localhost:8080/chessground/demo.html              |
 | API docs              | http://localhost:8089/                                   |
 | PGN Viewer            | http://localhost:8090/                                   |
 | lila-gif              | http://localhost:6175/image.gif?fen=4k3/6KP/8/8/8/8/7p/8 |
@@ -79,6 +80,13 @@ Code formatting:
 ```
 # lila scalafmtAll
 docker run --rm -v $(pwd)/repos/lila:/mnt sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 bash -c "cd /mnt && sbt scalafmtAll"
+```
+
+Chessground:
+
+```
+# watch for changes
+docker run --rm -v $(pwd)/repos/chessground:/mnt node:latest bash -c "npm install -g pnpm && cd /mnt && pnpm install && pnpm run compile -- --watch"
 ```
 
 Scalachess:

@@ -41,6 +41,7 @@ services:
       - ./conf/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./repos/lila/public:/lila/public
       - ./repos/lifat:/lifat
+      - ./repos/chessground:/chessground
     depends_on:
       - lila
       - lila_ws
