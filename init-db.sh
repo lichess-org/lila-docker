@@ -1,10 +1,18 @@
 #!/bin/bash
 
-echo "Choose a password for admin users:"
+echo "Choose a password for admin users (blank for 'password'):"
 read -s su_password
 
-echo "Choose a password for regular users:"
+echo "Choose a password for regular users (blank for 'password'):"
 read -s password
+
+if [ -z "$su_password" ]; then
+    su_password="password"
+fi
+
+if [ -z "$password" ]; then
+    password="password"
+fi
 
 echo "Adding test data..."
 
