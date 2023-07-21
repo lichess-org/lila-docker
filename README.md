@@ -4,10 +4,15 @@
 
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and have it running
 
-1. Set up the repos:
+1. Clone this repo:
 
     ```
     git clone https://github.com/fitztrev/lichess-docker-compose.git
+    ```
+
+1. Setup the Lichess repos:
+
+    ```
     cd lichess-docker-compose
     ./setup.sh
     ```
@@ -42,6 +47,19 @@
     ./init-db.sh
     ```
 
+## URLs
+
+| Service               | URL                                                      |
+| --------------------- | -------------------------------------------------------- |
+| Main lila instance    | http://localhost:8080/                                   |
+| API docs              | http://localhost:8089/                                   |
+| PGN Viewer            | http://localhost:8090/                                   |
+| lila-gif              | http://localhost:6175/image.gif?fen=4k3/6KP/8/8/8/8/7p/8 |
+| Picfit                | http://localhost:3001/healthcheck                        |
+| Mongodb manager       | http://localhost:8081/                                   |
+| Elasticsearch manager | http://localhost:5601/                                   |
+| Email inbox           | http://localhost:8025/                                   |
+
 ## Usage
 
 To watch for Typescript/SCSS changes and automatically recompile:
@@ -56,13 +74,22 @@ To restart lila (after making changes to any Scala code):
 docker compose restart lila
 ```
 
-| Service               | URL                                                      |
-| --------------------- | -------------------------------------------------------- |
-| Main lila instance    | http://localhost:8080/                                   |
-| API docs              | http://localhost:8089/                                   |
-| PGN Viewer            | http://localhost:8090/                                   |
-| lila-gif              | http://localhost:6175/image.gif?fen=4k3/6KP/8/8/8/8/7p/8 |
-| Picfit                | http://localhost:3001/healthcheck                        |
-| Mongodb manager       | http://localhost:8081/                                   |
-| Elasticsearch manager | http://localhost:5601/                                   |
-| Email inbox           | http://localhost:8025/                                   |
+Code formatting:
+
+```
+# lila scalafmtAll
+docker run --rm -v $(pwd)/repos/lila:/mnt sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 bash -c "cd /mnt && sbt scalafmtAll"
+```
+
+Scalachess:
+
+```
+## compile
+docker run --rm -v $(pwd)/repos/scalachess:/mnt sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 bash -c "cd /mnt && sbt compile"
+
+## test
+docker run --rm -v $(pwd)/repos/scalachess:/mnt sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 bash -c "cd /mnt && sbt test"
+
+## package
+docker run --rm -v $(pwd)/repos/scalachess:/mnt sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 bash -c "cd /mnt && sbt package"
+```

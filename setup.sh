@@ -2,7 +2,7 @@
 
 echo "Cloning repos..."
 
-repos=(lila lila-ws lila-db-seed lila-engine lila-fishnet lila-gif lila-search lifat api pgn-viewer)
+repos=(lila lila-ws lila-db-seed lila-engine lila-fishnet lila-gif lila-search lifat scalachess api pgn-viewer)
 
 for repo in "${repos[@]}"; do
     [ ! -d repos/$repo ] && git clone https://github.com/lichess-org/$repo.git repos/$repo
