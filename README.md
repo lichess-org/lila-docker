@@ -47,7 +47,7 @@
 To watch for Typescript/SCSS changes and automatically recompile:
 
 ```
-docker run --rm -v $(pwd):/mnt node:latest bash -c "npm install -g pnpm && /mnt/lila/ui/build -w"
+docker run --rm -v $(pwd)/repos/lila:/mnt node:latest bash -c "npm install -g pnpm && /mnt/ui/build -w"
 ```
 
 To restart lila (after making changes to any Scala code):
