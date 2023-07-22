@@ -7,7 +7,7 @@
 1. Clone this repo:
 
     ```
-    git clone https://github.com/fitztrev/lichess-docker-compose.git
+    git clone https://github.com/fitztrev/lichess-docker-compose
     ```
 
 1. Setup the Lichess repos:
@@ -100,4 +100,19 @@ docker run --rm -v $(pwd)/repos/scalachess:/mnt sbtscala/scala-sbt:eclipse-temur
 
 ## package
 docker run --rm -v $(pwd)/repos/scalachess:/mnt sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 bash -c "cd /mnt && sbt package"
+```
+
+bbpPairings:
+
+```
+docker build -f docker/bbpPairings.Dockerfile . -t bbppairings
+docker run --rm -v $(pwd)/repos:/mnt bbppairings bash -c "\
+    git clone https://github.com/cyanfish/bbpPairings \
+    && cd bbpPairings \
+    && make \
+    && chmod +x bbpPairings.exe \
+    && cp bbpPairings.exe /mnt"
+
+## verify
+./repos/bbpPairings.exe
 ```

@@ -22,6 +22,7 @@ services:
       - lila-network
     volumes:
       - ./repos/lila:/lila
+      - ./repos/bbpPairings.exe:/opt/bbpPairings.exe
       - ./conf/lila.conf:/lila/conf/application.conf
 
   lila_ws:
