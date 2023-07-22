@@ -3,11 +3,13 @@ version: '3.8'
 services:
   mongodb:
     image: mongo:5.0.18-focal
+    restart: unless-stopped
     networks:
       - lila-network
 
   redis:
     image: redis:alpine
+    restart: unless-stopped
     networks:
       - lila-network
 
@@ -15,6 +17,7 @@ services:
     build:
       context: docker
       dockerfile: lila.Dockerfile
+    restart: unless-stopped
     networks:
       - lila-network
     volumes:
@@ -25,6 +28,7 @@ services:
     build:
       context: docker
       dockerfile: lila-ws.Dockerfile
+    restart: unless-stopped
     networks:
       - lila-network
     volumes:
@@ -42,6 +46,7 @@ services:
       - ./repos/lila/public:/lila/public
       - ./repos/lifat:/lifat
       - ./repos/chessground:/chessground
+      - ./nginx:/nginx
     depends_on:
       - lila
       - lila_ws
@@ -184,6 +189,7 @@ services:
   
   mongo_express:
     image: mongo-express
+    restart: unless-stopped
     ports:
       - 8081:8081
     environment:

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="5">
+    <style>
+        html {
+            background: #161512;
+            font-size: 1.2rem;
+        }
+        .container {
+            font-family: sans-serif;
+            width: 80%;
+            margin: 0 auto;
+        }
+        .error {
+            background: #5d2929;
+            font-size: 1.4rem;
+            margin: 4rem 0 3rem;
+            padding: 1rem;
+        }
+        footer {
+            border-top: 1px solid #bababa;
+            margin-top: 3rem;
+            padding-top: 1rem;
+        }
+        * {
+            color: #bababa;
+        }
+    </style>
+    <title>lila-docker</title>
+</head>
+<body>
+    <div class="container">
+        <h2>lila-docker</h2>
+
+        <p class="error">The lila process is not currently running and/or port 9663 is not yet available.</p>
+
+        <h3>To Fix:</h3>
+        <p>If you're just starting your environment, wait until lila finishes compiling. It will automatically start after about 8-10 minutes.</p>
+        <p>Check the status in the lila service within Docker. Restart it manually if necessary.</p>
+        <p>For the full documentation, see <a href="https://github.com/fitztrev/lichess-docker-compose">https://github.com/fitztrev/lichess-docker-compose</a></p>
+
+        <footer>Nginx Error: <!--# echo var="status" default="" --></footer>
+    </div>
+</body>
+</html>
