@@ -78,6 +78,9 @@ docker compose restart lila
 Code formatting:
 
 ```
+# pnpm run lint
+docker run --rm -v $(pwd)/repos/lila:/mnt node:latest bash -c "npm install -g pnpm && cd /mnt && pnpm install && pnpm run lint"
+
 # lila scalafmtAll
 docker run --rm -v $(pwd)/repos/lila:/mnt sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 bash -c "cd /mnt && sbt scalafmtAll"
 ```
