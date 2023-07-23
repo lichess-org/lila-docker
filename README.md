@@ -89,6 +89,12 @@ Chessground:
 docker run --rm -v $(pwd)/repos/chessground:/mnt node:latest bash -c "npm install -g pnpm && cd /mnt && pnpm install && pnpm run compile -- --watch"
 ```
 
+Berserk (Python library):
+
+```
+docker run --rm -v $(pwd)/repos/berserk:/berserk -v $(pwd)/scripts:/scripts python:latest bash -c "cd /berserk && pip install -e . && python /scripts/berserk-example.py"
+```
+
 Scalachess:
 
 ```
