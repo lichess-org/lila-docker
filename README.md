@@ -1,4 +1,8 @@
-# Lichess Local Development
+# lila-docker
+
+Lichess local development using Docker Compose.
+
+The only requirements for running on your local machine are `git` and Docker Desktop. All the other dependencies (Scala, MongoDB, Node.js, etc) are installed and run in Docker containers.
 
 ## Instructions
 
@@ -6,27 +10,27 @@
 
 1. Clone this repo:
 
-    ```
-    git clone https://github.com/fitztrev/lichess-docker-compose
+    ```bash
+    git clone https://github.com/fitztrev/lila-docker
     ```
 
 1. Setup the Lichess repos:
 
-    ```
-    cd lichess-docker-compose
+    ```bash
+    cd lila-docker
     ./setup.sh
     ```
 
 1. Start the services:
 
-    ```
+    ```bash
     ## start the basic services (lila, lila-ws, mongodb, redis)
     docker compose up
     ```
 
     Or to include optional services, depending on what you're working on, apply the appropriate profile(s):
 
-    ```
+    ```bash
     ## include stockfish services (for playing and analyzing)
     COMPOSE_PROFILES=stockfish docker compose up
 
@@ -43,40 +47,45 @@
 
 1. (Optional, but recommended) Seed your database with test data (users, games, etc):
 
-    ```
+    In a separate terminal:
+
+    ```bash
     ./init-db.sh
     ```
 
 ## URLs
 
-| Service               | URL                                                      |
-| --------------------- | -------------------------------------------------------- |
-| Main lila instance    | http://localhost:8080/                                   |
-| Chessground demo      | http://localhost:8080/chessground/demo.html              |
-| API docs              | http://localhost:8089/                                   |
-| PGN Viewer            | http://localhost:8090/                                   |
-| lila-gif              | http://localhost:6175/image.gif?fen=4k3/6KP/8/8/8/8/7p/8 |
-| Picfit                | http://localhost:3001/healthcheck                        |
-| Mongodb manager       | http://localhost:8081/                                   |
-| Elasticsearch manager | http://localhost:5601/                                   |
-| Email inbox           | http://localhost:8025/                                   |
+| Service               | URL                                                      | Profile |
+| --------------------- | -------------------------------------------------------- | ------- |
+| Main lila instance    | http://localhost:8080/                                   | \*      |
+| Chessground demo      | http://localhost:8080/chessground/demo.html              | \*      |
+| API docs              | http://localhost:8089/                                   | \*      |
+| PGN Viewer            | http://localhost:8090/                                   | \*      |
+| Mongodb manager       | http://localhost:8081/                                   | \*      |
+| Email inbox           | http://localhost:8025/                                   | \*      |
+| lila-gif              | http://localhost:6175/image.gif?fen=4k3/6KP/8/8/8/8/7p/8 | images  |
+| Picfit                | http://localhost:3001/healthcheck                        | images  |
+| Elasticsearch manager | http://localhost:5601/                                   | search  |
 
 ## Usage
 
 ### Scala Metals (IDE helper):
 
-1. In VSCode, install the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
-2. Open the `repos/lila` folder in a new VSCode window
+1. In VS Code, install the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
+2. Open the `repos/lila` folder in a new VS Code window
 3. Cmd+Shift+P > "Dev Containers: Attach to Running Container"
-4. Select the "lila" container
-5. Install the Scala Metals extension (Cmd+Shift+X > "Scala (Metals)")
-6. Cmd+Shift+P > "Metals: Import build"
+4. Select the "lila-docker-lila-1" container
+5. A new VS Code window will open, attached to the container
+6. Install the Scala Metals extension (Cmd+Shift+X > "Scala (Metals)")
+7. Cmd+Shift+P > "Metals: Import build"
+
+Once the build has been imported, you should have code completion, go to definition, etc when you open a Scala file.
 
 ### Scala development:
 
 To restart lila (after making changes to any Scala code):
 
-```
+```bash
 docker compose restart lila
 ```
 
@@ -84,20 +93,20 @@ docker compose restart lila
 
 To watch for Typescript/SCSS changes and automatically recompile:
 
-```
+```bash
 docker run --rm -v $(pwd)/repos/lila:/mnt node:latest bash -c "npm install -g pnpm && /mnt/ui/build -w"
 ```
 
 #### Chessground:
 
-```
+```bash
 # watch for changes
 docker run --rm -v $(pwd)/repos/chessground:/mnt node:latest bash -c "npm install -g pnpm && cd /mnt && pnpm install && pnpm run compile -- --watch"
 ```
 
 ### Code formatting:
 
-```
+```bash
 # pnpm run lint
 docker run --rm -v $(pwd)/repos/lila:/mnt node:latest bash -c "npm install -g pnpm && cd /mnt && pnpm install && pnpm run lint"
 
@@ -107,13 +116,15 @@ docker run --rm -v $(pwd)/repos/lila:/mnt sbtscala/scala-sbt:eclipse-temurin-foc
 
 ### Berserk (Python library):
 
-```
+To install the development version of [Berserk](https://github.com/lichess-org/berserk) and run a sample script against your local development site:
+
+```bash
 docker run --rm -v $(pwd)/repos/berserk:/berserk -v $(pwd)/scripts:/scripts python:latest bash -c "cd /berserk && pip install -e . && python /scripts/berserk-example.py"
 ```
 
 ### Scalachess:
 
-```
+```bash
 ## compile
 docker run --rm -v $(pwd)/repos/scalachess:/mnt sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 bash -c "cd /mnt && sbt compile"
 
@@ -126,7 +137,7 @@ docker run --rm -v $(pwd)/repos/scalachess:/mnt sbtscala/scala-sbt:eclipse-temur
 
 ### bbpPairings:
 
-```
+```bash
 docker build -f docker/bbpPairings.Dockerfile . -t bbppairings
 docker run --rm -v $(pwd)/repos:/mnt bbppairings bash -c "\
     git clone https://github.com/cyanfish/bbpPairings \

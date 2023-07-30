@@ -22,6 +22,8 @@ services:
       - lila-network
     volumes:
       - ./repos/lila:/lila
+      - ./repos/chessground:/chessground
+      - ./repos/pgn-viewer:/pgn-viewer
       - ./repos/bbpPairings.exe:/opt/bbpPairings.exe
       - ./conf/lila.conf:/lila/conf/application.conf
 
