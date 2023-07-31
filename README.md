@@ -91,7 +91,7 @@ docker run --rm -v $(pwd)/repos/lila:/mnt node:latest \
 ```bash
 # watch for changes
 docker run --rm -v $(pwd)/repos/chessground:/mnt node:latest \
-    bash -c "npm install -g pnpm && cd /mnt && pnpm install && pnpm run compile -- --watch"
+    bash -c "npm install -g pnpm && cd /mnt && pnpm install && pnpm run compile --watch"
 ```
 
 Then you can see the updated chessground demo at http://localhost:8080/chessground/demo.html
@@ -120,7 +120,7 @@ docker run --rm -v $(pwd)/repos/berserk:/berserk -v $(pwd)/scripts:/scripts pyth
 
 ### Scala Metals (IDE helper):
 
-1. In VS Code, install the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+1. In VS Code, open this `lila-docker` project and install the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 3. Cmd+Shift+P > "Dev Containers: Reopen in Container"
 4. A new VS Code window will open, attached to the container instead of your host machine
 5. File > Open Folder > "/workspaces/lila-docker/repos/lila" (or whichever Scala project you want to work on)
