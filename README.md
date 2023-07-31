@@ -69,18 +69,6 @@ The only requirements for running on your local machine are `git` and Docker Des
 
 ## Usage
 
-### Scala Metals (IDE helper):
-
-1. In VS Code, install the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
-2. Open the `repos/lila` folder in a new VS Code window
-3. Cmd+Shift+P > "Dev Containers: Attach to Running Container"
-4. Select the "lila-docker-lila-1" container
-5. A new VS Code window will open, attached to the container
-6. Install the Scala Metals extension (Cmd+Shift+X > "Scala (Metals)")
-7. Cmd+Shift+P > "Metals: Import build"
-
-Once the build has been imported, you should have code completion, go to definition, etc when you open a Scala file.
-
 ### Scala development:
 
 To restart lila (after making changes to any Scala code):
@@ -94,24 +82,29 @@ docker compose restart lila
 To watch for Typescript/SCSS changes and automatically recompile:
 
 ```bash
-docker run --rm -v $(pwd)/repos/lila:/mnt node:latest bash -c "npm install -g pnpm && /mnt/ui/build -w"
+docker run --rm -v $(pwd)/repos/lila:/mnt node:latest \
+    bash -c "npm install -g pnpm && /mnt/ui/build -w"
 ```
 
 #### Chessground:
 
 ```bash
 # watch for changes
-docker run --rm -v $(pwd)/repos/chessground:/mnt node:latest bash -c "npm install -g pnpm && cd /mnt && pnpm install && pnpm run compile -- --watch"
+docker run --rm -v $(pwd)/repos/chessground:/mnt node:latest \
+    bash -c "npm install -g pnpm && cd /mnt && pnpm install && pnpm run compile -- --watch"
 ```
 
 ### Code formatting:
 
 ```bash
 # pnpm run lint
-docker run --rm -v $(pwd)/repos/lila:/mnt node:latest bash -c "npm install -g pnpm && cd /mnt && pnpm install && pnpm run lint"
+docker run --rm -v $(pwd)/repos/lila:/mnt node:latest \
+    bash -c "npm install -g pnpm && cd /mnt && pnpm install && pnpm run lint"
 
 # lila scalafmtAll
-docker run --rm -v $(pwd)/repos/lila:/mnt sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 bash -c "cd /mnt && sbt scalafmtAll"
+docker run --rm -v $(pwd)/repos/lila:/mnt \
+    sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 \
+    bash -c "cd /mnt && sbt scalafmtAll"
 ```
 
 ### Berserk (Python library):
@@ -119,20 +112,38 @@ docker run --rm -v $(pwd)/repos/lila:/mnt sbtscala/scala-sbt:eclipse-temurin-foc
 To install the development version of [Berserk](https://github.com/lichess-org/berserk) and run a sample script against your local development site:
 
 ```bash
-docker run --rm -v $(pwd)/repos/berserk:/berserk -v $(pwd)/scripts:/scripts python:latest bash -c "cd /berserk && pip install -e . && python /scripts/berserk-example.py"
+docker run --rm -v $(pwd)/repos/berserk:/berserk -v $(pwd)/scripts:/scripts python:latest \
+    bash -c "cd /berserk && pip install -e . && python /scripts/berserk-example.py"
 ```
+
+### Scala Metals (IDE helper):
+
+1. In VS Code, install the [Dev Containers](https://marketplace.
+3. Cmd+Shift+P > "Dev Containers: Reopen in Container"
+4. A new VS Code window will open, attached to the container instead of your host machine
+5. File > Open Folder > "/workspaces/lila-docker/repos/lila" (or whichever Scala project you want to work on)
+6. Install + Enable the Scala Metals extension (Cmd+Shift+X > "Scala (Metals)")
+7. Cmd+Shift+P > "Metals: Import build"
+
+Once the build has been imported, you should have code completion, go to definition, etc when you open a Scala file.
 
 ### Scalachess:
 
 ```bash
 ## compile
-docker run --rm -v $(pwd)/repos/scalachess:/mnt sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 bash -c "cd /mnt && sbt compile"
+docker run --rm -v $(pwd)/repos/scalachess:/mnt \
+    sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 \
+    bash -c "cd /mnt && sbt compile"
 
 ## test
-docker run --rm -v $(pwd)/repos/scalachess:/mnt sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 bash -c "cd /mnt && sbt test"
+docker run --rm -v $(pwd)/repos/scalachess:/mnt \
+    sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 \
+    bash -c "cd /mnt && sbt test"
 
 ## package
-docker run --rm -v $(pwd)/repos/scalachess:/mnt sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 bash -c "cd /mnt && sbt package"
+docker run --rm -v $(pwd)/repos/scalachess:/mnt \
+    sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 \
+    bash -c "cd /mnt && sbt package"
 ```
 
 ### bbpPairings:
