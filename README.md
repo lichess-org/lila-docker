@@ -101,7 +101,7 @@ docker run --rm -v $(pwd)/repos/chessground:/mnt node:latest \
 docker run --rm -v $(pwd)/repos/lila:/mnt node:latest \
     bash -c "npm install -g pnpm && cd /mnt && pnpm install && pnpm run lint"
 
-# lila scalafmtAll
+# sbt scalafmtAll
 docker run --rm -v $(pwd)/repos/lila:/mnt \
     sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 \
     bash -c "cd /mnt && sbt scalafmtAll"
@@ -118,7 +118,7 @@ docker run --rm -v $(pwd)/repos/berserk:/berserk -v $(pwd)/scripts:/scripts pyth
 
 ### Scala Metals (IDE helper):
 
-1. In VS Code, install the [Dev Containers](https://marketplace.
+1. In VS Code, install the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 3. Cmd+Shift+P > "Dev Containers: Reopen in Container"
 4. A new VS Code window will open, attached to the container instead of your host machine
 5. File > Open Folder > "/workspaces/lila-docker/repos/lila" (or whichever Scala project you want to work on)
