@@ -94,6 +94,8 @@ docker run --rm -v $(pwd)/repos/chessground:/mnt node:latest \
     bash -c "npm install -g pnpm && cd /mnt && pnpm install && pnpm run compile -- --watch"
 ```
 
+Then you can see the updated chessground demo at http://localhost:8080/chessground/demo.html
+
 ### Code formatting:
 
 ```bash
