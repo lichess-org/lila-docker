@@ -19,6 +19,6 @@ docker run --rm -v $(pwd)/repos/lila:/mnt node:latest bash -c "git config --glob
 echo "Compiling chessground..."
 docker run --rm -v $(pwd)/repos/chessground:/mnt node:latest bash -c "git config --global --add safe.directory /mnt && npm install -g pnpm && cd /mnt && pnpm install && pnpm run compile"
 
-COMPOSE_PROFILES=$(docker-compose config --profiles | xargs | sed -e 's/ /,/g') docker-compose build
+COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose build
 
 echo "Done!"
