@@ -14,10 +14,10 @@ git submodule update --init
 cd ../..
 
 echo "Compiling lila js/css..."
-docker run --rm -v $(pwd)/repos/lila:/mnt node:latest bash -c "npm install -g pnpm && /mnt/ui/build"
+docker run --rm -v $(pwd)/repos/lila:/mnt node:latest bash -c "git config --global --add safe.directory /mnt && npm install -g pnpm && /mnt/ui/build"
 
 echo "Compiling chessground..."
-docker run --rm -v $(pwd)/repos/chessground:/mnt node:latest bash -c "npm install -g pnpm && cd /mnt && pnpm install && pnpm run compile"
+docker run --rm -v $(pwd)/repos/chessground:/mnt node:latest bash -c "git config --global --add safe.directory /mnt && npm install -g pnpm && cd /mnt && pnpm install && pnpm run compile"
 
 COMPOSE_PROFILES=$(docker-compose config --profiles | xargs | sed -e 's/ /,/g') docker-compose build
 
