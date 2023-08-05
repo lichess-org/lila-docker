@@ -184,7 +184,7 @@ services:
       - images
 
   mailpit:
-    image: axllent/mailpit:v1.7.1
+    image: axllent/mailpit:v1.8.0
     ports:
       - 8025:8025
     networks:
