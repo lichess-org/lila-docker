@@ -86,6 +86,14 @@ docker run --rm -v $(pwd)/repos/lila:/mnt node:latest \
     bash -c "npm install -g pnpm && /mnt/ui/build -w"
 ```
 
+### To add translation keys:
+
+After modifying a `translation/source/*.xml` file, run:
+
+```bash
+docker run --rm -v $(pwd)/repos/lila:/mnt node:latest bash -c "/mnt/bin/trans-dump"
+```
+
 #### Chessground:
 
 ```bash
