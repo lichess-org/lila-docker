@@ -53,6 +53,17 @@ The only requirements for running on your local machine are `git` and Docker Des
     ./init-db.sh
     ```
 
+### Shutting down / Resetting
+
+When you're done working, you can shut down the services with:
+
+```bash
+COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose down
+
+## or to destroy the volumes (completely resetting the database)
+COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose down -v
+```
+
 ## URLs
 
 | Service               | URL                                                      | Profile |
