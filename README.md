@@ -82,8 +82,7 @@ docker compose restart lila
 To watch for Typescript/SCSS changes and automatically recompile:
 
 ```bash
-docker run --rm -v $(pwd)/repos/lila:/mnt node:latest \
-    bash -c "npm install -g pnpm && /mnt/ui/build -w"
+docker compose run --rm ui bash -c "/lila/ui/build -w"
 ```
 
 ### To add translation keys:
@@ -91,15 +90,14 @@ docker run --rm -v $(pwd)/repos/lila:/mnt node:latest \
 After modifying a `translation/source/*.xml` file, run:
 
 ```bash
-docker run --rm -v $(pwd)/repos/lila:/mnt node:latest bash -c "/mnt/bin/trans-dump"
+docker compose run --rm ui bash -c "/lila/bin/trans-dump"
 ```
 
 #### Chessground:
 
 ```bash
 # watch for changes
-docker run --rm -v $(pwd)/repos/chessground:/mnt node:latest \
-    bash -c "npm install -g pnpm && cd /mnt && pnpm install && pnpm run compile --watch"
+docker compose run --rm ui bash -c "cd /chessground && pnpm install && pnpm run compile --watch"
 ```
 
 Then you can see the updated chessground demo at http://localhost:8080/chessground/demo.html
@@ -108,8 +106,7 @@ Then you can see the updated chessground demo at http://localhost:8080/chessgrou
 
 ```bash
 # pnpm run lint
-docker run --rm -v $(pwd)/repos/lila:/mnt node:latest \
-    bash -c "npm install -g pnpm && cd /mnt && pnpm install && pnpm run lint"
+docker compose run --rm ui bash -c "cd /chessground && pnpm install && pnpm run lint"
 
 # sbt scalafmtAll
 docker run --rm -v $(pwd)/repos/lila:/mnt \

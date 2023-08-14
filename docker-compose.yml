@@ -124,6 +124,19 @@ services:
     profiles:
       - utils
 
+  ui:
+    build:
+      context: docker
+      dockerfile: ui.Dockerfile
+    networks:
+      - lila-network
+    volumes:
+      - ./repos/lila:/lila
+      - ./repos/chessground:/chessground
+      - ./repos/pgn-viewer:/pgn-viewer
+    profiles:
+      - utils
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.5.0
     environment:

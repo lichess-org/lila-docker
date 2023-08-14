@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 echo "Choose a password for admin users (blank for 'password'):"
 read -s su_password
