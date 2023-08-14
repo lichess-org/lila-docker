@@ -93,15 +93,6 @@ After modifying a `translation/source/*.xml` file, run:
 docker compose run --rm ui bash -c "/lila/bin/trans-dump"
 ```
 
-#### Chessground:
-
-```bash
-# watch for changes
-docker compose run --rm ui bash -c "cd /chessground && pnpm install && pnpm run compile --watch"
-```
-
-Then you can see the updated chessground demo at http://localhost:8080/chessground/demo.html
-
 ### Code formatting:
 
 ```bash
@@ -126,11 +117,11 @@ docker run --rm -v $(pwd)/repos/berserk:/berserk -v $(pwd)/scripts:/scripts pyth
 ### Scala Metals (IDE helper):
 
 1. In VS Code, open this `lila-docker` project and install the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-3. Cmd+Shift+P > "Dev Containers: Reopen in Container"
-4. A new VS Code window will open, attached to the container instead of your host machine
-5. File > Open Folder > "/workspaces/lila-docker/repos/lila" (or whichever Scala project you want to work on)
-6. Install + Enable the Scala Metals extension (Cmd+Shift+X > "Scala (Metals)")
-7. Cmd+Shift+P > "Metals: Import build"
+2. Cmd+Shift+P > "Dev Containers: Reopen in Container"
+3. A new VS Code window will open, attached to the container instead of your host machine
+4. File > Open Folder > "/workspaces/lila-docker/repos/lila" (or whichever Scala project you want to work on)
+5. Install + Enable the Scala Metals extension (Cmd+Shift+X > "Scala (Metals)")
+6. Cmd+Shift+P > "Metals: Import build"
 
 Once the build has been imported, you should have code completion, go to definition, etc when you open a Scala file.
 
@@ -167,3 +158,30 @@ docker run --rm -v $(pwd)/repos:/mnt bbppairings bash -c "\
 ## verify
 ./repos/bbpPairings.exe
 ```
+
+### Developing Chessground locally
+
+By default, your local lila instance will use the version of chessground that is published to npm. If you want to make changes to that library and see them reflected in your local lila instance, you can do the following:
+
+1. Update the `package.json` in the `lila` repo:
+
+    ```diff
+    "dependencies": {
+    -  "chessground": "^8.3.11",
+    +  "chessground": "link:/chessground",
+    }
+    ```
+
+2. Start the chessground compiler in watch mode:
+
+    ```bash
+    docker compose run --rm ui bash -c "cd /chessground && pnpm install && pnpm run compile --watch"
+    ```
+
+3. Start the lila ui build in watch mode:
+
+    ```bash
+    docker compose run --rm ui bash -c "/lila/ui/build -w"
+    ```
+
+Then you can see the updated chessground demo at http://localhost:8080/chessground/demo.html and when you refresh lila, it will use the local copy of chessground.
