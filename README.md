@@ -38,7 +38,7 @@ The only requirements for running on your local machine are `git` and Docker Des
     COMPOSE_PROFILES=external-engine docker compose up
 
     ## include ALL optional services
-    COMPOSE_PROFILES=stockfish,external-engine,search,images docker compose up
+    COMPOSE_PROFILES=all docker compose up
     ```
 
     Might take 5-10 minutes. Some services will start before others and you may see errors in the logs until everything comes online.
