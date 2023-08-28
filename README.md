@@ -58,9 +58,9 @@ The only requirements for running on your local machine are `git` and Docker Des
 When you're done working, you can shut down the services with:
 
 ```bash
-COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose down
+COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose stop
 
-## or to destroy the volumes (completely resetting the database)
+## or to remove the containers and volumes (completely resetting the database)
 COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose down -v
 ```
 
