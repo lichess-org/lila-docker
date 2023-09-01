@@ -107,13 +107,14 @@ docker compose run --rm ui bash -c "/lila/bin/trans-dump"
 ### Code formatting:
 
 ```bash
-# pnpm run lint
-docker compose run --rm ui bash -c "cd /chessground && pnpm install && pnpm run lint"
+docker compose run --rm ui bash -c "cd /lila && pnpm install && pnpm run format"
+docker compose run --rm ui bash -c "cd /chessground && pnpm install && pnpm run format"
+docker compose run --rm ui bash -c "cd /pgn-viewer && pnpm install && pnpm run format"
 
 # sbt scalafmtAll
-docker run --rm -v $(pwd)/repos/lila:/mnt \
+docker run --rm -v $(pwd)/repos/lila:/lila \
     sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 \
-    bash -c "cd /mnt && sbt scalafmtAll"
+    bash -c "cd /lila && sbt scalafmtAll"
 ```
 
 ### Berserk (Python library):
