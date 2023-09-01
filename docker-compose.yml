@@ -225,6 +225,11 @@ services:
     depends_on:
       - mongodb
 
+  stripe:
+    image: stripe/stripe-mock
+    networks:
+      - lila-network
+
 networks:
   lila-network:
     driver: bridge
