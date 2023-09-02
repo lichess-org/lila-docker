@@ -14,54 +14,23 @@ The only requirements for running on your local machine are `git` and Docker Des
     git clone https://github.com/fitztrev/lila-docker
     ```
 
-1. Setup the Lichess repos:
+1. Start the services
 
     ```bash
     cd lila-docker
-    ./setup.sh
-    ```
-
-1. Start the services:
-
-    ```bash
-    ## start the basic services (lila, lila-ws, mongodb, redis)
-    docker compose up
-    ```
-
-    Or to include optional services, depending on what you're working on, apply the appropriate profile(s):
-
-    ```bash
-    ## include stockfish services (for playing and analyzing)
-    COMPOSE_PROFILES=stockfish docker compose up
-
-    ## include external engine service
-    COMPOSE_PROFILES=external-engine docker compose up
-
-    ## include ALL optional services
-    COMPOSE_PROFILES=all docker compose up
+    ./lila-docker start
     ```
 
     Might take 5-10 minutes. Some services will start before others and you may see errors in the logs until everything comes online.
 
     Lila will be the last service to complete, at which point you can visit http://localhost:8080/ to see the site.
 
-1. (Optional, but recommended) Seed your database with test data (users, games, etc):
-
-    In a separate terminal:
-
-    ```bash
-    ./init-db.sh
-    ```
-
 ### Shutting down / Resetting
 
 When you're done working, you can shut down the services with:
 
 ```bash
-COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose stop
-
-## or to remove the containers and volumes (completely resetting the database)
-COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose down -v
+./lila-docker stop
 ```
 
 ## URLs
