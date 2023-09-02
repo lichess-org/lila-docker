@@ -197,3 +197,13 @@ By default, your local lila instance will use the version of chessground that is
     ```
 
 Then you can see the updated chessground demo at http://localhost:8080/chessground/demo.html and when you refresh lila, it will use the local copy of chessground.
+
+### Developing PGN Viewer locally
+
+To re-compile the PGN Viewer after making changes:
+
+```bash
+docker compose run --rm ui bash -c "cd /pgn-viewer && pnpm run sass-dev && pnpm run bundle-dev"
+```
+
+See the changes on the PGN Viewer demo page: http://localhost:8090/
