@@ -1,6 +1,8 @@
 FROM node:latest
 
+RUN npm install -g pnpm
+
 WORKDIR /pgn-viewer
 
-ENTRYPOINT npm install \
-    && npm run demo
+ENTRYPOINT pnpm install \
+    && pnpm run demo
