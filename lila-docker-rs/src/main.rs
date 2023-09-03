@@ -9,14 +9,21 @@ const BANNER: &str = r#"
                                                    |___/
 "#;
 
+const ENV_PATH: &str = "/.env";
+
 fn main() -> std::io::Result<()> {
     intro(BANNER)?;
 
     let profiles = multiselect("Select which optional services to run")
         .required(false)
         .item(
-            "stockfish",
-            "Stockfish (for playing against or analyzing games)",
+            "stockfish-play",
+            "Stockfish (for playing against the computer)",
+            "",
+        )
+        .item(
+            "stockfish-analysis",
+            "Stockfish (for requesting computer analysis of games)",
             "",
         )
         .item(
@@ -29,7 +36,8 @@ fn main() -> std::io::Result<()> {
             "Search (for searching games, forum posts, etc)",
             "",
         )
-        .item("images", "Images (for generating gifs and thumbnails)", "")
+        .item("gifs", "GIFs (for generating animated GIFs of games)", "")
+        .item("thumbnails", "Thumbnailer (for resizing images)", "")
         .interact()?;
 
     let setup_database = confirm("Do you want to seed the database with test users, games, etc?")
@@ -54,16 +62,22 @@ fn main() -> std::io::Result<()> {
         (String::from(""), String::from(""))
     };
 
-    std::fs::write(
-        "/.env",
-        format!(
-            "COMPOSE_PROFILES={}\nSETUP_DB={}\nSU_PASSWORD={}\nPASSWORD={}",
-            profiles.join(","),
-            setup_database,
-            su_password,
-            password
-        ),
-    )?;
+    let env_contents = format!(
+        "COMPOSE_PROFILES={}\nSETUP_DB={}\nSU_PASSWORD={}\nPASSWORD={}\n",
+        profiles.join(","),
+        setup_database,
+        su_password,
+        password
+    );
+
+    match std::fs::metadata(ENV_PATH) {
+        Ok(_) => {
+            std::fs::write(ENV_PATH, env_contents)?;
+        }
+        Err(_) => {
+            println!(".env contents:\n{}", env_contents);
+        }
+    }
 
     Ok(())
 }

@@ -82,7 +82,6 @@ services:
       - ./repos/lila-engine:/lila-engine
     profiles:
       - external-engine
-      - all
 
   lila_fishnet:
     build:
@@ -94,8 +93,7 @@ services:
       - ./repos/lila-fishnet:/lila-fishnet
       - ./conf/lila-fishnet.conf:/lila-fishnet/conf/application.conf
     profiles:
-      - stockfish
-      - all
+      - stockfish-play
 
   fishnet_play:
     image: niklasf/fishnet:2.7.1
@@ -103,8 +101,7 @@ services:
     networks:
       - lila-network
     profiles:
-      - stockfish
-      - all
+      - stockfish-play
 
   fishnet_analysis:
     image: niklasf/fishnet:2.7.1
@@ -112,8 +109,7 @@ services:
     networks:
       - lila-network
     profiles:
-      - stockfish
-      - all
+      - stockfish-analysis
 
   lila_docker_rs:
     image: rust:1.71
@@ -158,7 +154,6 @@ services:
       - lila-network
     profiles:
       - search
-      - all
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.5.0
@@ -172,7 +167,6 @@ services:
       - elasticsearch
     profiles:
       - search
-      - all
 
   lila_search:
     build:
@@ -185,7 +179,6 @@ services:
       - ./conf/lila-search.conf:/lila-search/conf/application.conf
     profiles:
       - search
-      - all
 
   lila_gif:
     build:
@@ -198,8 +191,7 @@ services:
     volumes:
       - ./repos/lila-gif:/lila-gif
     profiles:
-      - images
-      - all
+      - gifs
 
   picfit:
     build:
@@ -210,8 +202,7 @@ services:
     networks:
       - lila-network
     profiles:
-      - images
-      - all
+      - thumbnails
 
   mailpit:
     image: axllent/mailpit:v1.8.0
