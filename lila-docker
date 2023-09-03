@@ -1,12 +1,11 @@
-#!/bin/sh
-
+#!/bin/bash
 set -e
 
-function show_help {
+show_help() {
     echo "Usage: $0 [start|stop|down]"
 }
 
-function run_start() {
+run_start() {
     touch $(pwd)/.env
     docker run --rm -it -v $(pwd)/.env:/.env -v $(pwd)/lila-docker-rs:/mnt rust:latest bash -c "cd /mnt && cargo run"
 
@@ -20,7 +19,7 @@ function run_start() {
     git submodule update --init
     cd ../..
 
-    COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose build
+    COMPOSE_PROFILES=$(all_profiles) docker compose build
 
     echo "Compiling lila js/css..."
     docker compose run --rm ui bash -c "/lila/ui/build"
@@ -36,15 +35,20 @@ function run_start() {
     fi
 }
 
-function run_stop() {
-    COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose stop
+run_stop() {
+    COMPOSE_PROFILES=$(all_profiles) docker compose stop
 }
 
-function run_down() {
-    COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose down -v
+run_down() {
+    COMPOSE_PROFILES=$(all_profiles) docker compose down -v
 }
 
-function setup_database() {
+all_profiles() {
+    # return all Docker Compose profiles as a comma-separated string
+    docker compose config --profiles | xargs | sed -e 's/ /,/g'
+}
+
+setup_database() {
     # wait for mongodb to be ready
     while ! docker exec $(docker compose ps -q mongodb) mongo --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
         echo "Waiting for mongodb to be ready..."

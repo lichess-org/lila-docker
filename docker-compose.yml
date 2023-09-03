@@ -117,6 +117,14 @@ services:
       - stockfish
       - all
 
+  # lila_docker_rs:
+  #   image: rust:latest
+  #   volumes:
+  #     - .env:/.env
+  #     - ./lila-docker-rs:/mnt
+  #   profiles:
+  #     - utils
+
   python:
     build:
       context: docker
