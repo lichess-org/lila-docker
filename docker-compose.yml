@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mongodb:
     image: mongo:5.0.18-focal
@@ -117,13 +115,15 @@ services:
       - stockfish
       - all
 
-  # lila_docker_rs:
-  #   image: rust:latest
-  #   volumes:
-  #     - .env:/.env
-  #     - ./lila-docker-rs:/mnt
-  #   profiles:
-  #     - utils
+  lila_docker_rs:
+    image: rust:1.71
+    volumes:
+      - .env:/.env
+      - ./lila-docker-rs:/mnt
+    environment:
+      - CARGO_HOME=/mnt/.cargo
+    profiles:
+      - utils
 
   python:
     build:
