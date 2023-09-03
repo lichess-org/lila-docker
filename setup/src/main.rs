@@ -1,6 +1,6 @@
 use std::vec;
 
-use cliclack::{intro, multiselect, MultiSelect};
+use cliclack::{intro, multiselect};
 
 const BANNER: &str = r#"
    |\_    _ _      _
@@ -11,48 +11,26 @@ const BANNER: &str = r#"
                                                    |___/
 "#;
 
-#[derive(Debug)]
-struct Profile {
-    name: &'static str,
-    compose_profile: &'static str,
-}
-
-const PROFILES: &[Profile; 5] = &[
-    Profile {
-        name: "Default (lila, lila-ws, mongodb, redis)",
-        compose_profile: "",
-    },
-    Profile {
-        name: "Stockfish (for playing against or analyzing games)",
-        compose_profile: "stockfish",
-    },
-    Profile {
-        name: "External Engine",
-        compose_profile: "external-engine",
-    },
-    Profile {
-        name: "Search (elasticsearch, lila-search)",
-        compose_profile: "search",
-    },
-    Profile {
-        name: "Images (for generating gifs and thumbnails)",
-        compose_profile: "images",
-    },
-];
-
 fn main() -> std::io::Result<()> {
     intro(BANNER)?;
 
-    let mut additional_tools: MultiSelect<&str> =
-        multiselect("Select which services to run").initial_values(vec![""]);
+    let profiles = multiselect("Select which services to run")
+        .initial_values(vec![""])
+        .item("", "Default (lila, lila-ws, mongodb, redis)", "required")
+        .item(
+            "stockfish",
+            "Stockfish (for playing against or analyzing games)",
+            "",
+        )
+        .item("external-engine", "External Engine", "")
+        .item("search", "Search (elasticsearch, lila-search)", "")
+        .item("images", "Images (for generating gifs and thumbnails)", "")
+        .interact()?;
 
-    for profile in PROFILES {
-        additional_tools = additional_tools.item(profile.compose_profile, profile.name, "");
-    }
-
-    let result = additional_tools.interact()?;
-
-    std::fs::write("../.env", format!("COMPOSE_PROFILES={}", result.join(",")))?;
+    std::fs::write(
+        "../.env",
+        format!("COMPOSE_PROFILES={}", profiles.join(",")),
+    )?;
 
     Ok(())
 }
