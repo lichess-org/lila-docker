@@ -1,0 +1,60 @@
+#!/bin/sh
+
+set -e
+
+function show_help {
+    echo "Usage: $0 [start|stop|down]"
+}
+
+function run_start() {
+    docker run --rm -it -v $(pwd):/mnt rust:latest bash -c "cd /mnt/setup && cargo run"
+
+    echo "Cloning repos..."
+    repos=(lila lila-ws lila-db-seed lila-engine lila-fishnet lila-gif lila-search lifat scalachess api pgn-viewer chessground berserk)
+    for repo in "${repos[@]}"; do
+        [ ! -d repos/$repo ] && git clone https://github.com/lichess-org/$repo.git repos/$repo
+    done
+
+    cd repos/lila
+    git submodule update --init
+    cd ../..
+
+    COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose build
+
+    echo "Compiling lila js/css..."
+    docker compose run --rm ui bash -c "/lila/ui/build"
+
+    echo "Compiling chessground..."
+    docker compose run --rm ui bash -c "cd /chessground && pnpm install && pnpm run compile"
+
+    export $(cat .env | xargs)
+    docker compose up -d
+}
+
+function run_stop() {
+    COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose stop
+}
+
+function run_down() {
+    COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose down -v
+}
+
+case $1 in
+    --help|-h)
+        show_help
+        exit 0
+        ;;
+    start)
+        run_start
+        ;;
+    stop)
+        run_stop
+        ;;
+    down)
+        run_down
+        ;;
+    *)
+        show_help
+        exit 1
+        ;;
+esac

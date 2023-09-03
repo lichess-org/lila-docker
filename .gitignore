@@ -1,3 +1,5 @@
+.env
 .pnpm-store
+setup/target
 
 todo.md
