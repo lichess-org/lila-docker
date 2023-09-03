@@ -45,19 +45,18 @@ fn main() -> std::io::Result<()> {
         .interact()?;
 
     let (su_password, password) = if setup_database {
-        let su_password: String = input("Choose a password for admin users (blank for 'password')")
-            .placeholder("password")
-            .default_input("password")
-            .required(false)
-            .interact()?;
-
-        let password: String = input("Choose a password for regular users (blank for 'password')")
-            .placeholder("password")
-            .default_input("password")
-            .required(false)
-            .interact()?;
-
-        (su_password, password)
+        (
+            input("Choose a password for admin users (blank for 'password')")
+                .placeholder("password")
+                .default_input("password")
+                .required(false)
+                .interact()?,
+            input("Choose a password for regular users (blank for 'password')")
+                .placeholder("password")
+                .default_input("password")
+                .required(false)
+                .interact()?,
+        )
     } else {
         (String::from(""), String::from(""))
     };
