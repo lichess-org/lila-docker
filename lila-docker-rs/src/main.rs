@@ -27,8 +27,9 @@ fn main() -> std::io::Result<()> {
         .item("images", "Images (for generating gifs and thumbnails)", "")
         .interact()?;
 
-    let setup_database =
-        confirm("Do you want to seed the database with test users, games, etc?").interact()?;
+    let setup_database = confirm("Do you want to seed the database with test users, games, etc?")
+        .initial_value(true)
+        .interact()?;
 
     let (su_password, password) = if setup_database {
         let su_password: String = input("Choose a password for admin users (blank for 'password')")

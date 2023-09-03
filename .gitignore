@@ -1,5 +1,5 @@
 .env
 .pnpm-store
-scripts/lila-docker-rs/target
+lila-docker-rs/target
 
 todo.md
