@@ -181,7 +181,7 @@ services:
     networks:
       - lila-network
     volumes:
-      - ./lila-search:/lila-search
+      - ./repos/lila-search:/lila-search
       - ./conf/lila-search.conf:/lila-search/conf/application.conf
     profiles:
       - search
