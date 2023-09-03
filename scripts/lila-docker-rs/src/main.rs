@@ -49,7 +49,7 @@ fn main() -> std::io::Result<()> {
     };
 
     std::fs::write(
-        "../.env",
+        "/.env",
         format!(
             "COMPOSE_PROFILES={}\nSETUP_DB={}\nSU_PASSWORD={}\nPASSWORD={}",
             profiles.join(","),
