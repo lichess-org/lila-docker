@@ -11,8 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build
-        run: cargo build --verbose --manifest-path lila-docker-rs/Cargo.toml
+        run: cargo build --verbose --manifest-path command/Cargo.toml
       - name: Run tests
-        run: cargo test --verbose --manifest-path lila-docker-rs/Cargo.toml
+        run: cargo test --verbose --manifest-path command/Cargo.toml
       - name: Check formatting
-        run: cargo fmt --manifest-path lila-docker-rs/Cargo.toml -- --check
+        run: cargo fmt --manifest-path command/Cargo.toml -- --check
