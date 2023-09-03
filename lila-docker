@@ -29,6 +29,10 @@ function run_start() {
 
     export $(cat .env | xargs)
     docker compose up -d
+
+    if [ "$SETUP_DB" = "true" ]; then
+        setup_database
+    fi
 }
 
 function run_stop() {
@@ -37,6 +41,25 @@ function run_stop() {
 
 function run_down() {
     COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose down -v
+}
+
+function setup_database() {
+    # wait for mongodb to be ready
+    while ! docker exec $(docker compose ps -q mongodb) mongo --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
+        echo "Waiting for mongodb to be ready..."
+        sleep 1
+    done
+
+    echo "Adding test data..."
+
+    docker compose run --rm -v $(pwd)/repos/lila:/lila mongodb bash -c \
+        "mongo --host mongodb lichess /lila/bin/mongodb/indexes.js"
+
+    docker compose run --rm python bash -c \
+        "pip install pymongo && python /lila-db-seed/spamdb/spamdb.py --uri=mongodb://mongodb/lichess --password=$PASSWORD --su-password=$SU_PASSWORD --es --es-host=elasticsearch:9200"
+
+    docker compose run --rm -v $(pwd)/scripts:/scripts mongodb bash -c \
+        "mongosh --host mongodb lichess --file /scripts/mongodb/users.js"
 }
 
 case $1 in
