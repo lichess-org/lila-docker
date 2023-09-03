@@ -87,6 +87,7 @@ services:
     build:
       context: docker
       dockerfile: lila-fishnet.Dockerfile
+    restart: unless-stopped
     networks:
       - lila-network
     volumes:
