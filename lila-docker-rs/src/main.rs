@@ -1,5 +1,3 @@
-use std::vec;
-
 use cliclack::{confirm, input, intro, multiselect};
 
 const BANNER: &str = r#"
@@ -14,16 +12,15 @@ const BANNER: &str = r#"
 fn main() -> std::io::Result<()> {
     intro(BANNER)?;
 
-    let profiles = multiselect("Select which services to run")
-        .initial_values(vec![""])
-        .item("", "Default (lila, lila-ws, mongodb, redis)", "required")
+    let profiles = multiselect("Select which optional services to run")
+        .required(false)
         .item(
             "stockfish",
             "Stockfish (for playing against or analyzing games)",
             "",
         )
-        .item("external-engine", "External Engine", "")
-        .item("search", "Search (elasticsearch, lila-search)", "")
+        .item("external-engine", "External Engine (for connecting a local chess engine to the analysis board)", "")
+        .item("search", "Search (for searching games, forum posts, etc)", "")
         .item("images", "Images (for generating gifs and thumbnails)", "")
         .interact()?;
 
