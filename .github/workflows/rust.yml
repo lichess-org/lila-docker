@@ -10,10 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: cd lila-docker-rs
       - name: Build
-        run: cargo build --verbose
+        run: cargo build --verbose --manifest-path lila-docker-rs/Cargo.toml
       - name: Run tests
-        run: cargo test --verbose
+        run: cargo test --verbose --manifest-path lila-docker-rs/Cargo.toml
       - name: Check formatting
-        run: cargo fmt -- --check
+        run: cargo fmt --manifest-path lila-docker-rs/Cargo.toml -- --check
