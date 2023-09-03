@@ -19,8 +19,16 @@ fn main() -> std::io::Result<()> {
             "Stockfish (for playing against or analyzing games)",
             "",
         )
-        .item("external-engine", "External Engine (for connecting a local chess engine to the analysis board)", "")
-        .item("search", "Search (for searching games, forum posts, etc)", "")
+        .item(
+            "external-engine",
+            "External Engine (for connecting a local chess engine to the analysis board)",
+            "",
+        )
+        .item(
+            "search",
+            "Search (for searching games, forum posts, etc)",
+            "",
+        )
         .item("images", "Images (for generating gifs and thumbnails)", "")
         .interact()?;
 
