@@ -1,6 +1,6 @@
 # lila-docker
 
-Lichess local development using Docker Compose.
+Lichess local development using Docker Compose, for developing on Mac or Linux.
 
 The only requirements for running on your local machine are `git` and Docker Desktop. All the other dependencies (Scala, MongoDB, Node.js, etc) are installed and run in Docker containers.
 
@@ -14,69 +14,38 @@ The only requirements for running on your local machine are `git` and Docker Des
     git clone https://github.com/fitztrev/lila-docker
     ```
 
-1. Setup the Lichess repos:
+1. Start the services
 
     ```bash
     cd lila-docker
-    ./setup.sh
-    ```
-
-1. Start the services:
-
-    ```bash
-    ## start the basic services (lila, lila-ws, mongodb, redis)
-    docker compose up
-    ```
-
-    Or to include optional services, depending on what you're working on, apply the appropriate profile(s):
-
-    ```bash
-    ## include stockfish services (for playing and analyzing)
-    COMPOSE_PROFILES=stockfish docker compose up
-
-    ## include external engine service
-    COMPOSE_PROFILES=external-engine docker compose up
-
-    ## include ALL optional services
-    COMPOSE_PROFILES=all docker compose up
+    ./lila-docker start
     ```
 
     Might take 5-10 minutes. Some services will start before others and you may see errors in the logs until everything comes online.
 
     Lila will be the last service to complete, at which point you can visit http://localhost:8080/ to see the site.
 
-1. (Optional, but recommended) Seed your database with test data (users, games, etc):
-
-    In a separate terminal:
-
-    ```bash
-    ./init-db.sh
-    ```
-
 ### Shutting down / Resetting
 
 When you're done working, you can shut down the services with:
 
 ```bash
-COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose stop
-
-## or to remove the containers and volumes (completely resetting the database)
-COMPOSE_PROFILES=$(docker compose config --profiles | xargs | sed -e 's/ /,/g') docker compose down -v
+./lila-docker stop
 ```
 
 ## URLs
 
-| Service               | URL                                                      | Profile |
-| --------------------- | -------------------------------------------------------- | ------- |
-| Main lila instance    | http://localhost:8080/                                   | \*      |
-| Chessground demo      | http://localhost:8080/chessground/demo.html              | \*      |
-| API docs              | http://localhost:8089/                                   | \*      |
-| PGN Viewer            | http://localhost:8090/                                   | \*      |
-| Mongodb manager       | http://localhost:8081/                                   | \*      |
-| Email inbox           | http://localhost:8025/                                   | \*      |
-| lila-gif              | http://localhost:6175/image.gif?fen=4k3/6KP/8/8/8/8/7p/8 | images  |
-| Picfit                | http://localhost:3001/healthcheck                        | images  |
-| Elasticsearch manager | http://localhost:5601/                                   | search  |
+| Service               | URL                                                      | Availability |
+| --------------------- | -------------------------------------------------------- | ------------ |
+| Main lila instance    | http://localhost:8080/                                   | \*           |
+| Chessground demo      | http://localhost:8080/chessground/demo.html              | \*           |
+| API docs              | http://localhost:8089/                                   | \*           |
+| PGN Viewer            | http://localhost:8090/                                   | \*           |
+| Mongodb manager       | http://localhost:8081/                                   | \*           |
+| Email inbox           | http://localhost:8025/                                   | \*           |
+| lila-gif              | http://localhost:6175/image.gif?fen=4k3/6KP/8/8/8/8/7p/8 | optional     |
+| Picfit                | http://localhost:3001/healthcheck                        | optional     |
+| Elasticsearch manager | http://localhost:5601/                                   | optional     |
 
 ## Usage
 
