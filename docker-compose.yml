@@ -113,7 +113,7 @@ services:
       - stockfish-analysis
 
   lila_docker_rs:
-    image: rust:1.71
+    image: rust:1.72
     volumes:
       - .env:/.env
       - ./command:/mnt
@@ -206,7 +206,7 @@ services:
       - thumbnails
 
   mailpit:
-    image: axllent/mailpit:v1.8.0
+    image: axllent/mailpit:v1.8.2
     ports:
       - 8025:8025
     networks:

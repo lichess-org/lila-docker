@@ -1,4 +1,4 @@
-FROM rust:1.71
+FROM rust:1.72
 
 WORKDIR /lila-gif
 
