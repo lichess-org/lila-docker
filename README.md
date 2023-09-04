@@ -35,17 +35,24 @@ When you're done working, you can shut down the services with:
 
 ## URLs
 
-| Service               | URL                                                      | Availability |
-| --------------------- | -------------------------------------------------------- | ------------ |
-| Main lila instance    | http://localhost:8080/                                   | \*           |
-| Chessground demo      | http://localhost:8080/chessground/demo.html              | \*           |
-| API docs              | http://localhost:8089/                                   | \*           |
-| PGN Viewer            | http://localhost:8090/                                   | \*           |
-| Mongodb manager       | http://localhost:8081/                                   | \*           |
-| Email inbox           | http://localhost:8025/                                   | \*           |
-| lila-gif              | http://localhost:6175/image.gif?fen=4k3/6KP/8/8/8/8/7p/8 | optional     |
-| Picfit                | http://localhost:3001/healthcheck                        | optional     |
-| Elasticsearch manager | http://localhost:5601/                                   | optional     |
+Always available:
+
+| Service               | URL                                                      |
+| --------------------- | -------------------------------------------------------- |
+| Main lila instance    | http://localhost:8080/                                   |
+| Chessground demo      | http://localhost:8080/chessground/demo.html              |
+| Mongodb manager       | http://localhost:8081/                                   |
+| API docs              | http://localhost:8089/                                   |
+| PGN Viewer            | http://localhost:8090/                                   |
+| Email inbox           | http://localhost:8025/                                   |
+
+Depending on which optional services you start:
+
+| Service               | URL                                                      |
+| --------------------- | -------------------------------------------------------- |
+| lila-gif              | http://localhost:6175/image.gif?fen=4k3/6KP/8/8/8/8/7p/8 |
+| Picfit                | http://localhost:3001/healthcheck                        |
+| Elasticsearch manager | http://localhost:5601/                                   |
 
 ## Usage
 
