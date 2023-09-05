@@ -2,7 +2,7 @@
 set -e
 
 show_help() {
-    echo "Usage: $0 [start|stop|down]"
+    echo "Usage: $0 [start|stop|down|resume]"
 }
 
 run_start() {
@@ -43,6 +43,14 @@ run_down() {
     COMPOSE_PROFILES=$(all_profiles) docker compose down -v
 }
 
+run_resume() {
+    if [ ! -z "$(docker compose ps -a --services --status=exited | xargs)" ]; then
+        docker compose start
+    else
+        echo "There are no stopped services to resume"
+    fi
+}
+
 all_profiles() {
     # return all Docker Compose profiles as a comma-separated string
     docker compose config --profiles | xargs | sed -e 's/ /,/g'
@@ -80,6 +88,9 @@ case $1 in
         ;;
     down)
         run_down
+        ;;
+    resume)
+        run_resume
         ;;
     *)
         show_help
