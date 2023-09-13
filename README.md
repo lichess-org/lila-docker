@@ -21,7 +21,7 @@ The only requirements for running on your local machine are `git` and Docker Des
     ./lila-docker start
     ```
 
-    Might take 5-10 minutes. Some services will start before others and you may see errors in the logs until everything comes online.
+    Starting new services may take 5-10 minutes. Some services will start before others and you may see errors in the logs until everything comes online.
 
     Lila will be the last service to complete, at which point you can visit http://localhost:8080/ to see the site.
 
@@ -32,6 +32,15 @@ When you're done working, you can shut down the services with:
 ```bash
 ./lila-docker stop
 ```
+
+When the `stop` command is used, `./lila-docker start` can be later used to resume the stopped services.
+
+Alternatively, you can shut down and remove the services with:
+```bash
+./lila-docker down
+```
+
+When the `down` command is used, `./lila-docker start` can be later used to create and start new services.
 
 ## URLs
 
