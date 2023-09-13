@@ -2,10 +2,10 @@
 set -e
 
 show_help() {
-    echo "Usage: $0 [start|stop|down|resume]"
+    echo "Usage: $0 [start|stop|down]"
 }
 
-run_start() {
+run_setup() {
     touch .env
     docker compose run --rm -it lila_docker_rs bash -c "cd /mnt && cargo run"
 
@@ -35,20 +35,24 @@ run_start() {
     fi
 }
 
+run_start() {
+    if [ -z "$(docker compose ps -a --services | xargs)" ]; then
+        run_setup
+    else
+        if [ ! -z "$(docker compose ps -a --services --status=exited | xargs)" ]; then
+            docker compose start
+        else
+            echo "There are no stopped services to resume"
+        fi
+    fi
+}
+
 run_stop() {
     COMPOSE_PROFILES=$(all_profiles) docker compose stop
 }
 
 run_down() {
     COMPOSE_PROFILES=$(all_profiles) docker compose down -v
-}
-
-run_resume() {
-    if [ ! -z "$(docker compose ps -a --services --status=exited | xargs)" ]; then
-        docker compose start
-    else
-        echo "There are no stopped services to resume"
-    fi
 }
 
 all_profiles() {
@@ -88,9 +92,6 @@ case $1 in
         ;;
     down)
         run_down
-        ;;
-    resume)
-        run_resume
         ;;
     *)
         show_help
