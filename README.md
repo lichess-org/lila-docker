@@ -36,6 +36,7 @@ When you're done working, you can shut down the services with:
 When the `stop` command is used, `./lila-docker start` can be later used to resume the stopped services.
 
 Alternatively, you can shut down and remove the services with:
+
 ```bash
 ./lila-docker down
 ```
@@ -46,14 +47,14 @@ When the `down` command is used, `./lila-docker start` can be later used to crea
 
 Always available:
 
-| Service               | URL                                                      |
-| --------------------- | -------------------------------------------------------- |
-| Main lila instance    | http://localhost:8080/                                   |
-| Chessground demo      | http://localhost:8080/chessground/demo.html              |
-| Mongodb manager       | http://localhost:8081/                                   |
-| API docs              | http://localhost:8089/                                   |
-| PGN Viewer            | http://localhost:8090/                                   |
-| Email inbox           | http://localhost:8025/                                   |
+| Service            | URL                                         |
+| ------------------ | ------------------------------------------- |
+| Main lila instance | http://localhost:8080/                      |
+| Chessground demo   | http://localhost:8080/chessground/demo.html |
+| Mongodb manager    | http://localhost:8081/                      |
+| API docs           | http://localhost:8089/                      |
+| PGN Viewer         | http://localhost:8090/                      |
+| Email inbox        | http://localhost:8025/                      |
 
 Depending on which optional services you start:
 
@@ -98,7 +99,7 @@ docker compose run --rm ui bash -c "cd /pgn-viewer && pnpm install && pnpm run f
 
 # sbt scalafmtAll
 docker run --rm -v $(pwd)/repos/lila:/lila \
-    sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 \
+    sbtscala/scala-sbt:eclipse-temurin-focal-17.0.8.1_1_1.9.6_3.3.1 \
     bash -c "cd /lila && sbt scalafmtAll"
 ```
 
@@ -127,17 +128,17 @@ Once the build has been imported, you should have code completion, go to definit
 ```bash
 ## compile
 docker run --rm -v $(pwd)/repos/scalachess:/mnt \
-    sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 \
+    sbtscala/scala-sbt:eclipse-temurin-focal-17.0.8.1_1_1.9.6_3.3.1 \
     bash -c "cd /mnt && sbt compile"
 
 ## test
 docker run --rm -v $(pwd)/repos/scalachess:/mnt \
-    sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 \
-    bash -c "cd /mnt && sbt test"
+    sbtscala/scala-sbt:eclipse-temurin-focal-17.0.8.1_1_1.9.6_3.3.1 \
+    bash -c "cd /mnt && sbt testKit/test"
 
 ## package
 docker run --rm -v $(pwd)/repos/scalachess:/mnt \
-    sbtscala/scala-sbt:eclipse-temurin-focal-17.0.5_8_1.9.1_3.3.0 \
+    sbtscala/scala-sbt:eclipse-temurin-focal-17.0.8.1_1_1.9.6_3.3.1 \
     bash -c "cd /mnt && sbt package"
 ```
 

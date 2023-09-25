@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo:5.0.18-focal
+    image: mongo:5.0.21-focal
     restart: unless-stopped
     networks:
       - lila-network
@@ -206,7 +206,7 @@ services:
       - thumbnails
 
   mailpit:
-    image: axllent/mailpit:v1.8.2
+    image: axllent/mailpit:v1.9.2
     ports:
       - 8025:8025
     networks:
