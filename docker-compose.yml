@@ -23,6 +23,7 @@ services:
       - ./repos/chessground:/chessground
       - ./repos/pgn-viewer:/pgn-viewer
       - ./repos/bbpPairings.exe:/opt/bbpPairings.exe
+      - ./repos/scalachess:/scalachess
       - ./conf/lila.conf:/lila/conf/application.conf
 
   lila_ws:

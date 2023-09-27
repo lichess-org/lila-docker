@@ -25,23 +25,19 @@ The only requirements for running on your local machine are `git` and Docker Des
 
     Lila will be the last service to complete, at which point you can visit http://localhost:8080/ to see the site.
 
-### Shutting down / Resetting
+### Stopping
 
-When you're done working, you can shut down the services with:
+To stop the containers, for later resuming via `./lila-docker start`:
 
 ```bash
 ./lila-docker stop
 ```
 
-When the `stop` command is used, `./lila-docker start` can be later used to resume the stopped services.
-
-Alternatively, you can shut down and remove the services with:
+To remove the containers:
 
 ```bash
 ./lila-docker down
 ```
-
-When the `down` command is used, `./lila-docker start` can be later used to create and start new services.
 
 ## URLs
 
@@ -124,6 +120,31 @@ docker run --rm -v $(pwd)/repos/berserk:/berserk -v $(pwd)/scripts:/scripts pyth
 Once the build has been imported, you should have code completion, go to definition, etc when you open a Scala file.
 
 ### Scalachess:
+
+If you're making changes to the Scalachess library, you can have lila use it instead of the published Maven version:
+
+1. Update the `build.sbt` file in the scalachess repo:
+
+    ```diff
+    -  ThisBuild / version           := "15.6.7"
+    +  ThisBuild / version           := "my-test-1"  # give it a custom version
+    ```
+
+2. Update the `Dependencies.scala` file in the lila repo:
+
+    ```diff
+    -  val chess = "org.lichess" %% "scalachess" % "15.6.7"
+    +  val chess = "org.lichess" %% "scalachess" % "my-test-1"
+    ```
+
+3. Publish the local scalachess changes and restart lila:
+
+    ```bash
+    docker compose exec lila bash -c "cd /scalachess && sbt publishLocal"
+    docker compose restart lila
+    ```
+
+Other Scalachess commands:
 
 ```bash
 ## compile
