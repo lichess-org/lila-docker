@@ -11,7 +11,7 @@ The only requirements for running on your local machine are `git` and Docker Des
 1. Clone this repo:
 
     ```bash
-    git clone https://github.com/fitztrev/lila-docker
+    git clone https://github.com/lichess-org/lila-docker
     ```
 
 1. Start the services
