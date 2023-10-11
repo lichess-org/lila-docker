@@ -47,7 +47,7 @@ Always available:
 | ------------------ | ------------------------------------------- |
 | Main lila instance | http://localhost:8080/                      |
 | Chessground demo   | http://localhost:8080/chessground/demo.html |
-| Mongodb manager    | http://localhost:8081/                      |
+| Mongodb manager    | http://localhost:8081/ (admin/pass)         |
 | API docs           | http://localhost:8089/                      |
 | PGN Viewer         | http://localhost:8090/                      |
 | Email inbox        | http://localhost:8025/                      |

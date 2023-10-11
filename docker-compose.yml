@@ -114,7 +114,7 @@ services:
       - stockfish-analysis
 
   lila_docker_rs:
-    image: rust:1.72
+    image: rust:1.73.0-slim-bookworm
     volumes:
       - .env:/.env
       - ./command:/mnt
@@ -207,20 +207,19 @@ services:
       - thumbnails
 
   mailpit:
-    image: axllent/mailpit:v1.9.2
+    image: axllent/mailpit:v1.9.6
     ports:
       - 8025:8025
     networks:
       - lila-network
-  
+
   mongo_express:
-    image: mongo-express
+    image: mongo-express:1.0.0-20-alpine3.18
     restart: unless-stopped
     ports:
       - 8081:8081
     environment:
       - ME_CONFIG_MONGODB_SERVER=mongodb
-      - ME_CONFIG_MONGODB_PORT=27017
     networks:
       - lila-network
     depends_on:
