@@ -2,12 +2,12 @@
 set -e
 
 show_help() {
-    echo "Usage: $0 [start|stop|down]"
+    echo "Usage: $0 [start|stop|down|build]"
 }
 
 run_setup() {
     touch .env
-    docker compose run --rm -it lila_docker_rs bash -c "cd /mnt && cargo run"
+    docker compose run --rm -it lila_docker_rs bash -c "cargo run --manifest-path /mnt/Cargo.toml"
 
     echo "Cloning repos..."
     repos=(lila lila-ws lila-db-seed lila-engine lila-fishnet lila-gif lila-search lifat scalachess api pgn-viewer chessground berserk)
@@ -15,11 +15,9 @@ run_setup() {
         [ ! -d repos/$repo ] && git clone https://github.com/lichess-org/$repo.git repos/$repo
     done
 
-    cd repos/lila
-    git submodule update --init
-    cd ../..
+    git -C repos/lila submodule update --init
 
-    COMPOSE_PROFILES=$(all_profiles) docker compose build
+    run_build
 
     echo "Compiling lila js/css..."
     docker compose run --rm ui bash -c "/lila/ui/build"
@@ -60,6 +58,10 @@ all_profiles() {
     docker compose config --profiles | xargs | sed -e 's/ /,/g'
 }
 
+run_build() {
+    COMPOSE_PROFILES=$(all_profiles) docker compose build
+}
+
 setup_database() {
     # wait for mongodb to be ready
     while ! docker exec $(docker compose ps -q mongodb) mongo --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
@@ -92,6 +94,9 @@ case $1 in
         ;;
     down)
         run_down
+        ;;
+    build)
+        run_build
         ;;
     *)
         show_help
