@@ -6,7 +6,7 @@ services:
       - lila-network
 
   redis:
-    image: redis:alpine
+    image: redis:7.2.1-alpine3.18
     restart: unless-stopped
     networks:
       - lila-network
@@ -38,7 +38,7 @@ services:
       - ./conf/lila-ws.conf:/lila-ws.conf
 
   nginx:
-    image: nginx:alpine-slim
+    image: nginx:1.25.2-alpine3.18-slim
     networks:
       - lila-network
     ports:
