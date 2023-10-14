@@ -95,7 +95,7 @@ docker compose run --rm ui bash -c "cd /pgn-viewer && pnpm install && pnpm run f
 
 # sbt scalafmtAll
 docker run --rm -v $(pwd)/repos/lila:/lila \
-    sbtscala/scala-sbt:eclipse-temurin-focal-17.0.8.1_1_1.9.6_3.3.1 \
+    sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.6_3.3.1 \
     bash -c "cd /lila && sbt scalafmtAll"
 ```
 
@@ -111,7 +111,7 @@ docker run --rm -v $(pwd)/repos/berserk:/berserk -v $(pwd)/scripts:/scripts pyth
 ### Scala Metals (IDE helper):
 
 1. In VS Code, open this `lila-docker` project and install the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-2. Cmd+Shift+P > "Dev Containers: Reopen in Container"
+2. Cmd+Shift+P > "Dev Containers: Rebuild and Reopen in Container"
 3. A new VS Code window will open, attached to the container instead of your host machine
 4. File > Open Folder > "/workspaces/lila-docker/repos/lila" (or whichever Scala project you want to work on)
 5. Install + Enable the Scala Metals extension (Cmd+Shift+X > "Scala (Metals)")
@@ -149,17 +149,17 @@ Other Scalachess commands:
 ```bash
 ## compile
 docker run --rm -v $(pwd)/repos/scalachess:/mnt \
-    sbtscala/scala-sbt:eclipse-temurin-focal-17.0.8.1_1_1.9.6_3.3.1 \
+    sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.6_3.3.1 \
     bash -c "cd /mnt && sbt compile"
 
 ## test
 docker run --rm -v $(pwd)/repos/scalachess:/mnt \
-    sbtscala/scala-sbt:eclipse-temurin-focal-17.0.8.1_1_1.9.6_3.3.1 \
+    sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.6_3.3.1 \
     bash -c "cd /mnt && sbt testKit/test"
 
 ## package
 docker run --rm -v $(pwd)/repos/scalachess:/mnt \
-    sbtscala/scala-sbt:eclipse-temurin-focal-17.0.8.1_1_1.9.6_3.3.1 \
+    sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.6_3.3.1 \
     bash -c "cd /mnt && sbt package"
 ```
 
