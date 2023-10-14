@@ -79,6 +79,23 @@ setup_database() {
 
     docker compose run --rm -v $(pwd)/scripts:/scripts mongodb bash -c \
         "mongosh --host mongodb lichess --file /scripts/mongodb/users.js"
+
+    echo "You can login with any of these test user accounts."
+}
+
+run_gitpod_welcome() {
+    GREEN="\e[32m"
+    RED="31"
+    BOLDGREEN="\e[1;32m"
+    ENDCOLOR="\e[0m"
+
+    echo -e "${GREEN}################${ENDCOLOR}"
+    echo -e "${GREEN}Your Lichess development environment is starting!${ENDCOLOR}"
+    echo -e "${GREEN}When it's ready, you can access it at:${ENDCOLOR}"
+    echo -e "${BOLDGREEN} $(gp url 8080)${ENDCOLOR}"
+    echo -e "${GREEN}Monitor the progress in the 'lila' container with the command:${ENDCOLOR}"
+    echo -e "${BOLDGREEN} docker compose logs lila --follow${ENDCOLOR}"
+    echo -e "${GREEN}For full documentation, see: https://lichess-org.github.io/lila-gitpod/${ENDCOLOR}"
 }
 
 case $1 in
@@ -97,6 +114,9 @@ case $1 in
         ;;
     build-all)
         build_all_profiles
+        ;;
+    gitpod-welcome)
+        run_gitpod_welcome
         ;;
     *)
         show_help
