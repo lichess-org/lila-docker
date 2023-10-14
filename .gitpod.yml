@@ -8,10 +8,20 @@ tasks:
 ports:
   - port: 8080
     onOpen: open-preview
+    name: lichess
+    description: Your Lichess development site
   - port: 8025
     onOpen: ignore
+    name: mailpit
+    description: For debugging emails
   - port: 8081
     onOpen: ignore
+    name: mongo-express
+    description: "For exploring database schema and contents (u: admin / p: pass)"
+  - port: 5601
+    onOpen: ignore
+    name: kibana
+    description: For debugging Elasticsearch
 
 vscode:
   extensions:
