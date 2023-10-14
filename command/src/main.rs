@@ -38,6 +38,8 @@ fn main() -> std::io::Result<()> {
         )
         .item("gifs", "GIFs (for generating animated GIFs of games)", "")
         .item("thumbnails", "Thumbnailer (for resizing images)", "")
+        .item("api-docs", "API docs", "")
+        .item("pgn-viewer", "PGN Viewer (Standalone)", "")
         .interact()?;
 
     let setup_database = confirm("Do you want to seed the database with test users, games, etc?")

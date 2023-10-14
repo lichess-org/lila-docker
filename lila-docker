@@ -8,16 +8,15 @@ show_help() {
 run_setup() {
     touch .env
     docker compose run --rm -it lila_docker_rs bash -c "cargo run --manifest-path /mnt/Cargo.toml"
+    export $(cat .env | xargs)
 
     echo "Cloning repos..."
     repos=(lila lila-ws lila-db-seed lila-engine lila-fishnet lila-gif lila-search lifat scalachess api pgn-viewer chessground berserk)
     for repo in "${repos[@]}"; do
-        [ ! -d repos/$repo ] && git clone https://github.com/lichess-org/$repo.git repos/$repo
+        [ ! -d repos/$repo ] && git clone --depth 1 https://github.com/lichess-org/$repo.git repos/$repo
     done
 
     git -C repos/lila submodule update --init
-
-    run_build
 
     echo "Compiling lila js/css..."
     docker compose run --rm ui bash -c "/lila/ui/build"
@@ -25,7 +24,7 @@ run_setup() {
     echo "Compiling chessground..."
     docker compose run --rm ui bash -c "cd /chessground && pnpm install && pnpm run compile"
 
-    export $(cat .env | xargs)
+    docker compose build
     docker compose up -d
 
     if [ "$SETUP_DB" = "true" ]; then
@@ -58,7 +57,8 @@ all_profiles() {
     docker compose config --profiles | xargs | sed -e 's/ /,/g'
 }
 
-run_build() {
+build_all_profiles() {
+    COMPOSE_PROFILES=$(all_profiles) docker compose pull
     COMPOSE_PROFILES=$(all_profiles) docker compose build
 }
 
@@ -95,8 +95,8 @@ case $1 in
     down)
         run_down
         ;;
-    build)
-        run_build
+    build-all)
+        build_all_profiles
         ;;
     *)
         show_help
