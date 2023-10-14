@@ -14,7 +14,7 @@ const ENV_PATH: &str = "/.env";
 fn main() -> std::io::Result<()> {
     intro(BANNER)?;
 
-    let profiles = multiselect("Select which optional services to run")
+    let profiles = multiselect("Select which optional services to run:\n   (Use <space> to toggle, <enter> to confirm)")
         .required(false)
         .item(
             "stockfish-play",
