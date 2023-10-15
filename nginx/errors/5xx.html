@@ -20,6 +20,10 @@
             margin: 4rem 0 3rem;
             padding: 1rem;
         }
+        pre {
+            background: #333;
+            padding: 1rem;
+        }
         footer {
             border-top: 1px solid #bababa;
             margin-top: 3rem;
@@ -39,10 +43,14 @@
 
         <h3>To Fix:</h3>
         <p>If you're just starting your environment, wait until lila finishes compiling. It will automatically start within 5-15 minutes.</p>
-        <p>Check the status of the lila service within Docker. View the logs and restart it manually if necessary.</p>
-        <p>For the full documentation, see <a href="https://github.com/lichess-org/lila-docker">https://github.com/lichess-org/lila-docker</a></p>
+        <p>You can monitor the logs to see the progress:</p>
+        <pre><code>docker compose logs lila --follow</code></pre>
 
-        <footer>Nginx Error: <!--# echo var="status" default="" --></footer>
+
+        <footer>
+            <p>For the full documentation, see <a href="https://github.com/lichess-org/lila-docker">https://github.com/lichess-org/lila-docker</a></p>
+            <p>Nginx Error: <!--# echo var="status" default="" --></p>
+        </footer>
     </div>
 
     <script>
