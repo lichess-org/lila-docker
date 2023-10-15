@@ -1,7 +1,7 @@
 tasks:
   - command: |
-      find ./conf -type f -exec sed -i "s/http:\/\/localhost:8080/$(gp url 8080 | sed 's/\//\\\//g')/g" {} \;
-      find ./conf -type f -exec sed -i "s/localhost:8080/$(gp url 8080 | cut -c9-)/g" {} \;
+      find ./conf/lila.conf ./conf/lila-ws.conf -type f -exec sed -i "s/http:\/\/localhost:8080/$(gp url 8080 | sed 's/\//\\\//g')/g" {} \;
+      find ./conf/lila.conf ./conf/lila-ws.conf -type f -exec sed -i "s/localhost:8080/$(gp url 8080 | cut -c9-)/g" {} \;
       ./lila-docker start
       ./lila-docker gitpod-welcome
 
