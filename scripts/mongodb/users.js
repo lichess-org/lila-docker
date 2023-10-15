@@ -21,3 +21,5 @@ console.table(users.filter((user) => user.marks))
 
 console.log('Regular Accounts')
 console.table(users.filter((user) => !user.roles && !user.marks))
+
+console.log('You can log in with any of the above user accounts.')

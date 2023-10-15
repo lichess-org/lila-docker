@@ -94,8 +94,6 @@ setup_database() {
 
     docker compose run --rm -v $(pwd)/scripts:/scripts mongodb bash -c \
         "mongosh --host mongodb lichess --file /scripts/mongodb/users.js"
-
-    echo "You can login with any of these test user accounts."
 }
 
 run_gitpod_welcome() {
