@@ -18,9 +18,7 @@ run_setup() {
 
     git -C repos/lila submodule update --init
 
-    echo "Copying config files..."
-    cp conf/lila.original.conf conf/lila.conf
-    cp conf/lila-ws.original.conf conf/lila-ws.conf
+    run_setup_config
 
     echo "Compiling lila js/css..."
     docker compose run --rm ui bash -c "/lila/ui/build"
@@ -33,6 +31,19 @@ run_setup() {
 
     if [ "$SETUP_DB" = "true" ]; then
         setup_database
+    fi
+}
+
+run_setup_config() {
+    echo "Copying config files..."
+    cp conf/lila.original.conf conf/lila.conf
+    cp conf/lila-ws.original.conf conf/lila-ws.conf
+
+    # if we're running on Gitpod, we need to replace the localhost URLs with the Gitpod URLs
+    if [ ! -z "$GITPOD_WORKSPACE_ID" ]; then
+        echo "Replacing localhost URLs with Gitpod URLs..."
+        find ./conf/lila.conf ./conf/lila-ws.conf -type f -exec sed -i "s/http:\/\/localhost:8080/$(gp url 8080 | sed 's/\//\\\//g')/g" {} \;
+        find ./conf/lila.conf ./conf/lila-ws.conf -type f -exec sed -i "s/localhost:8080/$(gp url 8080 | cut -c9-)/g" {} \;
     fi
 }
 
