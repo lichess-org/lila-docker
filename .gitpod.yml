@@ -23,5 +23,6 @@ ports:
 
 vscode:
   extensions:
+    - esbenp.prettier-vscode
     - ms-azuretools.vscode-docker
     - scala-lang.scala
