@@ -18,6 +18,10 @@ run_setup() {
 
     git -C repos/lila submodule update --init
 
+    echo "Copying config files..."
+    cp conf/lila.original.conf conf/lila.conf
+    cp conf/lila-ws.original.conf conf/lila-ws.conf
+
     echo "Compiling lila js/css..."
     docker compose run --rm ui bash -c "/lila/ui/build"
 
