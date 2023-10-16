@@ -1,10 +1,6 @@
 #!/bin/bash
 set -e
 
-show_help() {
-    echo "Usage: $0 [start|stop|down|build]"
-}
-
 run_setup() {
     touch .env
     docker compose run --rm -it lila_docker_rs bash -c "cargo run --manifest-path /mnt/Cargo.toml"
@@ -110,6 +106,10 @@ run_gitpod_welcome() {
     echo -e "${GREEN}For full documentation, see: https://lichess-org.github.io/lila-gitpod/${ENDCOLOR}"
 }
 
+show_help() {
+    echo "Usage: $0 [start|stop|down|build]"
+}
+
 case $1 in
     --help|-h)
         show_help
@@ -124,7 +124,7 @@ case $1 in
     down)
         run_down
         ;;
-    build-all)
+    build)
         build_all_profiles
         ;;
     gitpod-welcome)
