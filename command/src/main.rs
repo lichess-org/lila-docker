@@ -44,9 +44,10 @@ fn main() -> std::io::Result<()> {
     .item("pgn-viewer", "PGN Viewer (Standalone)", "")
     .interact()?;
 
-    let setup_database = confirm("Do you want to seed the database with test users, games, etc?")
-        .initial_value(true)
-        .interact()?;
+    let setup_database =
+        confirm("Do you want to seed the database with test users, games, etc? (Recommended)")
+            .initial_value(true)
+            .interact()?;
 
     let (su_password, password) = if setup_database {
         (
