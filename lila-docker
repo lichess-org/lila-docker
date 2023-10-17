@@ -92,6 +92,20 @@ setup_database() {
         "mongosh --host mongodb lichess --file /scripts/mongodb/users.js"
 }
 
+run_formatter() {
+    docker compose run --rm ui bash -c "\
+        cd /lila && \
+        pnpm install && pnpm run format && \
+        cd /chessground && \
+        pnpm install && pnpm run format && \
+        cd /pgn-viewer && \
+        pnpm install && pnpm run format"
+
+    docker run --rm -v $(pwd)/repos/lila:/lila \
+        sbtscala/scala-sbt:eclipse-temurin-focal-17.0.8.1_1_1.9.6_3.3.1 \
+        bash -c "cd /lila && sbt scalafmtAll"
+}
+
 run_gitpod_welcome() {
     GREEN="\e[32m"
     BOLDGREEN="\e[1;32m"
@@ -107,7 +121,7 @@ run_gitpod_welcome() {
 }
 
 show_help() {
-    echo "Usage: $0 [start|stop|down|build]"
+    echo "Usage: $0 [start|stop|down|build|format]"
 }
 
 case $1 in
@@ -126,6 +140,9 @@ case $1 in
         ;;
     build)
         build_all_profiles
+        ;;
+    format)
+        run_formatter
         ;;
     gitpod-welcome)
         run_gitpod_welcome
