@@ -15,7 +15,7 @@ As an alternative to running it on your local machine, you can use Gitpod (a fre
 
 Click here to create a workspace:
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/new/#https://github.com/fitztrev/lila-docker/tree/gitpod)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/new/#https://github.com/lichess-org/lila-docker)
 
 ## Instructions
 
