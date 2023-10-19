@@ -1,0 +1,28 @@
+tasks:
+  - command: |
+      ./lila-docker start
+      ./lila-docker gitpod-welcome
+
+ports:
+  - port: 8080
+    name: lichess
+    description: Your Lichess development site
+    onOpen: open-preview
+  - port: 8025
+    name: mailpit
+    description: For debugging emails
+    onOpen: ignore
+  - port: 8081
+    name: mongo-express
+    description: "For exploring database schema and contents (u: admin / p: pass)"
+    onOpen: ignore
+  - port: 5601
+    name: kibana
+    description: For debugging Elasticsearch
+    onOpen: ignore
+
+vscode:
+  extensions:
+    - esbenp.prettier-vscode
+    - ms-azuretools.vscode-docker
+    - scala-lang.scala

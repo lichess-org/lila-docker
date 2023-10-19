@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="5">
     <style>
         html {
             background: #161512;
@@ -19,6 +18,10 @@
             background: #5d2929;
             font-size: 1.4rem;
             margin: 4rem 0 3rem;
+            padding: 1rem;
+        }
+        pre {
+            background: #333;
             padding: 1rem;
         }
         footer {
@@ -36,14 +39,32 @@
     <div class="container">
         <h2>lila-docker</h2>
 
-        <p class="error">The lila process is not currently running and/or port 9663 is not yet available.</p>
+        <p class="error">The lila process is not currently available.</p>
 
         <h3>To Fix:</h3>
-        <p>If you're just starting your environment, wait until lila finishes compiling. It will automatically start within 5-10 minutes.</p>
-        <p>Check the status in the lila service within Docker. Restart it manually if necessary.</p>
-        <p>For the full documentation, see <a href="https://github.com/lichess-org/lila-docker">https://github.com/lichess-org/lila-docker</a></p>
+        <p>If you're just starting your environment, wait until lila finishes compiling. It will automatically start within 5-15 minutes.</p>
+        <p>You can monitor the logs to see the progress:</p>
+        <pre><code>docker compose logs lila --follow</code></pre>
 
-        <footer>Nginx Error: <!--# echo var="status" default="" --></footer>
+
+        <footer>
+            <p>For the full documentation, see <a href="https://github.com/lichess-org/lila-docker">https://github.com/lichess-org/lila-docker</a></p>
+            <p>Nginx Error: <!--# echo var="status" default="" --></p>
+        </footer>
     </div>
+
+    <script>
+        // Check if lila is ready yet
+        setInterval(function() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', window.location.href);
+            xhr.onload = function() {
+                if (xhr.status < 500) {
+                    window.location.reload();
+                }
+            };
+            xhr.send();
+        }, 5*1000);
+    </script>
 </body>
 </html>
