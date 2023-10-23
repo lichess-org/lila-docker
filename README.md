@@ -108,7 +108,7 @@ docker compose run --rm ui bash -c "cd /pgn-viewer && pnpm install && pnpm run f
 
 # sbt scalafmtAll
 docker run --rm -v $(pwd)/repos/lila:/lila \
-    sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.6_3.3.1 \
+    sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.7_3.3.1 \
     bash -c "cd /lila && sbt scalafmtAll"
 ```
 
@@ -162,17 +162,17 @@ Other Scalachess commands:
 ```bash
 ## compile
 docker run --rm -v $(pwd)/repos/scalachess:/mnt \
-    sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.6_3.3.1 \
+    sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.7_3.3.1 \
     bash -c "cd /mnt && sbt compile"
 
 ## test
 docker run --rm -v $(pwd)/repos/scalachess:/mnt \
-    sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.6_3.3.1 \
+    sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.7_3.3.1 \
     bash -c "cd /mnt && sbt testKit/test"
 
 ## package
 docker run --rm -v $(pwd)/repos/scalachess:/mnt \
-    sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.6_3.3.1 \
+    sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.7_3.3.1 \
     bash -c "cd /mnt && sbt package"
 ```
 

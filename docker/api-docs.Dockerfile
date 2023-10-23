@@ -1,4 +1,4 @@
-FROM node:20.8.0-bookworm
+FROM node:20.8.1-bookworm
 
 WORKDIR /api/doc
 

@@ -102,7 +102,7 @@ run_formatter() {
         pnpm install && pnpm run format"
 
     docker run --rm -v $(pwd)/repos/lila:/lila \
-        sbtscala/scala-sbt:eclipse-temurin-focal-17.0.8.1_1_1.9.6_3.3.1 \
+        sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.7_3.3.1 \
         bash -c "cd /lila && sbt scalafmtAll"
 }
 

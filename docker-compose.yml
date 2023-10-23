@@ -6,7 +6,7 @@ services:
       - lila-network
 
   redis:
-    image: redis:7.2.1-alpine3.18
+    image: redis:7.2.2-alpine3.18
     restart: unless-stopped
     networks:
       - lila-network
@@ -211,7 +211,7 @@ services:
       - thumbnails
 
   mailpit:
-    image: axllent/mailpit:v1.9.6
+    image: axllent/mailpit:v1.9.9
     ports:
       - 8025:8025
     networks:
