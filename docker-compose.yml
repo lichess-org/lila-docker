@@ -61,6 +61,8 @@ services:
       - 8089:8089
     volumes:
       - ./repos/api:/api
+    profiles:
+      - api-docs
 
   pgn_viewer:
     build:
@@ -70,6 +72,8 @@ services:
       - 8090:8080
     volumes:
       - ./repos/pgn-viewer:/pgn-viewer
+    profiles:
+      - pgn-viewer
 
   lila_engine:
     build:

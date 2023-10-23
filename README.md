@@ -1,8 +1,21 @@
 # lila-docker
 
-Lichess local development using Docker Compose, for developing on Mac or Linux.
+Lichess development environment using Docker Compose, for developing on Mac or Linux.
 
 The only requirements for running on your local machine are `git` and Docker Desktop. All the other dependencies (Scala, MongoDB, Node.js, etc) are installed and run in Docker containers.
+
+## Running in Gitpod
+
+As an alternative to running it on your local machine, you can use Gitpod (a free, online, VS Code-like IDE) for contributing. With a single click, it will launch a workspace and automatically:
+
+- Clone the necessary Lichess repositories
+- Install all the dependencies
+- Seed your database with test data
+- Start your development site
+
+Click here to create a workspace:
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/new/#https://github.com/lichess-org/lila-docker)
 
 ## Instructions
 
@@ -48,8 +61,6 @@ Always available:
 | Main lila instance | http://localhost:8080/                      |
 | Chessground demo   | http://localhost:8080/chessground/demo.html |
 | Mongodb manager    | http://localhost:8081/ (admin/pass)         |
-| API docs           | http://localhost:8089/                      |
-| PGN Viewer         | http://localhost:8090/                      |
 | Email inbox        | http://localhost:8025/                      |
 
 Depending on which optional services you start:
@@ -59,6 +70,8 @@ Depending on which optional services you start:
 | lila-gif              | http://localhost:6175/image.gif?fen=4k3/6KP/8/8/8/8/7p/8 |
 | Picfit                | http://localhost:3001/healthcheck                        |
 | Elasticsearch manager | http://localhost:5601/                                   |
+| API docs              | http://localhost:8089/                                   |
+| PGN Viewer            | http://localhost:8090/                                   |
 
 ## Usage
 
