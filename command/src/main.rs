@@ -1,13 +1,13 @@
 use cliclack::{confirm, input, intro, multiselect};
 
-const BANNER: &str = r#"
+const BANNER: &str = r"
    |\_    _ _      _
    /o \  | (_) ___| |__   ___  ___ ___   ___  _ __ __ _
  (_. ||  | | |/ __| '_ \ / _ \/ __/ __| / _ \| '__/ _` |
    /__\  | | | (__| | | |  __/\__ \__ \| (_) | | | (_| |
   )___(  |_|_|\___|_| |_|\___||___/___(_)___/|_|  \__, |
                                                    |___/
-"#;
+";
 
 const ENV_PATH: &str = "/.env";
 
@@ -133,14 +133,14 @@ fn main() -> std::io::Result<()> {
                 .interact()?,
         )
     } else {
-        (String::from(""), String::from(""))
+        (String::new(), String::new())
     };
 
     let repos = [
         vec!["lila", "lila-ws", "lila-db-seed", "lifat"],
         services
             .iter()
-            .flat_map(|service| service.repositories.clone())
+            .filter_map(|service| service.repositories.clone())
             .flatten()
             .collect::<Vec<_>>(),
     ]
@@ -148,7 +148,7 @@ fn main() -> std::io::Result<()> {
 
     let profiles = services
         .iter()
-        .flat_map(|service| service.compose_profile.clone())
+        .filter_map(|service| service.compose_profile)
         .collect::<Vec<_>>();
 
     let env_contents = format!(
@@ -165,7 +165,7 @@ fn main() -> std::io::Result<()> {
             std::fs::write(ENV_PATH, env_contents)?;
         }
         Err(_) => {
-            println!(".env contents:\n{}", env_contents);
+            println!(".env contents:\n{env_contents}");
         }
     }
 
