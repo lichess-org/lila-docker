@@ -1,4 +1,4 @@
-FROM node:20.8.1-bookworm
+FROM node:20.8.1-bookworm-slim
 
 RUN npm install -g pnpm
 

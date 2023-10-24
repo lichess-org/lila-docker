@@ -1,6 +1,6 @@
-FROM node:20.8.1-bookworm
+FROM node:20.8.1-bookworm-slim
 
-RUN git config --global --add safe.directory /lila
-RUN git config --global --add safe.directory /chessground
-RUN git config --global --add safe.directory /pgn-viewer
+RUN apt-get update
+RUN apt-get install -y git
+
 RUN npm install -g pnpm
