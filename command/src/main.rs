@@ -67,7 +67,7 @@ fn main() -> std::io::Result<()> {
     .item(
         OptionalService {
             compose_profile: Some("thumbnails"),
-            repositories: None
+            repositories: None,
         },
         "Thumbnailer (for resizing images)",
         "",
