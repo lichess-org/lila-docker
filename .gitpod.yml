@@ -6,19 +6,38 @@ tasks:
 ports:
   - port: 8080
     name: lichess
-    description: Your Lichess development site
+    description: Lichess dev site
     onOpen: open-preview
   - port: 8025
     name: mailpit
-    description: For debugging emails
+    description: Email inbox
     onOpen: ignore
   - port: 8081
     name: mongo-express
-    description: "For exploring database schema and contents (u: admin / p: pass)"
+    description: "Database explorer (u: admin / p: pass)"
+    onOpen: ignore
+  - port: 8089
+    name: API docs
+    onOpen: ignore
+  - port: 8090
+    name: chessground
+    onOpen: ignore
+  - port: 8091
+    name: pgn-viewer
+    onOpen: ignore
+  - port: 9666
+    name: lila-engine
+    description: External engine
+    onOpen: ignore
+  - port: 6175
+    name: lila-gif
+    onOpen: ignore
+  - port: 3001
+    name: picfit
     onOpen: ignore
   - port: 5601
     name: kibana
-    description: For debugging Elasticsearch
+    description: Elasticsearch manager
     onOpen: ignore
 
 vscode:
