@@ -6,8 +6,8 @@ run_setup() {
     docker compose run --rm -it lila_docker_rs bash -c "cargo run --manifest-path /mnt/Cargo.toml"
     export $(cat .env | xargs)
 
-    echo "Cloning repos..."
-    repos=(lila lila-ws lila-db-seed lila-engine lila-fishnet lila-gif lila-search lifat scalachess api pgn-viewer chessground berserk)
+    repos=($(echo $REPOS | tr ',' ' '))
+    echo "Cloning repos... ${repos[@]}"
     for repo in "${repos[@]}"; do
         [ ! -d repos/$repo ] && git clone --depth 1 https://github.com/lichess-org/$repo.git repos/$repo
     done

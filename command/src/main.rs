@@ -11,37 +11,99 @@ const BANNER: &str = r#"
 
 const ENV_PATH: &str = "/.env";
 
+#[derive(Default, Clone, Eq, PartialEq, Debug)]
+struct OptionalService {
+    compose_profile: Option<&'static str>,
+    repositories: Option<Vec<&'static str>>,
+}
+
 fn main() -> std::io::Result<()> {
     intro(BANNER)?;
 
-    let profiles = multiselect(
-        "Select which optional services to run:\n   (Use <space> to toggle, <enter> to confirm)",
+    let services = multiselect(
+        "Select which optional services to install:\n   (Use <space> to toggle, <enter> to confirm)",
     )
     .required(false)
     .item(
-        "stockfish-play",
+        OptionalService {
+            compose_profile: Some("stockfish-play"),
+            repositories: vec!["lila-fishnet"].into(),
+        },
         "Stockfish (for playing against the computer)",
         "",
     )
     .item(
-        "stockfish-analysis",
+        OptionalService {
+            compose_profile: Some("stockfish-analysis"),
+            repositories: None,
+        },
         "Stockfish (for requesting computer analysis of games)",
         "",
     )
     .item(
-        "external-engine",
+        OptionalService {
+            compose_profile: Some("external-engine"),
+            repositories: vec!["lila-engine"].into(),
+        },
         "External Engine (for connecting a local chess engine to the analysis board)",
         "",
     )
     .item(
-        "search",
+        OptionalService {
+            compose_profile: Some("search"),
+            repositories: vec!["lila-search"].into(),
+        },
         "Search (for searching games, forum posts, etc)",
         "",
     )
-    .item("gifs", "GIFs (for generating animated GIFs of games)", "")
-    .item("thumbnails", "Thumbnailer (for resizing images)", "")
-    .item("api-docs", "API docs", "")
-    .item("pgn-viewer", "PGN Viewer (Standalone)", "")
+    .item(
+        OptionalService {
+            compose_profile: Some("gifs"),
+            repositories: vec!["lila-gif"].into(),
+        },
+        "GIFs (for generating animated GIFs of games)",
+        "",
+    )
+    .item(
+        OptionalService {
+            compose_profile: Some("thumbnails"),
+            repositories: None
+        },
+        "Thumbnailer (for resizing images)",
+        "",
+    )
+    .item(
+        OptionalService {
+            compose_profile: Some("api-docs"),
+            repositories: vec!["api"].into(),
+        },
+        "API docs",
+        "",
+    )
+    .item(
+        OptionalService {
+            compose_profile: Some("pgn-viewer"),
+            repositories: vec!["pgn-viewer"].into(),
+        },
+        "PGN Viewer (Standalone)",
+        "",
+    )
+    .item(
+        OptionalService {
+            compose_profile: None,
+            repositories: vec!["scalachess"].into(),
+        },
+        "Scalachess library",
+        "",
+    )
+    .item(
+        OptionalService {
+            compose_profile: None,
+            repositories: vec!["berserk"].into(),
+        },
+        "Berserk (Python API client)",
+        "",
+    )
     .interact()?;
 
     let setup_database =
@@ -66,8 +128,24 @@ fn main() -> std::io::Result<()> {
         (String::from(""), String::from(""))
     };
 
+    let repos = [
+        vec!["lila", "lila-ws", "lila-db-seed", "lifat", "chessground"],
+        services
+            .iter()
+            .flat_map(|service| service.repositories.clone())
+            .flatten()
+            .collect::<Vec<_>>(),
+    ]
+    .concat();
+
+    let profiles = services
+        .iter()
+        .flat_map(|service| service.compose_profile.clone())
+        .collect::<Vec<_>>();
+
     let env_contents = format!(
-        "COMPOSE_PROFILES={}\nSETUP_DB={}\nSU_PASSWORD={}\nPASSWORD={}\n",
+        "REPOS={}\nCOMPOSE_PROFILES={}\nSETUP_DB={}\nSU_PASSWORD={}\nPASSWORD={}\n",
+        repos.join(","),
         profiles.join(","),
         setup_database,
         su_password,
