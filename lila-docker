@@ -9,7 +9,7 @@ run_setup() {
     repos=($(echo $REPOS | tr ',' ' '))
     echo "Cloning repos... ${repos[@]}"
     for repo in "${repos[@]}"; do
-        [ ! -d repos/$repo ] && git clone --depth 1 https://github.com/lichess-org/$repo.git repos/$repo
+        [ ! -d repos/$repo ] && git clone --depth 1 --origin lichess-org https://github.com/lichess-org/$repo.git repos/$repo
     done
 
     git -C repos/lila submodule update --init
