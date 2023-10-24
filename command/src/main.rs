@@ -21,7 +21,7 @@ fn main() -> std::io::Result<()> {
     intro(BANNER)?;
 
     let services = multiselect(
-        "Select which optional services to install:\n   (Use <space> to toggle, <enter> to confirm)",
+        "Select which optional services to run:\n   (Use <space> to toggle, <enter> to confirm)",
     )
     .required(false)
     .item(
@@ -82,6 +82,14 @@ fn main() -> std::io::Result<()> {
     )
     .item(
         OptionalService {
+            compose_profile: Some("chessground"),
+            repositories: vec!["chessground"].into(),
+        },
+        "Chessground board UI (Standalone)",
+        "",
+    )
+    .item(
+        OptionalService {
             compose_profile: Some("pgn-viewer"),
             repositories: vec!["pgn-viewer"].into(),
         },
@@ -129,7 +137,7 @@ fn main() -> std::io::Result<()> {
     };
 
     let repos = [
-        vec!["lila", "lila-ws", "lila-db-seed", "lifat", "chessground"],
+        vec!["lila", "lila-ws", "lila-db-seed", "lifat"],
         services
             .iter()
             .flat_map(|service| service.repositories.clone())
