@@ -21,7 +21,7 @@ fn main() -> std::io::Result<()> {
     intro(BANNER)?;
 
     let services = multiselect(
-        "Select which optional services to run:\n   (Use <space> to toggle, <enter> to confirm)",
+        "Select which optional services to run:\n    (Use arrows, <space> to toggle, <enter> to continue)\n",
     )
     .required(false)
     .item(
@@ -29,48 +29,48 @@ fn main() -> std::io::Result<()> {
             compose_profile: Some("stockfish-play"),
             repositories: vec!["lila-fishnet"].into(),
         },
-        "Stockfish (for playing against the computer)",
-        "",
+        "Stockfish Play",
+        "for playing against the computer",
     )
     .item(
         OptionalService {
             compose_profile: Some("stockfish-analysis"),
             repositories: None,
         },
-        "Stockfish (for requesting computer analysis of games)",
-        "",
+        "Stockfish Analysis",
+        "for requesting computer analysis of games",
     )
     .item(
         OptionalService {
             compose_profile: Some("external-engine"),
             repositories: vec!["lila-engine"].into(),
         },
-        "External Engine (for connecting a local chess engine to the analysis board)",
-        "",
+        "External Engine",
+        "for connecting a local chess engine to the analysis board",
     )
     .item(
         OptionalService {
             compose_profile: Some("search"),
             repositories: vec!["lila-search"].into(),
         },
-        "Search (for searching games, forum posts, etc)",
-        "",
+        "Search",
+        "for searching games, forum posts, etc",
     )
     .item(
         OptionalService {
             compose_profile: Some("gifs"),
             repositories: vec!["lila-gif"].into(),
         },
-        "GIFs (for generating animated GIFs of games)",
-        "",
+        "GIFs",
+        "for generating animated GIFs of games",
     )
     .item(
         OptionalService {
             compose_profile: Some("thumbnails"),
             repositories: None,
         },
-        "Thumbnailer (for resizing images)",
-        "",
+        "Thumbnail generator",
+        "for resizing blog/streamer images",
     )
     .item(
         OptionalService {
@@ -78,39 +78,39 @@ fn main() -> std::io::Result<()> {
             repositories: vec!["api"].into(),
         },
         "API docs",
-        "",
+        "standalone API documentation",
     )
     .item(
         OptionalService {
             compose_profile: Some("chessground"),
             repositories: vec!["chessground"].into(),
         },
-        "Chessground board UI (Standalone)",
-        "",
+        "Chessground",
+        "standalone board UI",
     )
     .item(
         OptionalService {
             compose_profile: Some("pgn-viewer"),
             repositories: vec!["pgn-viewer"].into(),
         },
-        "PGN Viewer (Standalone)",
-        "",
+        "PGN Viewer",
+        "standalone PGN viewer",
     )
     .item(
         OptionalService {
             compose_profile: None,
             repositories: vec!["scalachess"].into(),
         },
-        "Scalachess library",
-        "",
+        "Scalachess",
+        "standalone chess logic library",
     )
     .item(
         OptionalService {
             compose_profile: None,
             repositories: vec!["berserk"].into(),
         },
-        "Berserk (Python API client)",
-        "",
+        "Berserk",
+        "Python API client",
     )
     .interact()?;
 
