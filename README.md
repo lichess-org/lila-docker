@@ -91,6 +91,14 @@ To watch for Typescript/SCSS changes and automatically recompile:
 docker compose run --rm ui bash -c "/lila/ui/build -w"
 ```
 
+## Updating Routes
+
+If you edit the `conf/routes` file, you'll need to update the route cache.
+
+```bash
+docker compose exec lila bash -c "./lila playRoutes"
+```
+
 ### To add translation keys:
 
 After modifying a `translation/source/*.xml` file, run:

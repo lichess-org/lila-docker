@@ -80,7 +80,7 @@ fn main() -> std::io::Result<()> {
 
 fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
     multiselect(
-        "Select which optional services to run:\n    (Use arrows, <space> to toggle, <enter> to continue)\n",
+        "Select which optional services to include:\n    (Use arrows, <space> to toggle, <enter> to continue)\n",
     )
     .required(false)
     .item(
