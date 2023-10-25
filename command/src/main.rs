@@ -1,3 +1,5 @@
+use std::io::Error;
+
 use cliclack::{confirm, input, intro, multiselect};
 
 const BANNER: &str = r"
@@ -20,7 +22,64 @@ struct OptionalService {
 fn main() -> std::io::Result<()> {
     intro(BANNER)?;
 
-    let services = multiselect(
+    let services = prompt_for_optional_services()?;
+
+    let setup_database =
+        confirm("Do you want to seed the database with test users, games, etc? (Recommended)")
+            .initial_value(true)
+            .interact()?;
+
+    let (su_password, password) = if setup_database {
+        (
+            input("Choose a password for admin users (blank for 'password')")
+                .placeholder("password")
+                .default_input("password")
+                .required(false)
+                .interact()?,
+            input("Choose a password for regular users (blank for 'password')")
+                .placeholder("password")
+                .default_input("password")
+                .required(false)
+                .interact()?,
+        )
+    } else {
+        (String::new(), String::new())
+    };
+
+    let repos = [
+        vec!["lila", "lila-ws", "lila-db-seed", "lifat"],
+        services
+            .iter()
+            .filter_map(|service| service.repositories.clone())
+            .flatten()
+            .collect::<Vec<_>>(),
+    ]
+    .concat();
+
+    let profiles = services
+        .iter()
+        .filter_map(|service| service.compose_profile)
+        .collect::<Vec<_>>();
+
+    let env_contents = [
+        format!("REPOS={}", repos.join(",")),
+        format!("COMPOSE_PROFILES={}", profiles.join(",")),
+        format!("SETUP_DB={setup_database}"),
+        format!("SU_PASSWORD={su_password}"),
+        format!("PASSWORD={password}"),
+    ]
+    .join("\n");
+
+    match std::fs::metadata(ENV_PATH) {
+        Ok(_) => std::fs::write(ENV_PATH, env_contents)?,
+        Err(_) => println!(".env contents:\n{env_contents}"),
+    }
+
+    Ok(())
+}
+
+fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
+    multiselect(
         "Select which optional services to run:\n    (Use arrows, <space> to toggle, <enter> to continue)\n",
     )
     .required(false)
@@ -112,58 +171,5 @@ fn main() -> std::io::Result<()> {
         "Berserk",
         "Python API client",
     )
-    .interact()?;
-
-    let setup_database =
-        confirm("Do you want to seed the database with test users, games, etc? (Recommended)")
-            .initial_value(true)
-            .interact()?;
-
-    let (su_password, password) = if setup_database {
-        (
-            input("Choose a password for admin users (blank for 'password')")
-                .placeholder("password")
-                .default_input("password")
-                .required(false)
-                .interact()?,
-            input("Choose a password for regular users (blank for 'password')")
-                .placeholder("password")
-                .default_input("password")
-                .required(false)
-                .interact()?,
-        )
-    } else {
-        (String::new(), String::new())
-    };
-
-    let repos = [
-        vec!["lila", "lila-ws", "lila-db-seed", "lifat"],
-        services
-            .iter()
-            .filter_map(|service| service.repositories.clone())
-            .flatten()
-            .collect::<Vec<_>>(),
-    ]
-    .concat();
-
-    let profiles = services
-        .iter()
-        .filter_map(|service| service.compose_profile)
-        .collect::<Vec<_>>();
-
-    let env_contents = [
-        format!("REPOS={}", repos.join(",")),
-        format!("COMPOSE_PROFILES={}", profiles.join(",")),
-        format!("SETUP_DB={setup_database}"),
-        format!("SU_PASSWORD={su_password}"),
-        format!("PASSWORD={password}"),
-    ]
-    .join("\n");
-
-    match std::fs::metadata(ENV_PATH) {
-        Ok(_) => std::fs::write(ENV_PATH, env_contents)?,
-        Err(_) => println!(".env contents:\n{env_contents}"),
-    }
-
-    Ok(())
+    .interact()
 }
