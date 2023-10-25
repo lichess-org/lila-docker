@@ -151,22 +151,18 @@ fn main() -> std::io::Result<()> {
         .filter_map(|service| service.compose_profile)
         .collect::<Vec<_>>();
 
-    let env_contents = format!(
-        "REPOS={}\nCOMPOSE_PROFILES={}\nSETUP_DB={}\nSU_PASSWORD={}\nPASSWORD={}\n",
-        repos.join(","),
-        profiles.join(","),
-        setup_database,
-        su_password,
-        password
-    );
+    let env_contents = [
+        format!("REPOS={}", repos.join(",")),
+        format!("COMPOSE_PROFILES={}", profiles.join(",")),
+        format!("SETUP_DB={setup_database}"),
+        format!("SU_PASSWORD={su_password}"),
+        format!("PASSWORD={password}"),
+    ]
+    .join("\n");
 
     match std::fs::metadata(ENV_PATH) {
-        Ok(_) => {
-            std::fs::write(ENV_PATH, env_contents)?;
-        }
-        Err(_) => {
-            println!(".env contents:\n{env_contents}");
-        }
+        Ok(_) => std::fs::write(ENV_PATH, env_contents)?,
+        Err(_) => println!(".env contents:\n{env_contents}"),
     }
 
     Ok(())
