@@ -6,14 +6,6 @@ run_setup() {
     docker compose run --rm -it lila_docker_rs bash -c "cargo run --manifest-path /mnt/Cargo.toml"
     export $(cat .env | xargs)
 
-    # create a placeholder directory for each of the repos
-    # otherwise the directories will be created by Docker
-    # when the volumes are mounted and they may be owned by root
-    dirs=($(echo $DIRS | tr ',' ' '))
-    for dir in "${dirs[@]}"; do
-        mkdir -p repos/$dir
-    done
-
     repos=($(echo $REPOS | tr ',' ' '))
     echo "Cloning repos ${repos[@]}..."
     for repo in "${repos[@]}"; do
