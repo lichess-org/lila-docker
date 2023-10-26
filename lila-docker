@@ -6,24 +6,32 @@ run_setup() {
     docker compose run --rm -it lila_docker_rs bash -c "cargo run --manifest-path /mnt/Cargo.toml"
     export $(cat .env | xargs)
 
-    echo "Cloning repos..."
-    repos=(lila lila-ws lila-db-seed lila-engine lila-fishnet lila-gif lila-search lifat scalachess api pgn-viewer chessground berserk)
+    # create a placeholder directory for each of the repos
+    # otherwise the directories will be created by Docker
+    # when the volumes are mounted and they may be owned by root
+    dirs=($(echo $DIRS | tr ',' ' '))
+    for dir in "${dirs[@]}"; do
+        mkdir -p repos/$dir
+    done
+
+    repos=($(echo $REPOS | tr ',' ' '))
+    echo "Cloning repos ${repos[@]}..."
     for repo in "${repos[@]}"; do
-        [ ! -d repos/$repo ] && git clone --depth 1 https://github.com/lichess-org/$repo.git repos/$repo
+        [ ! -d repos/$repo/.git ] && git clone --depth 1 --origin lichess-org https://github.com/lichess-org/$repo repos/$repo
     done
 
     git -C repos/lila submodule update --init
 
     run_setup_config
 
-    echo "Compiling lila js/css..."
-    docker compose run --rm ui bash -c "/lila/ui/build"
-
-    echo "Compiling chessground..."
-    docker compose run --rm ui bash -c "cd /chessground && pnpm install && pnpm run compile"
-
     docker compose build
+    # separate build specifically for utils profile otherwise its Dockerfile changes won't be detected
+    docker compose --profile utils build
+
     docker compose up -d
+
+    echo "Compiling js/css..."
+    docker compose run --rm ui bash -c "/lila/ui/build"
 
     if [ "$SETUP_DB" = "true" ]; then
         setup_database
@@ -86,7 +94,7 @@ setup_database() {
         "mongo --host mongodb lichess /lila/bin/mongodb/indexes.js"
 
     docker compose run --rm python bash -c \
-        "pip install pymongo && python /lila-db-seed/spamdb/spamdb.py --uri=mongodb://mongodb/lichess --password=$PASSWORD --su-password=$SU_PASSWORD --es --es-host=elasticsearch:9200"
+        "python /lila-db-seed/spamdb/spamdb.py --uri=mongodb://mongodb/lichess --password=$PASSWORD --su-password=$SU_PASSWORD --es --es-host=elasticsearch:9200"
 
     docker compose run --rm -v $(pwd)/scripts:/scripts mongodb bash -c \
         "mongosh --host mongodb lichess --file /scripts/mongodb/users.js"
@@ -94,12 +102,9 @@ setup_database() {
 
 run_formatter() {
     docker compose run --rm ui bash -c "\
-        cd /lila && \
-        pnpm install && pnpm run format && \
-        cd /chessground && \
-        pnpm install && pnpm run format && \
-        cd /pgn-viewer && \
-        pnpm install && pnpm run format"
+        cd /lila && pnpm install && pnpm run format && \
+        (test -f /chessground/package.json && cd /chessground && pnpm install && pnpm run format) || echo 'Skipping chessground' && \
+        (test -f /pgn-viewer/package.json && cd /pgn-viewer && pnpm install && pnpm run format) || echo 'Skipping pgn-viewer'"
 
     docker run --rm -v $(pwd)/repos/lila:/lila \
         sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.7_3.3.1 \

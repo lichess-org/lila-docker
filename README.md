@@ -8,10 +8,10 @@ The only requirements for running on your local machine are `git` and Docker Des
 
 As an alternative to running it on your local machine, you can use Gitpod (a free, online, VS Code-like IDE) for contributing. With a single click, it will launch a workspace and automatically:
 
-- Clone the necessary Lichess repositories
-- Install all the dependencies
-- Seed your database with test data
-- Start your development site
+-   Clone the necessary Lichess repositories
+-   Install all the dependencies
+-   Seed your database with test data
+-   Start your development site
 
 Click here to create a workspace:
 
@@ -56,12 +56,11 @@ To remove the containers:
 
 Always available:
 
-| Service            | URL                                         |
-| ------------------ | ------------------------------------------- |
-| Main lila instance | http://localhost:8080/                      |
-| Chessground demo   | http://localhost:8080/chessground/demo.html |
-| Mongodb manager    | http://localhost:8081/ (admin/pass)         |
-| Email inbox        | http://localhost:8025/                      |
+| Service            | URL                                 |
+| ------------------ | ----------------------------------- |
+| Main lila instance | http://localhost:8080/              |
+| Mongodb manager    | http://localhost:8081/ (admin/pass) |
+| Email inbox        | http://localhost:8025/              |
 
 Depending on which optional services you start:
 
@@ -71,7 +70,8 @@ Depending on which optional services you start:
 | Picfit                | http://localhost:3001/healthcheck                        |
 | Elasticsearch manager | http://localhost:5601/                                   |
 | API docs              | http://localhost:8089/                                   |
-| PGN Viewer            | http://localhost:8090/                                   |
+| Chessground           | http://localhost:8090/demo.html                          |
+| PGN Viewer            | http://localhost:8091/                                   |
 
 ## Usage
 
@@ -91,6 +91,14 @@ To watch for Typescript/SCSS changes and automatically recompile:
 docker compose run --rm ui bash -c "/lila/ui/build -w"
 ```
 
+## Updating Routes
+
+If you edit the `conf/routes` file, you'll need to update the route cache.
+
+```bash
+docker compose exec lila bash -c "./lila playRoutes"
+```
+
 ### To add translation keys:
 
 After modifying a `translation/source/*.xml` file, run:
@@ -102,14 +110,7 @@ docker compose run --rm ui bash -c "/lila/bin/trans-dump"
 ### Code formatting:
 
 ```bash
-docker compose run --rm ui bash -c "cd /lila && pnpm install && pnpm run format"
-docker compose run --rm ui bash -c "cd /chessground && pnpm install && pnpm run format"
-docker compose run --rm ui bash -c "cd /pgn-viewer && pnpm install && pnpm run format"
-
-# sbt scalafmtAll
-docker run --rm -v $(pwd)/repos/lila:/lila \
-    sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.7_3.3.1 \
-    bash -c "cd /lila && sbt scalafmtAll"
+./lila-docker format
 ```
 
 ### Berserk (Python library):
@@ -216,7 +217,7 @@ By default, your local lila instance will use the version of chessground that is
     docker compose run --rm ui bash -c "/lila/ui/build -w"
     ```
 
-Then you can see the updated chessground demo at http://localhost:8080/chessground/demo.html and when you refresh lila, it will use the local copy of chessground.
+Then you can see the updated chessground demo at http://localhost:8090/demo.html and when you refresh lila, it will use the local copy of chessground.
 
 ### Developing PGN Viewer locally
 
@@ -226,4 +227,4 @@ To re-compile the PGN Viewer after making changes:
 docker compose run --rm ui bash -c "cd /pgn-viewer && pnpm run sass-dev && pnpm run bundle-dev"
 ```
 
-See the changes on the PGN Viewer demo page: http://localhost:8090/
+See the changes on the PGN Viewer demo page: http://localhost:8091/
