@@ -1,6 +1,7 @@
 use std::io::Error;
 
 use cliclack::{confirm, input, intro, multiselect};
+use strum::{EnumIter, EnumString, IntoEnumIterator};
 
 const BANNER: &str = r"
    |\_    _ _      _
@@ -15,8 +16,40 @@ const ENV_PATH: &str = "/.env";
 
 #[derive(Default, Clone, Eq, PartialEq, Debug)]
 struct OptionalService {
-    compose_profile: Option<&'static str>,
-    repositories: Option<Vec<&'static str>>,
+    compose_profile: Option<ComposeProfile>,
+    repositories: Option<Vec<Repository>>,
+}
+
+#[derive(Debug, Clone, PartialEq, EnumString, strum::Display, Eq, EnumIter)]
+#[strum(serialize_all = "kebab-case")]
+enum ComposeProfile {
+    StockfishPlay,
+    StockfishAnalysis,
+    ExternalEngine,
+    Search,
+    Gifs,
+    Thumbnails,
+    ApiDocs,
+    Chessground,
+    PgnViewer,
+}
+
+#[derive(Debug, Clone, PartialEq, EnumString, strum::Display, Eq, EnumIter)]
+#[strum(serialize_all = "kebab-case")]
+enum Repository {
+    Lila,
+    LilaWs,
+    LilaDbSeed,
+    Lifat,
+    LilaFishnet,
+    LilaEngine,
+    LilaSearch,
+    LilaGif,
+    Api,
+    Chessground,
+    PgnViewer,
+    Scalachess,
+    Berserk,
 }
 
 fn main() -> std::io::Result<()> {
@@ -46,24 +79,46 @@ fn main() -> std::io::Result<()> {
         (String::new(), String::new())
     };
 
-    let repos = [
-        vec!["lila", "lila-ws", "lila-db-seed", "lifat"],
-        services
-            .iter()
-            .filter_map(|service| service.repositories.clone())
-            .flatten()
-            .collect::<Vec<_>>(),
-    ]
-    .concat();
-
-    let profiles = services
-        .iter()
-        .filter_map(|service| service.compose_profile)
-        .collect::<Vec<_>>();
-
     let env_contents = [
-        format!("REPOS={}", repos.join(",")),
-        format!("COMPOSE_PROFILES={}", profiles.join(",")),
+        format!(
+            "DIRS={}",
+            Repository::iter()
+                .map(|repo| repo.to_string())
+                .collect::<Vec<_>>()
+                .join(",")
+        ),
+        format!(
+            "REPOS={}",
+            [
+                vec![
+                    Repository::Lila,
+                    Repository::LilaWs,
+                    Repository::LilaDbSeed,
+                    Repository::Lifat,
+                ],
+                services
+                    .iter()
+                    .filter_map(|service| service.repositories.clone())
+                    .flatten()
+                    .collect::<Vec<_>>(),
+            ]
+            .concat()
+            .iter()
+            .map(std::string::ToString::to_string)
+            .collect::<Vec<_>>()
+            .join(",")
+        ),
+        format!(
+            "COMPOSE_PROFILES={}",
+            services
+                .iter()
+                .filter_map(|service| service.compose_profile.clone())
+                .collect::<Vec<_>>()
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect::<Vec<_>>()
+                .join(",")
+        ),
         format!("SETUP_DB={setup_database}"),
         format!("SU_PASSWORD={su_password}"),
         format!("PASSWORD={password}"),
@@ -85,15 +140,15 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
     .required(false)
     .item(
         OptionalService {
-            compose_profile: Some("stockfish-play"),
-            repositories: vec!["lila-fishnet"].into(),
+            compose_profile: Some(ComposeProfile::StockfishPlay),
+            repositories: vec![Repository::LilaFishnet].into(),
         },
         "Stockfish Play",
         "for playing against the computer",
     )
     .item(
         OptionalService {
-            compose_profile: Some("stockfish-analysis"),
+            compose_profile: Some(ComposeProfile::StockfishAnalysis),
             repositories: None,
         },
         "Stockfish Analysis",
@@ -101,31 +156,31 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
     )
     .item(
         OptionalService {
-            compose_profile: Some("external-engine"),
-            repositories: vec!["lila-engine"].into(),
+            compose_profile: Some(ComposeProfile::ExternalEngine),
+            repositories: vec![Repository::LilaEngine].into(),
         },
         "External Engine",
         "for connecting a local chess engine to the analysis board",
     )
     .item(
         OptionalService {
-            compose_profile: Some("search"),
-            repositories: vec!["lila-search"].into(),
+            compose_profile: Some(ComposeProfile::Search),
+            repositories: vec![Repository::LilaSearch].into(),
         },
         "Search",
         "for searching games, forum posts, etc",
     )
     .item(
         OptionalService {
-            compose_profile: Some("gifs"),
-            repositories: vec!["lila-gif"].into(),
+            compose_profile: Some(ComposeProfile::Gifs),
+            repositories: vec![Repository::LilaGif].into(),
         },
         "GIFs",
         "for generating animated GIFs of games",
     )
     .item(
         OptionalService {
-            compose_profile: Some("thumbnails"),
+            compose_profile: Some(ComposeProfile::Thumbnails),
             repositories: None,
         },
         "Thumbnail generator",
@@ -133,24 +188,24 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
     )
     .item(
         OptionalService {
-            compose_profile: Some("api-docs"),
-            repositories: vec!["api"].into(),
+            compose_profile: Some(ComposeProfile::ApiDocs),
+            repositories: vec![Repository::Api].into(),
         },
         "API docs",
         "standalone API documentation",
     )
     .item(
         OptionalService {
-            compose_profile: Some("chessground"),
-            repositories: vec!["chessground"].into(),
+            compose_profile: Some(ComposeProfile::Chessground),
+            repositories: vec![Repository::Chessground].into(),
         },
         "Chessground",
         "standalone board UI",
     )
     .item(
         OptionalService {
-            compose_profile: Some("pgn-viewer"),
-            repositories: vec!["pgn-viewer"].into(),
+            compose_profile: Some(ComposeProfile::PgnViewer),
+            repositories: vec![Repository::PgnViewer].into(),
         },
         "PGN Viewer",
         "standalone PGN viewer",
@@ -158,7 +213,7 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
     .item(
         OptionalService {
             compose_profile: None,
-            repositories: vec!["scalachess"].into(),
+            repositories: vec![Repository::Scalachess].into(),
         },
         "Scalachess",
         "standalone chess logic library",
@@ -166,7 +221,7 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
     .item(
         OptionalService {
             compose_profile: None,
-            repositories: vec!["berserk"].into(),
+            repositories: vec![Repository::Berserk].into(),
         },
         "Berserk",
         "Python API client",
