@@ -1,4 +1,4 @@
-use std::{fs, io::Error};
+use std::io::Error;
 
 use cliclack::{confirm, input, intro, multiselect};
 use strum::{EnumIter, EnumString, IntoEnumIterator};
@@ -81,6 +81,13 @@ fn main() -> std::io::Result<()> {
 
     let env_contents = [
         format!(
+            "DIRS={}",
+            Repository::iter()
+                .map(|repo| repo.to_string())
+                .collect::<Vec<_>>()
+                .join(",")
+        ),
+        format!(
             "REPOS={}",
             [
                 vec![
@@ -119,16 +126,7 @@ fn main() -> std::io::Result<()> {
     .join("\n");
 
     match std::fs::metadata(ENV_PATH) {
-        Ok(_) => {
-            std::fs::write(ENV_PATH, env_contents)?;
-
-            // create a placeholder directory for each of the repos
-            // otherwise the directories will be created by Docker
-            // when the volumes are mounted and they may be owned by root
-            for repo in Repository::iter() {
-                fs::create_dir_all(format!("/repos/{repo}"))?;
-            }
-        }
+        Ok(_) => std::fs::write(ENV_PATH, env_contents)?,
         Err(_) => println!(".env contents:\n{env_contents}"),
     }
 

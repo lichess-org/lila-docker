@@ -132,7 +132,6 @@ services:
     volumes:
       - .env:/.env
       - ./command:/mnt
-      - ./repos:/repos
     environment:
       - CARGO_HOME=/mnt/.cargo
     profiles:
