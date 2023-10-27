@@ -107,7 +107,6 @@ services:
       - lila-network
     volumes:
       - ./repos/lila-fishnet:/lila-fishnet
-      - ./conf/lila-fishnet.conf:/lila-fishnet/conf/application.conf
     profiles:
       - stockfish-play
 
