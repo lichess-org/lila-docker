@@ -49,6 +49,7 @@ enum Repository {
     Chessground,
     PgnViewer,
     Scalachess,
+    Dartchess,
     Berserk,
 }
 
@@ -217,6 +218,14 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
         },
         "Scalachess",
         "standalone chess logic library",
+    )
+    .item(
+        OptionalService {
+            compose_profile: None,
+            repositories: vec![Repository::Dartchess].into(),
+        },
+        "Dartchess",
+        "standalone chess library for mobile platforms",
     )
     .item(
         OptionalService {

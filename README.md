@@ -177,6 +177,22 @@ docker run --rm -v $(pwd)/repos/scalachess:/mnt \
     bash -c "cd /mnt && sbt package"
 ```
 
+## Dartchess:
+
+```bash
+## run formatter
+docker run --rm -v $(pwd)/repos/dartchess:/mnt --workdir /mnt dart:3.1.5-sdk \
+    dart format .
+
+## analyze
+docker run --rm -v $(pwd)/repos/dartchess:/mnt --workdir /mnt dart:3.1.5-sdk \
+    bash -c "dart pub get && dart analyze"
+
+## run tests
+docker run --rm -v $(pwd)/repos/dartchess:/mnt --workdir /mnt dart:3.1.5-sdk \
+    bash -c "dart pub get && dart test -x full_perft"
+```
+
 ### bbpPairings:
 
 ```bash
