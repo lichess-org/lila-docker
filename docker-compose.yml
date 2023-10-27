@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo:5.0.21-focal
+    image: mongo:5.0.22-focal
     restart: unless-stopped
     networks:
       - lila-network
@@ -38,7 +38,7 @@ services:
       - ./conf/lila-ws.conf:/lila-ws.conf
 
   nginx:
-    image: nginx:1.25.2-alpine3.18-slim
+    image: nginx:1.25.3-alpine3.18-slim
     networks:
       - lila-network
     ports:
