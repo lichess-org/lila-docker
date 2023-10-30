@@ -11,13 +11,19 @@ run_setup() {
     # when the volumes are mounted and they may be owned by root
     dirs=($(echo $DIRS | tr ',' ' '))
     for dir in "${dirs[@]}"; do
-        mkdir -p repos/$dir
+        mkdir -p repos/$(basename $dir)
     done
 
     repos=($(echo $REPOS | tr ',' ' '))
     echo "Cloning repos ${repos[@]}..."
     for repo in "${repos[@]}"; do
-        [ ! -d repos/$repo/.git ] && git clone --depth 1 --origin upstream https://github.com/lichess-org/$repo repos/$repo
+        if [[ $repo == */* ]]; then
+            org="${repo%%/*}"
+        else
+            org="lichess-org"
+        fi
+        repo=$(basename $repo)
+        [ ! -d repos/$repo/.git ] && git clone --depth 1 --origin upstream https://github.com/$org/$repo repos/$repo
     done
 
     git -C repos/lila submodule update --init

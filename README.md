@@ -197,15 +197,10 @@ docker run --rm -v $(pwd)/repos/dartchess:/mnt --workdir /mnt dart:3.1.5-sdk \
 
 ```bash
 docker build -f docker/bbpPairings.Dockerfile . -t bbppairings
-docker run --rm -v $(pwd)/repos:/mnt bbppairings bash -c "\
-    git clone https://github.com/cyanfish/bbpPairings \
-    && cd bbpPairings \
-    && make \
-    && chmod +x bbpPairings.exe \
-    && cp bbpPairings.exe /mnt"
+docker run --rm -v $(pwd)/repos/bbpPairings:/mnt bbppairings make
 
 ## verify
-./repos/bbpPairings.exe
+./repos/bbpPairings/bbpPairings.exe
 ```
 
 ### Developing Chessground locally

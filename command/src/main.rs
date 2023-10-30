@@ -51,6 +51,8 @@ enum Repository {
     Scalachess,
     Dartchess,
     Berserk,
+    #[strum(serialize = "cyanfish/bbpPairings")]
+    BbpPairings,
 }
 
 fn main() -> std::io::Result<()> {
@@ -234,6 +236,14 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
         },
         "Berserk",
         "Python API client",
+    )
+    .item(
+        OptionalService {
+            compose_profile: None,
+            repositories: vec![Repository::BbpPairings].into(),
+        },
+        "Swiss Pairings",
+        "bbpPairings tool",
     )
     .interact()
 }
