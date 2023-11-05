@@ -91,7 +91,7 @@ To watch for Typescript/SCSS changes and automatically recompile:
 docker compose run --rm ui bash -c "/lila/ui/build -w"
 ```
 
-## Updating Routes
+### Updating Routes
 
 If you edit the `conf/routes` file, you'll need to update the route cache.
 
@@ -163,21 +163,21 @@ Other Scalachess commands:
 ```bash
 ## compile
 docker run --rm -v $(pwd)/repos/scalachess:/mnt \
-    sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.7_3.3.1 \
+    sbtscala/scala-sbt:eclipse-temurin-jammy-21.0.1_12_1.9.7_3.3.1 \
     bash -c "cd /mnt && sbt compile"
 
 ## test
 docker run --rm -v $(pwd)/repos/scalachess:/mnt \
-    sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.7_3.3.1 \
+    sbtscala/scala-sbt:eclipse-temurin-jammy-21.0.1_12_1.9.7_3.3.1 \
     bash -c "cd /mnt && sbt testKit/test"
 
 ## package
 docker run --rm -v $(pwd)/repos/scalachess:/mnt \
-    sbtscala/scala-sbt:eclipse-temurin-jammy-21_35_1.9.7_3.3.1 \
+    sbtscala/scala-sbt:eclipse-temurin-jammy-21.0.1_12_1.9.7_3.3.1 \
     bash -c "cd /mnt && sbt package"
 ```
 
-## Dartchess:
+### Dartchess:
 
 ```bash
 ## run formatter
