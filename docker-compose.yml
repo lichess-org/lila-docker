@@ -4,6 +4,9 @@ services:
     restart: unless-stopped
     networks:
       - lila-network
+    volumes:
+      - ./repos/lila:/lila
+      - ./scripts:/scripts
 
   redis:
     image: redis:7.2.3-alpine3.18
