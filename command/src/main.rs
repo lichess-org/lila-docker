@@ -186,8 +186,8 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
             compose_profile: Some(ComposeProfile::Thumbnails),
             repositories: None,
         },
-        "Thumbnail generator",
-        "for resizing blog/streamer images",
+        "Image uploads + thumbnails",
+        "for blog/coach/streamer images",
     )
     .item(
         OptionalService {

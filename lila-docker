@@ -53,6 +53,7 @@ run_setup_config() {
     if [ ! -z "$GITPOD_WORKSPACE_ID" ]; then
         echo "Replacing localhost URLs with Gitpod URLs..."
         find ./conf/lila.conf ./conf/lila-ws.conf -type f -exec sed -i "s/http:\/\/localhost:8080/$(gp url 8080 | sed 's/\//\\\//g')/g" {} \;
+        find ./conf/lila.conf ./conf/lila-ws.conf -type f -exec sed -i "s/http:\/\/localhost:3001/$(gp url 3001 | sed 's/\//\\\//g')/g" {} \;
         find ./conf/lila.conf ./conf/lila-ws.conf -type f -exec sed -i "s/localhost:8080/$(gp url 8080 | cut -c9-)/g" {} \;
     fi
 }
