@@ -219,6 +219,8 @@ services:
       - 3001:3001
     networks:
       - lila-network
+    volumes:
+      - ./conf/picfit.json:/mnt/config.json
     profiles:
       - thumbnails
 
