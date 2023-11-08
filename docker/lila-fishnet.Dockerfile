@@ -1,4 +1,4 @@
-FROM sbtscala/scala-sbt:eclipse-temurin-focal-17.0.8.1_1_1.9.7_3.3.1
+FROM sbtscala/scala-sbt:eclipse-temurin-jammy-21.0.1_12_1.9.7_3.3.1
 
 WORKDIR /lila-fishnet
 
