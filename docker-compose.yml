@@ -146,7 +146,9 @@ services:
     networks:
       - lila-network
     volumes:
+      - ./repos/berserk:/berserk
       - ./repos/lila-db-seed:/lila-db-seed
+      - ./scripts:/scripts
     profiles:
       - utils
 

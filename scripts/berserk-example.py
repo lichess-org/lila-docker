@@ -1,13 +1,14 @@
 import berserk
 import pprint
 
-# # For authenticated requests, specify your API token:
-# # Create a token here: http://localhost:8080/account/oauth/token/create?description=Test+Berserk+Token
-# my_token = 'lip_abc123'
-# session = berserk.TokenSession(my_token)
 session = None
 
-client = berserk.Client(session, base_url="http://host.docker.internal:8080")
+# # For authenticated requests, specify your API token:
+# # Create a token here: http://nginx/account/oauth/token/create?description=Test+Berserk+Token
+# my_token = 'lip_abc123'
+# session = berserk.TokenSession(my_token)
+
+client = berserk.Client(session, base_url="http://nginx")
 
 # # Sample authenticated request:
 # print('\n#### Me ####\n')

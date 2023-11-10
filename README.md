@@ -118,8 +118,8 @@ docker compose run --rm ui bash -c "/lila/bin/trans-dump"
 To install the development version of [Berserk](https://github.com/lichess-org/berserk) and run a sample script against your local development site:
 
 ```bash
-docker run --rm -v $(pwd)/repos/berserk:/berserk -v $(pwd)/scripts:/scripts python:latest \
-    bash -c "cd /berserk && pip install -e . && python /scripts/berserk-example.py"
+docker compose run --rm -w /berserk python \
+    bash -c "pip install -e . && python /scripts/berserk-example.py"
 ```
 
 ### Scala Metals (IDE helper):
@@ -162,19 +162,13 @@ Other Scalachess commands:
 
 ```bash
 ## compile
-docker run --rm -v $(pwd)/repos/scalachess:/mnt \
-    sbtscala/scala-sbt:eclipse-temurin-jammy-21.0.1_12_1.9.7_3.3.1 \
-    bash -c "cd /mnt && sbt compile"
+docker compose run --rm -w /scalachess --entrypoint="sbt compile" lila
 
 ## test
-docker run --rm -v $(pwd)/repos/scalachess:/mnt \
-    sbtscala/scala-sbt:eclipse-temurin-jammy-21.0.1_12_1.9.7_3.3.1 \
-    bash -c "cd /mnt && sbt testKit/test"
+docker compose run --rm -w /scalachess --entrypoint="sbt testKit/test" lila
 
 ## package
-docker run --rm -v $(pwd)/repos/scalachess:/mnt \
-    sbtscala/scala-sbt:eclipse-temurin-jammy-21.0.1_12_1.9.7_3.3.1 \
-    bash -c "cd /mnt && sbt package"
+docker compose run --rm -w /scalachess --entrypoint="sbt package" lila
 ```
 
 ### Dartchess:
