@@ -1,4 +1,6 @@
 tasks:
+  - init: |
+      ./lila-docker build
   - command: |
       ./lila-docker start
       ./lila-docker gitpod-welcome
