@@ -2,6 +2,9 @@ FROM golang:1.21.4-alpine3.18
 
 RUN apk add git make
 
+COPY assets/coach.png /uploads/coach.png
+COPY assets/streamer.png /uploads/streamer.png
+
 WORKDIR /opt
 
 RUN git clone --depth 1 https://github.com/thoas/picfit.git
