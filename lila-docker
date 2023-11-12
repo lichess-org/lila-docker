@@ -147,6 +147,9 @@ case $1 in
     stop)
         run_stop
         ;;
+    restart)
+        run_stop && run_start
+        ;;
     down)
         run_down
         ;;
