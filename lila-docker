@@ -133,7 +133,7 @@ run_gitpod_welcome() {
 }
 
 show_help() {
-    echo "Usage: $0 [start|stop|down|build|format]"
+    echo "Usage: $0 [start|stop|restart|down|build|format]"
 }
 
 case $1 in
@@ -146,6 +146,9 @@ case $1 in
         ;;
     stop)
         run_stop
+        ;;
+    restart)
+        run_stop && run_start
         ;;
     down)
         run_down
