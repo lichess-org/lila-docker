@@ -22,6 +22,7 @@ services:
     networks:
       - lila-network
     environment:
+      - SCHEME=${SCHEME:-http}
       - LILA_DOMAIN=${LILA_DOMAIN:-localhost:8080}
       - PICFIT_DOMAIN=${PICFIT_DOMAIN:-localhost:3001}
     volumes:
@@ -40,6 +41,7 @@ services:
     networks:
       - lila-network
     environment:
+      - SCHEME=${SCHEME:-http}
       - LILA_DOMAIN=${LILA_DOMAIN:-localhost:8080}
     volumes:
       - ./repos/lila-ws:/lila-ws

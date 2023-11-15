@@ -2,6 +2,7 @@
 set -e
 
 if [ ! -z "$GITPOD_WORKSPACE_ID" ]; then
+    export SCHEME=https
     export LILA_DOMAIN=$(gp url 8080 | cut -c9-)
     export PICFIT_DOMAIN=$(gp url 3001 | cut -c9-)
 fi
