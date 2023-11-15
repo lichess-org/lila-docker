@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+if [ ! -z "$GITPOD_WORKSPACE_ID" ]; then
+    export LILA_DOMAIN=$(gp url 8080 | cut -c9-)
+    export PICFIT_DOMAIN=$(gp url 3001 | cut -c9-)
+fi
+
 run_setup() {
     touch .env
     docker compose run --rm -it lila_docker_rs bash -c "cargo run --manifest-path /mnt/Cargo.toml"
@@ -28,8 +33,6 @@ run_setup() {
 
     git -C repos/lila submodule update --init
 
-    run_setup_config
-
     docker compose build
     # separate build specifically for utils profile otherwise its Dockerfile changes won't be detected
     docker compose --profile utils build
@@ -41,20 +44,6 @@ run_setup() {
 
     if [ "$SETUP_DB" = "true" ]; then
         setup_database
-    fi
-}
-
-run_setup_config() {
-    echo "Copying config files..."
-    cp conf/lila.original.conf conf/lila.conf
-    cp conf/lila-ws.original.conf conf/lila-ws.conf
-
-    # if we're running on Gitpod, we need to replace the localhost URLs with the Gitpod URLs
-    if [ ! -z "$GITPOD_WORKSPACE_ID" ]; then
-        echo "Replacing localhost URLs with Gitpod URLs..."
-        find ./conf/lila.conf ./conf/lila-ws.conf -type f -exec sed -i "s/http:\/\/localhost:8080/$(gp url 8080 | sed 's/\//\\\//g')/g" {} \;
-        find ./conf/lila.conf ./conf/lila-ws.conf -type f -exec sed -i "s/http:\/\/localhost:3001/$(gp url 3001 | sed 's/\//\\\//g')/g" {} \;
-        find ./conf/lila.conf ./conf/lila-ws.conf -type f -exec sed -i "s/localhost:8080/$(gp url 8080 | cut -c9-)/g" {} \;
     fi
 }
 
