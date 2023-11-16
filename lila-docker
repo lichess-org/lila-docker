@@ -1,5 +1,4 @@
-#!/bin/bash
-set -e
+#!/bin/bash -e
 
 if [ ! -z "$GITPOD_WORKSPACE_ID" ]; then
     export SCHEME=https
@@ -80,7 +79,7 @@ build_all_profiles() {
 
 setup_database() {
     # wait for mongodb to be ready
-    while ! docker exec $(docker compose ps -q mongodb) mongo --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
+    while ! docker compose exec mongodb mongo --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
         echo "Waiting for mongodb to be ready..."
         sleep 1
     done
@@ -103,9 +102,7 @@ run_formatter() {
         (test -f /chessground/package.json && cd /chessground && pnpm install && pnpm run format) || echo 'Skipping chessground' && \
         (test -f /pgn-viewer/package.json && cd /pgn-viewer && pnpm install && pnpm run format) || echo 'Skipping pgn-viewer'"
 
-    docker run --rm -v $(pwd)/repos/lila:/lila \
-        sbtscala/scala-sbt:eclipse-temurin-jammy-21.0.1_12_1.9.7_3.3.1 \
-        bash -c "cd /lila && sbt scalafmtAll"
+    docker compose run --rm --entrypoint "sbt scalafmtAll" lila
 }
 
 run_gitpod_welcome() {
