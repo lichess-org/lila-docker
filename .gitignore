@@ -1,9 +1,6 @@
 .env
 .pnpm-store
 
-conf/lila.conf
-conf/lila-ws.conf
-
 command/.cargo
 command/target
 

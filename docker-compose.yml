@@ -21,6 +21,10 @@ services:
     restart: unless-stopped
     networks:
       - lila-network
+    environment:
+      - SCHEME=${SCHEME:-http}
+      - LILA_DOMAIN=${LILA_DOMAIN:-localhost:8080}
+      - PICFIT_DOMAIN=${PICFIT_DOMAIN:-localhost:3001}
     volumes:
       - ./repos/lila:/lila
       - ./repos/chessground:/chessground
@@ -36,6 +40,9 @@ services:
     restart: unless-stopped
     networks:
       - lila-network
+    environment:
+      - SCHEME=${SCHEME:-http}
+      - LILA_DOMAIN=${LILA_DOMAIN:-localhost:8080}
     volumes:
       - ./repos/lila-ws:/lila-ws
       - ./conf/lila-ws.conf:/lila-ws.conf
