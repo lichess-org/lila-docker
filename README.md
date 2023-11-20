@@ -88,7 +88,7 @@ docker compose restart lila
 To watch for Typescript/SCSS changes and automatically recompile:
 
 ```bash
-docker compose run --rm ui bash -c "/lila/ui/build -w"
+docker compose run --rm ui /lila/ui/build -w
 ```
 
 ### Updating Routes
@@ -104,7 +104,7 @@ docker compose exec lila bash -c "./lila playRoutes"
 After modifying a `translation/source/*.xml` file, run:
 
 ```bash
-docker compose run --rm ui bash -c "/lila/bin/trans-dump"
+docker compose run --rm ui /lila/bin/trans-dump
 ```
 
 ### Code formatting:
