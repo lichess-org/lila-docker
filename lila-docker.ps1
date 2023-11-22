@@ -1,11 +1,5 @@
 # Requires -Version 5.1
 
-if (-not [string]::IsNullOrEmpty($Env:GITPOD_WORKSPACE_ID)) {
-    $Env:SCHEME = "https"
-    $Env:LILA_DOMAIN = (gp url 8080).Substring(8)
-    $Env:PICFIT_DOMAIN = (gp url 3001).Substring(8)
-}
-
 function run_setup {
     New-Item .env -ItemType File -Force
     docker compose run --rm -it lila_docker_rs bash -c "cargo run --manifest-path /mnt/Cargo.toml"
