@@ -34,6 +34,8 @@ Click here to create a workspace:
     ./lila-docker start
     ```
 
+    Note for Windows users: Replace `./lila-docker` with `./lila-docker.ps1` in these steps.
+
     Starting new services may take 5-10 minutes. Some services will start before others and you may see errors in the logs until everything comes online.
 
     Lila will be the last service to complete, at which point you can visit http://localhost:8080/ to see the site.
