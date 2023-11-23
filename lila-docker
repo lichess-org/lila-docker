@@ -9,7 +9,7 @@ fi
 
 rust_cmd() {
     if [ ! -z "$(which rustup)" ]; then
-        # if the host has rust installed, use it
+        # if the host has Rust installed, use it directly
         cargo build --release --manifest-path command/Cargo.toml
         ./command/target/release/command "$@"
     elif [ "$(uname)" = "Darwin" ]; then
