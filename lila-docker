@@ -80,12 +80,10 @@ setup_database() {
 }
 
 run_formatter() {
-    docker compose run --rm ui bash -c "\
-        cd /lila && pnpm install && pnpm run format && \
-        (test -f /chessground/package.json && cd /chessground && pnpm install && pnpm run format) || echo 'Skipping chessground' && \
-        (test -f /pgn-viewer/package.json && cd /pgn-viewer && pnpm install && pnpm run format) || echo 'Skipping pgn-viewer'"
-
-    docker compose run --rm --entrypoint "sbt scalafmtAll" lila
+    docker compose run --rm -w /lila ui pnpm run format
+    docker compose exec chessground pnpm run format || echo "Skipping chessground"
+    docker compose exec pgn_viewer pnpm run format || echo "Skipping pgn-viewer"
+    docker compose exec lila sbt scalafmtAll || docker compose run --rm --entrypoint "sbt scalafmtAll" lila
 }
 
 show_help() {
