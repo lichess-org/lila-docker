@@ -8,8 +8,8 @@ if [ ! -z "$GITPOD_WORKSPACE_ID" ]; then
 fi
 
 run_setup() {
-    docker compose run --rm lila_docker_rs cargo build
-    ./command/target/debug/command setup
+    docker compose run --rm command
+    ./command/target/release/command setup
 
     export $(cat .env | xargs)
 

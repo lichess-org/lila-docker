@@ -136,11 +136,12 @@ services:
     profiles:
       - stockfish-analysis
 
-  lila_docker_rs:
-    image: rust:1.74.0-slim-bookworm
+  command:
+    build:
+      context: docker
+      dockerfile: command.Dockerfile
     volumes:
-      - ./command:/mnt
-    working_dir: /mnt
+      - ./command:/command
     profiles:
       - utils
 
