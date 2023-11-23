@@ -1,37 +1,17 @@
 #!/bin/bash -e
 
 if [ ! -z "$GITPOD_WORKSPACE_ID" ]; then
+    export IS_GITPOD=true
     export SCHEME=https
     export LILA_DOMAIN=$(gp url 8080 | cut -c9-)
     export PICFIT_DOMAIN=$(gp url 3001 | cut -c9-)
 fi
 
 run_setup() {
-    touch .env
-    docker compose run --rm -it lila_docker_rs bash -c "cargo run --manifest-path /mnt/Cargo.toml"
+    docker compose run --rm lila_docker_rs cargo build
+    ./command/target/debug/command setup
+
     export $(cat .env | xargs)
-
-    # create a placeholder directory for each of the repos
-    # otherwise the directories will be created by Docker
-    # when the volumes are mounted and they may be owned by root
-    dirs=($(echo $DIRS | tr ',' ' '))
-    for dir in "${dirs[@]}"; do
-        mkdir -p repos/$(basename $dir)
-    done
-
-    repos=($(echo $REPOS | tr ',' ' '))
-    echo "Cloning repos ${repos[@]}..."
-    for repo in "${repos[@]}"; do
-        if [[ $repo == */* ]]; then
-            org="${repo%%/*}"
-        else
-            org="lichess-org"
-        fi
-        repo=$(basename $repo)
-        [ ! -d repos/$repo/.git ] && git clone --depth 1 --origin upstream https://github.com/$org/$repo repos/$repo
-    done
-
-    git -C repos/lila submodule update --init
 
     docker compose build
     # separate build specifically for utils profile otherwise its Dockerfile changes won't be detected
@@ -44,6 +24,10 @@ run_setup() {
 
     if [ "$SETUP_DB" = "true" ]; then
         setup_database
+    fi
+
+    if [ "$IS_GITPOD" = "true" ]; then
+        ./command/target/debug/command gitpod-welcome
     fi
 }
 
@@ -105,20 +89,6 @@ run_formatter() {
     docker compose run --rm --entrypoint "sbt scalafmtAll" lila
 }
 
-run_gitpod_welcome() {
-    GREEN="\e[32m"
-    BOLDGREEN="\e[1;32m"
-    ENDCOLOR="\e[0m"
-
-    echo -e "${GREEN}################${ENDCOLOR}"
-    echo -e "${GREEN}Your Lichess development environment is starting!${ENDCOLOR}"
-    echo -e "${GREEN}When it's ready, you can access it at:${ENDCOLOR}"
-    echo -e "${BOLDGREEN} $(gp url 8080)${ENDCOLOR}"
-    echo -e "${GREEN}Monitor the progress in the 'lila' container with the command:${ENDCOLOR}"
-    echo -e "${BOLDGREEN} docker compose logs lila --follow${ENDCOLOR}"
-    echo -e "${GREEN}For full documentation, see: https://lichess-org.github.io/lila-gitpod/${ENDCOLOR}"
-}
-
 show_help() {
     echo "Usage: $0 [start|stop|restart|down|build|format]"
 }
@@ -145,9 +115,6 @@ case $1 in
         ;;
     format)
         run_formatter
-        ;;
-    gitpod-welcome)
-        run_gitpod_welcome
         ;;
     *)
         show_help

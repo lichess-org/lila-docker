@@ -1,7 +1,6 @@
 tasks:
   - command: |
       ./lila-docker start
-      ./lila-docker gitpod-welcome
 
 ports:
   - port: 8080

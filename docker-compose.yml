@@ -139,10 +139,8 @@ services:
   lila_docker_rs:
     image: rust:1.74.0-slim-bookworm
     volumes:
-      - .env:/.env
       - ./command:/mnt
-    environment:
-      - CARGO_HOME=/mnt/.cargo
+    working_dir: /mnt
     profiles:
       - utils
 
