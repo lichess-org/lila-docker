@@ -7,9 +7,24 @@ if [ ! -z "$GITPOD_WORKSPACE_ID" ]; then
     export PICFIT_DOMAIN=$(gp url 3001 | cut -c9-)
 fi
 
+rust_cmd() {
+    if [ ! -z "$(which rustup)" ]; then
+        # if the host has rust installed, use it
+        cargo build --release --manifest-path command/Cargo.toml
+        ./command/target/release/command "$@"
+    elif [ "$(uname)" = "Darwin" ]; then
+        docker run --rm -v "$PWD/command:/command" -w /command messense/cargo-zigbuild:0.18.0 \
+            cargo zigbuild --release --target universal2-apple-darwin
+        ./command/target/universal2-apple-darwin/release/command "$@"
+    else
+        docker run --rm -v "$PWD/command:/command" -w /command messense/cargo-zigbuild:0.18.0 \
+            cargo zigbuild --release
+        ./command/target/release/command "$@"
+    fi
+}
+
 run_setup() {
-    docker compose run --rm command
-    ./command/target/release/command setup
+    rust_cmd setup
 
     export $(cat .env | xargs)
 
@@ -26,7 +41,7 @@ run_setup() {
     fi
 
     if [ "$IS_GITPOD" = "true" ]; then
-        ./command/target/debug/command gitpod-welcome
+        rust_cmd gitpod-welcome
     fi
 }
 

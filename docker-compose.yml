@@ -136,15 +136,6 @@ services:
     profiles:
       - stockfish-analysis
 
-  command:
-    build:
-      context: docker
-      dockerfile: command.Dockerfile
-    volumes:
-      - ./command:/command
-    profiles:
-      - utils
-
   python:
     build:
       context: docker
