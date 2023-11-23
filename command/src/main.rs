@@ -101,24 +101,6 @@ fn main() -> std::io::Result<()> {
     }
 }
 
-fn gitpod_welcome() -> std::io::Result<()> {
-    println!("{}", "################".green());
-    println!(
-        "{}",
-        "Your Lichess development environment is starting!".green()
-    );
-    println!(
-        "{}",
-        "Monitor the progress in the 'lila' container with the command:".green()
-    );
-    println!("{}", " docker compose logs lila --follow".green().bold());
-    println!(
-        "{}",
-        "For full documentation, see: https://lichess-org.github.io/lila-gitpod/".green()
-    );
-    Ok(())
-}
-
 fn setup() -> std::io::Result<()> {
     intro(BANNER)?;
 
@@ -333,4 +315,22 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
         "bbpPairings tool",
     )
     .interact()
+}
+
+fn gitpod_welcome() -> std::io::Result<()> {
+    println!("{}", "################".green());
+    println!(
+        "{}",
+        "Your Lichess development environment is starting!".green()
+    );
+    println!(
+        "{}",
+        "Monitor the progress in the 'lila' container with the command:".green()
+    );
+    println!("{}", " docker compose logs lila --follow".green().bold());
+    println!(
+        "{}",
+        "For full documentation, see: https://lichess-org.github.io/lila-gitpod/".green()
+    );
+    Ok(())
 }

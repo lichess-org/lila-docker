@@ -14,13 +14,12 @@ run_setup() {
     export $(cat .env | xargs)
 
     docker compose build
-    # separate build specifically for utils profile otherwise its Dockerfile changes won't be detected
     docker compose --profile utils build
 
     docker compose up -d
 
     echo "Compiling js/css..."
-    docker compose run --rm ui bash -c "/lila/ui/build"
+    docker compose run --rm ui /lila/ui/build
 
     if [ "$SETUP_DB" = "true" ]; then
         setup_database
