@@ -21,7 +21,7 @@ run_setup() {
     echo "Compiling js/css..."
     docker compose run --rm ui /lila/ui/build
 
-    if [ "$SETUP_DB" = "true" ]; then
+    if [ "$SETUP_DATABASE" = "true" ]; then
         setup_database
     fi
 
@@ -67,16 +67,11 @@ setup_database() {
         sleep 1
     done
 
-    echo "Adding test data..."
-
-    docker compose run --rm mongodb bash -c \
-        "mongo --host mongodb lichess /lila/bin/mongodb/indexes.js"
-
     docker compose run --rm python bash -c \
         "python /lila-db-seed/spamdb/spamdb.py --uri=mongodb://mongodb/lichess --password=$PASSWORD --su-password=$SU_PASSWORD --es --es-host=elasticsearch:9200"
 
-    docker compose run --rm mongodb bash -c \
-        "mongo --quiet --host mongodb lichess /scripts/mongodb/users.js"
+    docker compose run --rm mongodb mongo --quiet --host mongodb lichess /lila/bin/mongodb/indexes.js
+    docker compose run --rm mongodb mongo --quiet --host mongodb lichess /scripts/mongodb/users.js
 }
 
 run_formatter() {
