@@ -80,7 +80,7 @@ run_formatter() {
 }
 
 rust_cmd() {
-    if [ ! -z "$(which rustup)" ]; then
+    if command -v rustup &> /dev/null; then
         # if the host has Rust installed, use it directly
         cargo build --release --manifest-path command/Cargo.toml
         ./command/target/release/command "$@"
