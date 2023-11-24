@@ -96,7 +96,10 @@ fn main() -> std::io::Result<()> {
 
     match args[1].as_str() {
         "setup" => setup(),
-        "gitpod-welcome" => gitpod_welcome(),
+        "gitpod-welcome" => {
+            gitpod_welcome();
+            Ok(())
+        }
         _ => panic!("Unknown command"),
     }
 }
@@ -316,7 +319,7 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
     .interact()
 }
 
-fn gitpod_welcome() -> std::io::Result<()> {
+fn gitpod_welcome() {
     println!("{}", "################".green());
     println!(
         "{}",
@@ -331,5 +334,4 @@ fn gitpod_welcome() -> std::io::Result<()> {
         "{}",
         "For full documentation, see: https://lichess-org.github.io/lila-gitpod/".green()
     );
-    Ok(())
 }
