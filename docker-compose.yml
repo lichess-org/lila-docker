@@ -136,16 +136,6 @@ services:
     profiles:
       - stockfish-analysis
 
-  lila_docker_rs:
-    image: rust:1.74.0-slim-bookworm
-    volumes:
-      - .env:/.env
-      - ./command:/mnt
-    environment:
-      - CARGO_HOME=/mnt/.cargo
-    profiles:
-      - utils
-
   python:
     build:
       context: docker

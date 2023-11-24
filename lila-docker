@@ -1,49 +1,30 @@
 #!/bin/bash -e
 
 if [ ! -z "$GITPOD_WORKSPACE_ID" ]; then
+    export IS_GITPOD=true
     export SCHEME=https
     export LILA_DOMAIN=$(gp url 8080 | cut -c9-)
     export PICFIT_DOMAIN=$(gp url 3001 | cut -c9-)
 fi
 
 run_setup() {
-    touch .env
-    docker compose run --rm -it lila_docker_rs bash -c "cargo run --manifest-path /mnt/Cargo.toml"
+    rust_cmd setup
     export $(cat .env | xargs)
 
-    # create a placeholder directory for each of the repos
-    # otherwise the directories will be created by Docker
-    # when the volumes are mounted and they may be owned by root
-    dirs=($(echo $DIRS | tr ',' ' '))
-    for dir in "${dirs[@]}"; do
-        mkdir -p repos/$(basename $dir)
-    done
-
-    repos=($(echo $REPOS | tr ',' ' '))
-    echo "Cloning repos ${repos[@]}..."
-    for repo in "${repos[@]}"; do
-        if [[ $repo == */* ]]; then
-            org="${repo%%/*}"
-        else
-            org="lichess-org"
-        fi
-        repo=$(basename $repo)
-        [ ! -d repos/$repo/.git ] && git clone --depth 1 --origin upstream https://github.com/$org/$repo repos/$repo
-    done
-
-    git -C repos/lila submodule update --init
-
     docker compose build
-    # separate build specifically for utils profile otherwise its Dockerfile changes won't be detected
     docker compose --profile utils build
 
     docker compose up -d
 
     echo "Compiling js/css..."
-    docker compose run --rm ui bash -c "/lila/ui/build"
+    docker compose run --rm ui /lila/ui/build
 
-    if [ "$SETUP_DB" = "true" ]; then
+    if [ "$SETUP_DATABASE" = "true" ]; then
         setup_database
+    fi
+
+    if [ "$IS_GITPOD" = "true" ]; then
+        rust_cmd gitpod-welcome
     fi
 }
 
@@ -84,39 +65,34 @@ setup_database() {
         sleep 1
     done
 
-    echo "Adding test data..."
-
-    docker compose run --rm mongodb bash -c \
-        "mongo --host mongodb lichess /lila/bin/mongodb/indexes.js"
-
     docker compose run --rm python bash -c \
         "python /lila-db-seed/spamdb/spamdb.py --uri=mongodb://mongodb/lichess --password=$PASSWORD --su-password=$SU_PASSWORD --es --es-host=elasticsearch:9200"
 
-    docker compose run --rm mongodb bash -c \
-        "mongo --quiet --host mongodb lichess /scripts/mongodb/users.js"
+    docker compose run --rm mongodb mongo --quiet --host mongodb lichess /lila/bin/mongodb/indexes.js
+    docker compose run --rm mongodb mongo --quiet --host mongodb lichess /scripts/mongodb/users.js
 }
 
 run_formatter() {
-    docker compose run --rm ui bash -c "\
-        cd /lila && pnpm install && pnpm run format && \
-        (test -f /chessground/package.json && cd /chessground && pnpm install && pnpm run format) || echo 'Skipping chessground' && \
-        (test -f /pgn-viewer/package.json && cd /pgn-viewer && pnpm install && pnpm run format) || echo 'Skipping pgn-viewer'"
-
-    docker compose run --rm --entrypoint "sbt scalafmtAll" lila
+    docker compose run --rm -w /lila ui pnpm run format
+    docker compose exec chessground pnpm run format || echo "Skipping chessground"
+    docker compose exec pgn_viewer pnpm run format || echo "Skipping pgn-viewer"
+    docker compose exec lila sbt scalafmtAll || docker compose run --rm --entrypoint "sbt scalafmtAll" lila
 }
 
-run_gitpod_welcome() {
-    GREEN="\e[32m"
-    BOLDGREEN="\e[1;32m"
-    ENDCOLOR="\e[0m"
-
-    echo -e "${GREEN}################${ENDCOLOR}"
-    echo -e "${GREEN}Your Lichess development environment is starting!${ENDCOLOR}"
-    echo -e "${GREEN}When it's ready, you can access it at:${ENDCOLOR}"
-    echo -e "${BOLDGREEN} $(gp url 8080)${ENDCOLOR}"
-    echo -e "${GREEN}Monitor the progress in the 'lila' container with the command:${ENDCOLOR}"
-    echo -e "${BOLDGREEN} docker compose logs lila --follow${ENDCOLOR}"
-    echo -e "${GREEN}For full documentation, see: https://lichess-org.github.io/lila-gitpod/${ENDCOLOR}"
+rust_cmd() {
+    if command -v rustup &> /dev/null; then
+        # if the host has Rust installed, use it directly
+        cargo build --release --manifest-path command/Cargo.toml
+        ./command/target/release/command "$@"
+    elif [ "$(uname)" = "Darwin" ]; then
+        docker run --rm -v "$PWD/command:/command" -w /command messense/cargo-zigbuild:0.18.0 \
+            cargo zigbuild --release --target universal2-apple-darwin
+        ./command/target/universal2-apple-darwin/release/command "$@"
+    else
+        docker run --rm -v "$PWD/command:/command" -w /command messense/cargo-zigbuild:0.18.0 \
+            cargo zigbuild --release
+        ./command/target/release/command "$@"
+    fi
 }
 
 show_help() {
@@ -145,9 +121,6 @@ case $1 in
         ;;
     format)
         run_formatter
-        ;;
-    gitpod-welcome)
-        run_gitpod_welcome
         ;;
     *)
         show_help

@@ -2,6 +2,5 @@
 .pnpm-store
 
 command/.cargo
+command/repos
 command/target
-
-todo.md

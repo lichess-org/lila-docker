@@ -1,6 +1,7 @@
-use std::io::Error;
-
-use cliclack::{confirm, input, intro, multiselect};
+use cliclack::{confirm, input, intro, log, multiselect, spinner};
+use colored::Colorize;
+use serde::{Deserialize, Serialize};
+use std::{io::Error, path::Path};
 use strum::{EnumIter, EnumString, IntoEnumIterator};
 
 const BANNER: &str = r"
@@ -12,7 +13,26 @@ const BANNER: &str = r"
                                                    |___/
 ";
 
-const ENV_PATH: &str = "/.env";
+#[derive(Debug, Serialize, Deserialize)]
+struct Config {
+    profiles: Vec<String>,
+    setup_database: bool,
+    su_password: String,
+    password: String,
+}
+
+impl Config {
+    fn to_env(&self) -> String {
+        let mut env = String::new();
+
+        env.push_str(&format!("COMPOSE_PROFILES={}\n", self.profiles.join(",")));
+        env.push_str(&format!("SETUP_DATABASE={}\n", self.setup_database));
+        env.push_str(&format!("SU_PASSWORD={}\n", self.su_password));
+        env.push_str(&format!("PASSWORD={}\n", self.password));
+
+        env
+    }
+}
 
 #[derive(Default, Clone, Eq, PartialEq, Debug)]
 struct OptionalService {
@@ -37,25 +57,54 @@ enum ComposeProfile {
 #[derive(Debug, Clone, PartialEq, EnumString, strum::Display, Eq, EnumIter)]
 #[strum(serialize_all = "kebab-case")]
 enum Repository {
+    #[strum(serialize = "lichess-org/lila")]
     Lila,
+    #[strum(serialize = "lichess-org/lila-ws")]
     LilaWs,
+    #[strum(serialize = "lichess-org/lila-db-seed")]
     LilaDbSeed,
+    #[strum(serialize = "lichess-org/lifat")]
     Lifat,
+    #[strum(serialize = "lichess-org/lila-fishnet")]
     LilaFishnet,
+    #[strum(serialize = "lichess-org/lila-engine")]
     LilaEngine,
+    #[strum(serialize = "lichess-org/lila-search")]
     LilaSearch,
+    #[strum(serialize = "lichess-org/lila-gif")]
     LilaGif,
+    #[strum(serialize = "lichess-org/api")]
     Api,
+    #[strum(serialize = "lichess-org/chessground")]
     Chessground,
+    #[strum(serialize = "lichess-org/pgn-viewer")]
     PgnViewer,
+    #[strum(serialize = "lichess-org/scalachess")]
     Scalachess,
+    #[strum(serialize = "lichess-org/dartchess")]
     Dartchess,
+    #[strum(serialize = "lichess-org/berserk")]
     Berserk,
     #[strum(serialize = "cyanfish/bbpPairings")]
     BbpPairings,
 }
 
 fn main() -> std::io::Result<()> {
+    let args: Vec<String> = std::env::args().collect();
+
+    assert!(args.len() > 1, "Missing command");
+
+    match args[1].as_str() {
+        "setup" => setup(),
+        "gitpod-welcome" => {
+            gitpod_welcome();
+            Ok(())
+        }
+        _ => panic!("Unknown command"),
+    }
+}
+
+fn setup() -> std::io::Result<()> {
     intro(BANNER)?;
 
     let services = prompt_for_optional_services()?;
@@ -82,60 +131,83 @@ fn main() -> std::io::Result<()> {
         (String::new(), String::new())
     };
 
-    let env_contents = [
-        format!(
-            "DIRS={}",
-            Repository::iter()
-                .map(|repo| repo.to_string())
-                .collect::<Vec<_>>()
-                .join(",")
-        ),
-        format!(
-            "REPOS={}",
-            [
-                vec![
-                    Repository::Lila,
-                    Repository::LilaWs,
-                    Repository::LilaDbSeed,
-                    Repository::Lifat,
-                ],
-                services
-                    .iter()
-                    .filter_map(|service| service.repositories.clone())
-                    .flatten()
-                    .collect::<Vec<_>>(),
-            ]
-            .concat()
+    let config = Config {
+        profiles: services
             .iter()
-            .map(std::string::ToString::to_string)
-            .collect::<Vec<_>>()
-            .join(",")
-        ),
-        format!(
-            "COMPOSE_PROFILES={}",
-            services
-                .iter()
-                .filter_map(|service| service.compose_profile.clone())
-                .collect::<Vec<_>>()
-                .iter()
-                .map(std::string::ToString::to_string)
-                .collect::<Vec<_>>()
-                .join(",")
-        ),
-        format!("SETUP_DB={setup_database}"),
-        format!("SU_PASSWORD={su_password}"),
-        format!("PASSWORD={password}"),
-    ]
-    .join("\n");
+            .filter_map(|service| service.compose_profile.clone())
+            .map(|profile| profile.to_string())
+            .collect(),
+        setup_database,
+        su_password,
+        password,
+    };
 
-    match std::fs::metadata(ENV_PATH) {
-        Ok(_) => std::fs::write(ENV_PATH, env_contents)?,
-        Err(_) => println!(".env contents:\n{env_contents}"),
+    // Create a placeholder directory for each of the repos
+    // otherwise the directories will be created by Docker
+    // when the volumes are mounted and they may be owned by root
+    Repository::iter()
+        .map(|repo| repo.to_string())
+        .for_each(|repo| {
+            let folder = Path::new(&repo).file_name().unwrap();
+            let clone_path = Path::new("repos").join(folder);
+            std::fs::create_dir_all(clone_path).unwrap();
+        });
+
+    let default_repos: Vec<String> = vec![
+        Repository::Lila.to_string(),
+        Repository::LilaWs.to_string(),
+        Repository::LilaDbSeed.to_string(),
+        Repository::Lifat.to_string(),
+    ];
+    let optional_repos = services
+        .iter()
+        .filter_map(|service| service.repositories.clone())
+        .flatten()
+        .map(|repo| repo.to_string())
+        .collect::<Vec<String>>();
+    let repos_to_clone = default_repos
+        .iter()
+        .chain(optional_repos.iter())
+        .collect::<Vec<&String>>();
+
+    for repo in repos_to_clone {
+        let repo_url = format!("https://github.com/{repo}.git");
+        let mut progress = spinner();
+        progress.start(&format!("Cloning {repo}"));
+        let folder = Path::new(&repo).file_name().unwrap();
+        let clone_path = Path::new("repos").join(folder);
+
+        if clone_path.read_dir()?.next().is_some() {
+            progress.stop(format!("Clone {repo} ✓"));
+            continue;
+        }
+
+        let mut cmd = std::process::Command::new("git");
+        cmd.arg("clone")
+            .arg("--origin")
+            .arg("upstream")
+            .arg("--depth")
+            .arg("1")
+            .arg("--recurse-submodules")
+            .arg(&repo_url)
+            .arg(&clone_path);
+
+        let output = cmd.output().unwrap();
+        assert!(
+            output.status.success(),
+            "Failed to clone {repo} - {output:?}"
+        );
+
+        progress.stop(format!("Clone {repo} ✓"));
     }
+
+    std::fs::write(".env", config.to_env())?;
+    log::success("Wrote .env")?;
 
     Ok(())
 }
 
+#[allow(clippy::too_many_lines)]
 fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
     multiselect(
         "Select which optional services to include:\n    (Use arrows, <space> to toggle, <enter> to continue)\n",
@@ -246,4 +318,21 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
         "bbpPairings tool",
     )
     .interact()
+}
+
+fn gitpod_welcome() {
+    println!("{}", "################".green());
+    println!(
+        "{}",
+        "Your Lichess development environment is starting!".green()
+    );
+    println!(
+        "{}",
+        "Monitor the progress in the 'lila' container with the command:".green()
+    );
+    println!("{}", " docker compose logs lila --follow".green().bold());
+    println!(
+        "{}",
+        "For full documentation, see: https://lichess-org.github.io/lila-gitpod/".green()
+    );
 }
