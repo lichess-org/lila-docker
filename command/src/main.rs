@@ -207,6 +207,7 @@ fn setup() -> std::io::Result<()> {
     Ok(())
 }
 
+#[allow(clippy::too_many_lines)]
 fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
     multiselect(
         "Select which optional services to include:\n    (Use arrows, <space> to toggle, <enter> to continue)\n",
