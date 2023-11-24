@@ -198,8 +198,7 @@ fn setup() -> std::io::Result<()> {
         progress.stop(format!("Clone {repo} ✓"));
     }
 
-    let env_content = config.to_env();
-    std::fs::write(".env", env_content)?;
+    std::fs::write(".env", config.to_env())?;
     log::success("Wrote .env")?;
 
     Ok(())
