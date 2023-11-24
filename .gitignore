@@ -3,5 +3,6 @@
 
 command/.cargo
 command/target
+command/repos
 
 todo.md
