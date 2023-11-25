@@ -202,9 +202,7 @@ fn setup() -> std::io::Result<()> {
     }
 
     std::fs::write(".env", config.to_env())?;
-    log::success("Wrote .env")?;
-
-    Ok(())
+    log::success("Wrote .env")
 }
 
 #[allow(clippy::too_many_lines)]
