@@ -37,24 +37,6 @@ struct OptionalService<'a> {
     repositories: Option<Vec<&'a str>>,
 }
 
-const REPOSITORIES: [&str; 15] = [
-    "lichess-org/lila",
-    "lichess-org/lila-ws",
-    "lichess-org/lila-db-seed",
-    "lichess-org/lifat",
-    "lichess-org/lila-fishnet",
-    "lichess-org/lila-engine",
-    "lichess-org/lila-search",
-    "lichess-org/lila-gif",
-    "lichess-org/api",
-    "lichess-org/chessground",
-    "lichess-org/pgn-viewer",
-    "lichess-org/scalachess",
-    "lichess-org/dartchess",
-    "lichess-org/berserk",
-    "cyanfish/bbpPairings",
-];
-
 fn main() -> std::io::Result<()> {
     let args: Vec<String> = std::env::args().collect();
 
@@ -109,14 +91,7 @@ fn setup() -> std::io::Result<()> {
         password,
     };
 
-    // Create a placeholder directory for each of the repos
-    // otherwise the directories will be created by Docker
-    // when the volumes are mounted and they may be owned by root
-    for repo in &REPOSITORIES {
-        let folder = Path::new(&repo).file_name().unwrap();
-        let clone_path = Path::new("repos").join(folder);
-        std::fs::create_dir_all(clone_path)?;
-    }
+    create_placeholder_dirs()?;
 
     let mut repos_to_clone: Vec<&str> = [
         "lichess-org/lila",
@@ -167,6 +142,38 @@ fn setup() -> std::io::Result<()> {
 
     std::fs::write(".env", config.to_env())?;
     log::success("Wrote .env")
+}
+
+fn create_placeholder_dirs() -> std::io::Result<()> {
+    // Create a placeholder directory for each of the repos
+    // otherwise the directories will be created by Docker
+    // when the volumes are mounted and they may be owned by root
+
+    let repositories: [&str; 15] = [
+        "lichess-org/lila",
+        "lichess-org/lila-ws",
+        "lichess-org/lila-db-seed",
+        "lichess-org/lifat",
+        "lichess-org/lila-fishnet",
+        "lichess-org/lila-engine",
+        "lichess-org/lila-search",
+        "lichess-org/lila-gif",
+        "lichess-org/api",
+        "lichess-org/chessground",
+        "lichess-org/pgn-viewer",
+        "lichess-org/scalachess",
+        "lichess-org/dartchess",
+        "lichess-org/berserk",
+        "cyanfish/bbpPairings",
+    ];
+
+    for repo in &repositories {
+        let folder = Path::new(&repo).file_name().unwrap();
+        let clone_path = Path::new("repos").join(folder);
+        std::fs::create_dir_all(clone_path)?;
+    }
+
+    Ok(())
 }
 
 #[allow(clippy::too_many_lines)]
