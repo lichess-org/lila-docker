@@ -1,8 +1,9 @@
 use cliclack::{confirm, input, intro, log, multiselect, spinner};
 use colored::Colorize;
-use serde::{Deserialize, Serialize};
-use std::{io::Error, path::Path};
-use strum::{EnumIter, EnumString, IntoEnumIterator};
+use std::{
+    io::Error,
+    path::{Path, PathBuf},
+};
 
 const BANNER: &str = r"
    |\_    _ _      _
@@ -13,7 +14,6 @@ const BANNER: &str = r"
                                                    |___/
 ";
 
-#[derive(Debug, Serialize, Deserialize)]
 struct Config {
     profiles: Vec<String>,
     setup_database: bool,
@@ -34,59 +34,52 @@ impl Config {
     }
 }
 
+#[derive(Clone, Eq, PartialEq, Debug)]
+struct Repository {
+    org: String,
+    project: String,
+}
+
+impl Repository {
+    fn new(org: &str, project: &str) -> Self {
+        Self {
+            org: org.to_string(),
+            project: project.to_string(),
+        }
+    }
+
+    fn full_name(&self) -> String {
+        format!("{}/{}", self.org, self.project)
+    }
+
+    fn url(&self) -> String {
+        format!("https://github.com/{}/{}", self.org, self.project)
+    }
+
+    fn clone_path(&self) -> PathBuf {
+        Path::new("repos").join(&self.project)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_repository() {
+        let repo = Repository::new("lichess-org", "lila");
+        assert_eq!(repo.org, "lichess-org");
+        assert_eq!(repo.project, "lila");
+        assert_eq!(repo.full_name(), "lichess-org/lila");
+        assert_eq!(repo.url(), "https://github.com/lichess-org/lila");
+        assert_eq!(repo.clone_path(), Path::new("repos/lila"));
+    }
+}
+
 #[derive(Default, Clone, Eq, PartialEq, Debug)]
-struct OptionalService {
-    compose_profile: Option<ComposeProfile>,
+struct OptionalService<'a> {
+    compose_profile: Option<Vec<&'a str>>,
     repositories: Option<Vec<Repository>>,
-}
-
-#[derive(Debug, Clone, PartialEq, EnumString, strum::Display, Eq, EnumIter)]
-#[strum(serialize_all = "kebab-case")]
-enum ComposeProfile {
-    StockfishPlay,
-    StockfishAnalysis,
-    ExternalEngine,
-    Search,
-    Gifs,
-    Thumbnails,
-    ApiDocs,
-    Chessground,
-    PgnViewer,
-}
-
-#[derive(Debug, Clone, PartialEq, EnumString, strum::Display, Eq, EnumIter)]
-#[strum(serialize_all = "kebab-case")]
-enum Repository {
-    #[strum(serialize = "lichess-org/lila")]
-    Lila,
-    #[strum(serialize = "lichess-org/lila-ws")]
-    LilaWs,
-    #[strum(serialize = "lichess-org/lila-db-seed")]
-    LilaDbSeed,
-    #[strum(serialize = "lichess-org/lifat")]
-    Lifat,
-    #[strum(serialize = "lichess-org/lila-fishnet")]
-    LilaFishnet,
-    #[strum(serialize = "lichess-org/lila-engine")]
-    LilaEngine,
-    #[strum(serialize = "lichess-org/lila-search")]
-    LilaSearch,
-    #[strum(serialize = "lichess-org/lila-gif")]
-    LilaGif,
-    #[strum(serialize = "lichess-org/api")]
-    Api,
-    #[strum(serialize = "lichess-org/chessground")]
-    Chessground,
-    #[strum(serialize = "lichess-org/pgn-viewer")]
-    PgnViewer,
-    #[strum(serialize = "lichess-org/scalachess")]
-    Scalachess,
-    #[strum(serialize = "lichess-org/dartchess")]
-    Dartchess,
-    #[strum(serialize = "lichess-org/berserk")]
-    Berserk,
-    #[strum(serialize = "cyanfish/bbpPairings")]
-    BbpPairings,
 }
 
 fn main() -> std::io::Result<()> {
@@ -135,50 +128,37 @@ fn setup() -> std::io::Result<()> {
         profiles: services
             .iter()
             .filter_map(|service| service.compose_profile.clone())
-            .map(|profile| profile.to_string())
+            .flatten()
+            .map(std::string::ToString::to_string)
             .collect(),
         setup_database,
         su_password,
         password,
     };
 
-    // Create a placeholder directory for each of the repos
-    // otherwise the directories will be created by Docker
-    // when the volumes are mounted and they may be owned by root
-    Repository::iter()
-        .map(|repo| repo.to_string())
-        .for_each(|repo| {
-            let folder = Path::new(&repo).file_name().unwrap();
-            let clone_path = Path::new("repos").join(folder);
-            std::fs::create_dir_all(clone_path).unwrap();
-        });
+    create_placeholder_dirs();
 
-    let default_repos: Vec<String> = vec![
-        Repository::Lila.to_string(),
-        Repository::LilaWs.to_string(),
-        Repository::LilaDbSeed.to_string(),
-        Repository::Lifat.to_string(),
+    let mut repos_to_clone: Vec<Repository> = vec![
+        Repository::new("lichess-org", "lila"),
+        Repository::new("lichess-org", "lila-ws"),
+        Repository::new("lichess-org", "lila-db-seed"),
+        Repository::new("lichess-org", "lifat"),
     ];
-    let optional_repos = services
+
+    let optional_repos: Vec<Repository> = services
         .iter()
         .filter_map(|service| service.repositories.clone())
         .flatten()
-        .map(|repo| repo.to_string())
-        .collect::<Vec<String>>();
-    let repos_to_clone = default_repos
-        .iter()
-        .chain(optional_repos.iter())
-        .collect::<Vec<&String>>();
+        .collect();
+
+    repos_to_clone.extend(optional_repos);
 
     for repo in repos_to_clone {
-        let repo_url = format!("https://github.com/{repo}.git");
         let mut progress = spinner();
-        progress.start(&format!("Cloning {repo}"));
-        let folder = Path::new(&repo).file_name().unwrap();
-        let clone_path = Path::new("repos").join(folder);
+        progress.start(&format!("Cloning {}...", repo.full_name()));
 
-        if clone_path.read_dir()?.next().is_some() {
-            progress.stop(format!("Clone {repo} ✓"));
+        if repo.clone_path().read_dir()?.next().is_some() {
+            progress.stop(format!("Clone {} ✓", repo.full_name()));
             continue;
         }
 
@@ -189,41 +169,69 @@ fn setup() -> std::io::Result<()> {
             .arg("--depth")
             .arg("1")
             .arg("--recurse-submodules")
-            .arg(&repo_url)
-            .arg(&clone_path);
+            .arg(repo.url())
+            .arg(repo.clone_path());
 
         let output = cmd.output().unwrap();
         assert!(
             output.status.success(),
-            "Failed to clone {repo} - {output:?}"
+            "Failed to clone repo: {} - {:?}",
+            repo.full_name(),
+            output
         );
 
-        progress.stop(format!("Clone {repo} ✓"));
+        progress.stop(format!("Clone {} ✓", repo.full_name()));
     }
 
     std::fs::write(".env", config.to_env())?;
-    log::success("Wrote .env")?;
+    log::success("Wrote .env")
+}
 
-    Ok(())
+fn create_placeholder_dirs() {
+    // Create a placeholder directory for each of the repos
+    // otherwise the directories will be created by Docker
+    // when the volumes are mounted and they may be owned by root
+    [
+        Repository::new("lichess-org", "lila"),
+        Repository::new("lichess-org", "lila-ws"),
+        Repository::new("lichess-org", "lila-db-seed"),
+        Repository::new("lichess-org", "lifat"),
+        Repository::new("lichess-org", "lila-fishnet"),
+        Repository::new("lichess-org", "lila-engine"),
+        Repository::new("lichess-org", "lila-search"),
+        Repository::new("lichess-org", "lila-gif"),
+        Repository::new("lichess-org", "api"),
+        Repository::new("lichess-org", "chessground"),
+        Repository::new("lichess-org", "pgn-viewer"),
+        Repository::new("lichess-org", "scalachess"),
+        Repository::new("lichess-org", "dartchess"),
+        Repository::new("lichess-org", "berserk"),
+        Repository::new("cyanfish", "bbpPairings"),
+    ]
+    .iter()
+    .map(Repository::clone_path)
+    .for_each(|path| {
+        std::fs::create_dir_all(path).unwrap();
+    });
 }
 
 #[allow(clippy::too_many_lines)]
-fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
+fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error> {
     multiselect(
         "Select which optional services to include:\n    (Use arrows, <space> to toggle, <enter> to continue)\n",
     )
     .required(false)
     .item(
         OptionalService {
-            compose_profile: Some(ComposeProfile::StockfishPlay),
-            repositories: vec![Repository::LilaFishnet].into(),
+            compose_profile: vec!["stockfish-play"].into(),
+            repositories: vec![Repository::new("lichess-org", "lila-fishnet")].into(),
         },
         "Stockfish Play",
         "for playing against the computer",
     )
     .item(
         OptionalService {
-            compose_profile: Some(ComposeProfile::StockfishAnalysis),
+            compose_profile: vec!["stockfish-analysis"].into(),
             repositories: None,
         },
         "Stockfish Analysis",
@@ -231,31 +239,31 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
     )
     .item(
         OptionalService {
-            compose_profile: Some(ComposeProfile::ExternalEngine),
-            repositories: vec![Repository::LilaEngine].into(),
+            compose_profile: vec!["external-engine"].into(),
+            repositories: vec![Repository::new("lichess-org", "lila-engine")].into(),
         },
         "External Engine",
         "for connecting a local chess engine to the analysis board",
     )
     .item(
         OptionalService {
-            compose_profile: Some(ComposeProfile::Search),
-            repositories: vec![Repository::LilaSearch].into(),
+            compose_profile: vec!["search"].into(),
+            repositories: vec![Repository::new("lichess-org", "lila-search")].into(),
         },
         "Search",
         "for searching games, forum posts, etc",
     )
     .item(
         OptionalService {
-            compose_profile: Some(ComposeProfile::Gifs),
-            repositories: vec![Repository::LilaGif].into(),
+            compose_profile: vec!["gifs"].into(),
+            repositories: vec![Repository::new("lichess-org", "lila-gif")].into(),
         },
         "GIFs",
         "for generating animated GIFs of games",
     )
     .item(
         OptionalService {
-            compose_profile: Some(ComposeProfile::Thumbnails),
+            compose_profile: vec!["thumbnails"].into(),
             repositories: None,
         },
         "Image uploads + thumbnails",
@@ -263,24 +271,24 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
     )
     .item(
         OptionalService {
-            compose_profile: Some(ComposeProfile::ApiDocs),
-            repositories: vec![Repository::Api].into(),
+            compose_profile: vec!["api-docs"].into(),
+            repositories: vec![Repository::new("lichess-org", "api")].into(),
         },
         "API docs",
         "standalone API documentation",
     )
     .item(
         OptionalService {
-            compose_profile: Some(ComposeProfile::Chessground),
-            repositories: vec![Repository::Chessground].into(),
+            compose_profile: vec!["chessground"].into(),
+            repositories: vec![Repository::new("lichess-org", "chessground")].into(),
         },
         "Chessground",
         "standalone board UI",
     )
     .item(
         OptionalService {
-            compose_profile: Some(ComposeProfile::PgnViewer),
-            repositories: vec![Repository::PgnViewer].into(),
+            compose_profile: vec!["pgn-viewer"].into(),
+            repositories: vec![Repository::new("lichess-org", "pgn-viewer")].into(),
         },
         "PGN Viewer",
         "standalone PGN viewer",
@@ -288,7 +296,7 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
     .item(
         OptionalService {
             compose_profile: None,
-            repositories: vec![Repository::Scalachess].into(),
+            repositories: vec![Repository::new("lichess-org", "scalachess")].into(),
         },
         "Scalachess",
         "standalone chess logic library",
@@ -296,7 +304,7 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
     .item(
         OptionalService {
             compose_profile: None,
-            repositories: vec![Repository::Dartchess].into(),
+            repositories: vec![Repository::new("lichess-org", "dartchess")].into(),
         },
         "Dartchess",
         "standalone chess library for mobile platforms",
@@ -304,7 +312,7 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
     .item(
         OptionalService {
             compose_profile: None,
-            repositories: vec![Repository::Berserk].into(),
+            repositories: vec![Repository::new("lichess-org", "berserk")].into(),
         },
         "Berserk",
         "Python API client",
@@ -312,7 +320,7 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService>, Error> {
     .item(
         OptionalService {
             compose_profile: None,
-            repositories: vec![Repository::BbpPairings].into(),
+            repositories: vec![Repository::new("cyanfish", "bbpPairings")].into(),
         },
         "Swiss Pairings",
         "bbpPairings tool",
