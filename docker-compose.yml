@@ -7,6 +7,7 @@ services:
     volumes:
       - ./repos/lila:/lila
       - ./scripts:/scripts
+      - ./database:/data/db
 
   redis:
     image: redis:7.2.3-alpine3.18
