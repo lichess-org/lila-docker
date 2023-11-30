@@ -112,6 +112,8 @@ services:
     build:
       context: docker
       dockerfile: lila-fishnet.Dockerfile
+    environment:
+      - REDIS_HOST=redis
     restart: unless-stopped
     networks:
       - lila-network
