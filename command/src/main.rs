@@ -141,9 +141,11 @@ fn setup() -> std::io::Result<()> {
     let mut repos_to_clone: Vec<Repository> = vec![
         Repository::new("lichess-org", "lila"),
         Repository::new("lichess-org", "lila-ws"),
-        Repository::new("lichess-org", "lila-db-seed"),
-        Repository::new("lichess-org", "lifat"),
     ];
+
+    if setup_database {
+        repos_to_clone.push(Repository::new("lichess-org", "lila-db-seed"));
+    }
 
     let optional_repos: Vec<Repository> = services
         .iter()
@@ -247,6 +249,14 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error
     )
     .item(
         OptionalService {
+            compose_profile: None,
+            repositories: vec![Repository::new("lichess-org", "lifat")].into(),
+        },
+        "Larger static assets",
+        "Analysis board engines, background images, voice move models, etc",
+    )
+    .item(
+        OptionalService {
             compose_profile: vec!["search"].into(),
             repositories: vec![Repository::new("lichess-org", "lila-search")].into(),
         },
@@ -258,7 +268,7 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error
             compose_profile: vec!["gifs"].into(),
             repositories: vec![Repository::new("lichess-org", "lila-gif")].into(),
         },
-        "GIFs",
+        "GIF generation",
         "for generating animated GIFs of games",
     )
     .item(
