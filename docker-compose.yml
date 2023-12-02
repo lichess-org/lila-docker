@@ -113,6 +113,7 @@ services:
       context: docker
       dockerfile: lila-fishnet.Dockerfile
     environment:
+      - HTTP_API_LOGGER=true
       - REDIS_HOST=redis
     restart: unless-stopped
     networks:
