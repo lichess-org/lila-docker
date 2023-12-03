@@ -72,6 +72,7 @@ Depending on which optional services you start:
 | API docs              | http://localhost:8089/                                   |
 | Chessground           | http://localhost:8090/demo.html                          |
 | PGN Viewer            | http://localhost:8091/                                   |
+| InfluxDB              | http://localhost:8086/ (admin/password)                  |
 
 ## Usage
 
@@ -233,3 +234,16 @@ docker compose run --rm ui bash -c "cd /pgn-viewer && pnpm run sass-dev && pnpm 
 ```
 
 See the changes on the PGN Viewer demo page: http://localhost:8091/
+
+### InfluxDB Monitoring
+
+To view the InfluxDB monitoring dashboard, start your environment with the `Monitoring` service enabled and then visit http://localhost:8086/ (admin/password)
+
+You can also see all the metrics logged by running:
+
+```bash
+curl --get http://localhost:8086/query \
+    --header "Authorization: Token secret" \
+    --data-urlencode "db=kamon"  \
+    --data-urlencode "q=show measurements;"
+```

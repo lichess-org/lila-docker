@@ -15,6 +15,10 @@ ports:
     name: mongo-express
     description: "Database explorer (u: admin / p: pass)"
     onOpen: ignore
+  - port: 8086
+    name: influxdb
+    description: "Monitoring (u: admin / p: password)"
+    onOpen: ignore
   - port: 8089
     name: API docs
     onOpen: ignore
