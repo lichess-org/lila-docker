@@ -19,6 +19,7 @@ struct Config {
     setup_database: bool,
     su_password: String,
     password: String,
+    enable_monitoring: bool,
 }
 
 impl Config {
@@ -29,6 +30,7 @@ impl Config {
         env.push_str(&format!("SETUP_DATABASE={}\n", self.setup_database));
         env.push_str(&format!("SU_PASSWORD={}\n", self.su_password));
         env.push_str(&format!("PASSWORD={}\n", self.password));
+        env.push_str(&format!("ENABLE_MONITORING={}\n", self.enable_monitoring));
 
         env
     }
@@ -134,6 +136,9 @@ fn setup() -> std::io::Result<()> {
         setup_database,
         su_password,
         password,
+        enable_monitoring: services
+            .iter()
+            .any(|service| service.compose_profile == Some(vec!["monitoring"])),
     };
 
     create_placeholder_dirs();
@@ -326,6 +331,14 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error
         },
         "Berserk",
         "Python API client",
+    )
+    .item(
+        OptionalService {
+            compose_profile: vec!["monitoring"].into(),
+            repositories: None,
+        },
+        "Monitoring",
+        "Metric collection using InfluxDB",
     )
     .item(
         OptionalService {
