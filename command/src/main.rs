@@ -94,7 +94,7 @@ impl Config {
                     contents.insert(key, vec_string.join(","));
                 }
             } else {
-                panic!("Unsupported Config type for: {key}");
+                panic!("Unsupported type: Could not write [{key}] to env");
             }
         }
 
@@ -483,20 +483,15 @@ fn validate_string_length(input: &String, length: usize) -> Result<(), String> {
 }
 
 fn gitpod_welcome() {
-    println!("{}", "################".green());
-    println!(
-        "{}",
-        "Your Lichess development environment is starting!".green()
-    );
-    println!(
-        "{}",
-        "Monitor the progress in the 'lila' container with the command:".green()
-    );
-    println!("{}", " docker compose logs lila --follow".green().bold());
-    println!(
-        "{}",
-        "For full documentation, see: https://lichess-org.github.io/lila-gitpod/".green()
-    );
+    for line in &[
+        "################".green(),
+        "Your Lichess development environment is starting!".green(),
+        "Monitor the progress in the 'lila' container with the command:".green(),
+        " docker compose logs lila --follow".green().bold(),
+        "For full documentation, see: https://lichess-org.github.io/lila-gitpod/".green(),
+    ] {
+        println!("{line}");
+    }
 }
 
 #[cfg(test)]
