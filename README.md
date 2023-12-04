@@ -253,11 +253,11 @@ curl --get http://localhost:8086/query \
         ```bash
         ./lila-docker hostname
         ```
-    3. Configure the mobile settings
+    3. Connect to your phone
         ```bash
         ./lila-docker mobile
         ```
-    4. Enter the IP address, port, and pairing code from the steps below
+        Get the values from the steps below.
 2. On your Android phone:
     1. Connect your phone to the same wifi network as your host machine
     2. Ensure your phone and can access lila in your browser app using the host value you set above
@@ -272,13 +272,16 @@ curl --get http://localhost:8086/query \
             2. Tap "Pair device with pairing code"
                 1. Enter the pairing port and code in the prompt on your host
 3. On your host machine:
+
     1. Get a shell on the container:
+
         ```bash
         docker compose exec -it mobile bash
 
         # see your phone
         adb devices
         ```
+
     2. Install the app dependencies:
         ```bash
         flutter pub get

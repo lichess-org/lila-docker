@@ -1,4 +1,4 @@
-use cliclack::{confirm, input, intro, multiselect, select, spinner};
+use cliclack::{confirm, input, intro, log, multiselect, select, spinner};
 use colored::Colorize;
 use local_ip_address::local_ip;
 use serde::{Deserialize, Serialize};
@@ -25,11 +25,11 @@ struct Config {
     enable_monitoring: Option<bool>,
     su_password: Option<String>,
     password: Option<String>,
-    hostname: Option<String>,
+    lila_hostname: Option<String>,
     phone_ip: Option<String>,
     connection_port: Option<u16>,
-    pairing_port: Option<u16>,
     pairing_code: Option<u32>,
+    pairing_port: Option<u16>,
 }
 
 impl Config {
@@ -43,11 +43,11 @@ impl Config {
             enable_monitoring: None,
             su_password: None,
             password: None,
-            hostname: None,
+            lila_hostname: None,
             phone_ip: None,
             connection_port: None,
-            pairing_port: None,
             pairing_code: None,
+            pairing_port: None,
         }
     }
 
@@ -451,30 +451,35 @@ fn hostname(mut config: Config) -> std::io::Result<()> {
         selection => selection.to_string(),
     };
 
-    config.hostname = Some(hostname);
+    config.lila_hostname = Some(hostname);
     config.save();
 
     Ok(())
 }
 
 fn mobile_setup(mut config: Config) -> std::io::Result<()> {
+    log::info("On your Android phone, open Developer Options > Wireless Debugging")?;
+
     let phone_ip: String = input("Your phone's private IP address")
         .placeholder("192.168.x.x or 10.x.x.x")
         .interact()?;
-    let connection_port: u16 = input("Wireless debugging port")
+    let connection_port: u16 = input("Connection port")
         .validate(|input: &String| validate_string_length(input, 5))
+        .interact()?;
+
+    log::info("Tap `Pair device with pairing code`")?;
+
+    let pairing_code: u32 = input("Pairing code")
+        .validate(|input: &String| validate_string_length(input, 6))
         .interact()?;
     let pairing_port: u16 = input("Pairing port")
         .validate(|input: &String| validate_string_length(input, 5))
         .interact()?;
-    let pairing_code: u32 = input("Pairing code")
-        .validate(|input: &String| validate_string_length(input, 6))
-        .interact()?;
 
     config.phone_ip = Some(phone_ip);
     config.connection_port = Some(connection_port);
-    config.pairing_port = Some(pairing_port);
     config.pairing_code = Some(pairing_code);
+    config.pairing_port = Some(pairing_port);
     config.save();
 
     Ok(())
@@ -531,11 +536,11 @@ mod tests {
             enable_monitoring: Some(false),
             su_password: Some("foo".to_string()),
             password: Some("bar".to_string()),
-            hostname: Some("baz".to_string()),
+            lila_hostname: Some("baz".to_string()),
             phone_ip: Some("1.2.3.4".to_string()),
             connection_port: Some(1234),
-            pairing_port: Some(5678),
             pairing_code: Some(901234),
+            pairing_port: Some(5678),
         }
         .to_env();
 
@@ -544,10 +549,10 @@ mod tests {
         assert!(contents.contains("ENABLE_MONITORING=false"));
         assert!(contents.contains("SU_PASSWORD=foo"));
         assert!(contents.contains("PASSWORD=bar"));
-        assert!(contents.contains("HOSTNAME=baz"));
+        assert!(contents.contains("LILA_HOSTNAME=baz"));
         assert!(contents.contains("PHONE_IP=1.2.3.4"));
         assert!(contents.contains("CONNECTION_PORT=1234"));
-        assert!(contents.contains("PAIRING_PORT=5678"));
         assert!(contents.contains("PAIRING_CODE=901234"));
+        assert!(contents.contains("PAIRING_PORT=5678"));
     }
 }
