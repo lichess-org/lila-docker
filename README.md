@@ -176,16 +176,13 @@ docker compose run --rm -w /scalachess --entrypoint="sbt package" lila
 
 ```bash
 ## run formatter
-docker run --rm -v $(pwd)/repos/dartchess:/mnt --workdir /mnt dart:3.1.5-sdk \
-    dart format .
+docker compose run --rm -w /dartchess mobile dart format .
 
 ## analyze
-docker run --rm -v $(pwd)/repos/dartchess:/mnt --workdir /mnt dart:3.1.5-sdk \
-    bash -c "dart pub get && dart analyze"
+docker compose run --rm -w /dartchess mobile bash -c "dart pub get && dart analyze"
 
 ## run tests
-docker run --rm -v $(pwd)/repos/dartchess:/mnt --workdir /mnt dart:3.1.5-sdk \
-    bash -c "dart pub get && dart test -x full_perft"
+docker compose run --rm -w /dartchess mobile bash -c "dart pub get && dart test -x full_perft"
 ```
 
 ### bbpPairings:
@@ -247,3 +244,48 @@ curl --get http://localhost:8086/query \
     --data-urlencode "db=kamon"  \
     --data-urlencode "q=show measurements;"
 ```
+
+### Mobile
+
+1. On your host machine:
+    1. Have the lila-docker services running, with the `Mobile` optional service started
+    2. Configure lila to run with your host's IP address or hostname instead of localhost
+        ```bash
+        ./lila-docker hostname
+        ```
+    3. Configure the mobile settings
+        ```bash
+        ./lila-docker mobile
+        ```
+    4. Enter the IP address, port, and pairing code from the steps below
+2. On your Android phone:
+    1. Connect your phone to the same wifi network as your host machine
+    2. Ensure your phone and can access lila in your browser app using the host value you set above
+        ```
+        http://[your-selection]:8080
+        ```
+    3. Enable Developer Mode
+    4. In Developer Options
+        1. enable wireless debugging
+        2. Tap into the wireless debugging settings
+            1. Use the "IP address & Port" value in the prompt on your host
+            2. Tap "Pair device with pairing code"
+                1. Enter the pairing port and code in the prompt on your host
+3. On your host machine:
+    1. Get a shell on the container:
+        ```bash
+        docker compose exec -it mobile bash
+
+        # see your phone
+        adb devices
+        ```
+    2. Install the app dependencies:
+        ```bash
+        flutter pub get
+        dart run build_runner build
+        ```
+    3. Run the app:
+        ```bash
+        flutter run -v --dart-define=LICHESS_HOST=$LICHESS_URL --dart-define=LICHESS_WS_HOST=$LICHESS_URL
+        ```
+        - No substitutions necessary. The `$LICHESS_URL` environment variable will already be set on the container.

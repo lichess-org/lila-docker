@@ -1,9 +1,13 @@
-use cliclack::{confirm, input, intro, log, multiselect, spinner};
+use cliclack::{confirm, input, intro, multiselect, select, spinner};
 use colored::Colorize;
+use local_ip_address::local_ip;
+use serde::{Deserialize, Serialize};
 use std::{
+    collections::HashMap,
     io::Error,
     path::{Path, PathBuf},
 };
+use struct_iterable::Iterable;
 
 const BANNER: &str = r"
    |\_    _ _      _
@@ -14,25 +18,91 @@ const BANNER: &str = r"
                                                    |___/
 ";
 
+#[derive(Serialize, Deserialize, Iterable, Debug)]
 struct Config {
-    profiles: Vec<String>,
-    setup_database: bool,
-    su_password: String,
-    password: String,
-    enable_monitoring: bool,
+    compose_profiles: Option<Vec<String>>,
+    setup_database: Option<bool>,
+    enable_monitoring: Option<bool>,
+    su_password: Option<String>,
+    password: Option<String>,
+    hostname: Option<String>,
+    phone_ip: Option<String>,
+    connection_port: Option<u16>,
+    pairing_port: Option<u16>,
+    pairing_code: Option<u32>,
 }
 
 impl Config {
+    const SETTINGS_TOML: &'static str = "settings.toml";
+    const SETTINGS_ENV: &'static str = "settings.env";
+
+    fn default() -> Self {
+        Self {
+            compose_profiles: None,
+            setup_database: None,
+            enable_monitoring: None,
+            su_password: None,
+            password: None,
+            hostname: None,
+            phone_ip: None,
+            connection_port: None,
+            pairing_port: None,
+            pairing_code: None,
+        }
+    }
+
+    fn load() -> Self {
+        if !Path::new(Self::SETTINGS_TOML).exists() {
+            return Self::default();
+        }
+
+        let toml = std::fs::read_to_string(Self::SETTINGS_TOML).unwrap();
+        toml::from_str(&toml).unwrap()
+    }
+
+    fn save(&self) {
+        std::fs::write(Self::SETTINGS_TOML, self.to_toml()).unwrap();
+        std::fs::write(Self::SETTINGS_ENV, self.to_env()).unwrap();
+    }
+
+    fn to_toml(&self) -> String {
+        toml::to_string(&self).unwrap()
+    }
+
     fn to_env(&self) -> String {
-        let mut env = String::new();
+        let mut contents: HashMap<&str, String> = HashMap::new();
 
-        env.push_str(&format!("COMPOSE_PROFILES={}\n", self.profiles.join(",")));
-        env.push_str(&format!("SETUP_DATABASE={}\n", self.setup_database));
-        env.push_str(&format!("SU_PASSWORD={}\n", self.su_password));
-        env.push_str(&format!("PASSWORD={}\n", self.password));
-        env.push_str(&format!("ENABLE_MONITORING={}\n", self.enable_monitoring));
+        for (key, value) in self.iter() {
+            if let Some(string_opt) = value.downcast_ref::<Option<String>>() {
+                if let Some(string_opt) = string_opt {
+                    contents.insert(key, string_opt.to_string());
+                }
+            } else if let Some(bool_opt) = value.downcast_ref::<Option<bool>>() {
+                if let Some(bool_opt) = bool_opt {
+                    contents.insert(key, bool_opt.to_string());
+                }
+            } else if let Some(u16_opt) = value.downcast_ref::<Option<u16>>() {
+                if let Some(u16_opt) = u16_opt {
+                    contents.insert(key, u16_opt.to_string());
+                }
+            } else if let Some(u32_opt) = value.downcast_ref::<Option<u32>>() {
+                if let Some(u32_opt) = u32_opt {
+                    contents.insert(key, u32_opt.to_string());
+                }
+            } else if let Some(vec_string) = value.downcast_ref::<Option<Vec<String>>>() {
+                if let Some(vec_string) = vec_string {
+                    contents.insert(key, vec_string.join(","));
+                }
+            } else {
+                panic!("Unsupported Config type for: {key}");
+            }
+        }
 
-        env
+        contents
+            .iter()
+            .map(|(k, v)| format!("{}={}", k.to_uppercase(), v))
+            .collect::<Vec<String>>()
+            .join("\n")
     }
 }
 
@@ -63,21 +133,6 @@ impl Repository {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_repository() {
-        let repo = Repository::new("lichess-org", "lila");
-        assert_eq!(repo.org, "lichess-org");
-        assert_eq!(repo.project, "lila");
-        assert_eq!(repo.full_name(), "lichess-org/lila");
-        assert_eq!(repo.url(), "https://github.com/lichess-org/lila");
-        assert_eq!(repo.clone_path(), Path::new("repos/lila"));
-    }
-}
-
 #[derive(Default, Clone, Eq, PartialEq, Debug)]
 struct OptionalService<'a> {
     compose_profile: Option<Vec<&'a str>>,
@@ -86,11 +141,14 @@ struct OptionalService<'a> {
 
 fn main() -> std::io::Result<()> {
     let args: Vec<String> = std::env::args().collect();
-
     assert!(args.len() > 1, "Missing command");
 
+    let config = Config::load();
+
     match args[1].as_str() {
-        "setup" => setup(),
+        "setup" => setup(config),
+        "hostname" => hostname(config),
+        "mobile" => mobile_setup(config),
         "gitpod-welcome" => {
             gitpod_welcome();
             Ok(())
@@ -99,7 +157,7 @@ fn main() -> std::io::Result<()> {
     }
 }
 
-fn setup() -> std::io::Result<()> {
+fn setup(mut config: Config) -> std::io::Result<()> {
     intro(BANNER)?;
 
     let services = prompt_for_optional_services()?;
@@ -126,20 +184,23 @@ fn setup() -> std::io::Result<()> {
         (String::new(), String::new())
     };
 
-    let config = Config {
-        profiles: services
+    config.compose_profiles = Some(
+        services
             .iter()
             .filter_map(|service| service.compose_profile.clone())
             .flatten()
             .map(std::string::ToString::to_string)
             .collect(),
-        setup_database,
-        su_password,
-        password,
-        enable_monitoring: services
+    );
+    config.setup_database = Some(setup_database);
+    config.enable_monitoring = Some(
+        services
             .iter()
             .any(|service| service.compose_profile == Some(vec!["monitoring"])),
-    };
+    );
+    config.su_password = Some(su_password);
+    config.password = Some(password);
+    config.save();
 
     create_placeholder_dirs();
 
@@ -190,8 +251,7 @@ fn setup() -> std::io::Result<()> {
         progress.stop(format!("Clone {} ✓", repo.full_name()));
     }
 
-    std::fs::write(".env", config.to_env())?;
-    log::success("Wrote .env")
+    Ok(())
 }
 
 fn create_placeholder_dirs() {
@@ -211,6 +271,7 @@ fn create_placeholder_dirs() {
         Repository::new("lichess-org", "chessground"),
         Repository::new("lichess-org", "pgn-viewer"),
         Repository::new("lichess-org", "scalachess"),
+        Repository::new("lichess-org", "mobile"),
         Repository::new("lichess-org", "dartchess"),
         Repository::new("lichess-org", "berserk"),
         Repository::new("cyanfish", "bbpPairings"),
@@ -318,6 +379,14 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error
     )
     .item(
         OptionalService {
+            compose_profile: vec!["mobile"].into(),
+            repositories: vec![Repository::new("lichess-org", "mobile")].into(),
+        },
+        "Mobile app",
+        "Flutter-based mobile app",
+    )
+    .item(
+        OptionalService {
             compose_profile: None,
             repositories: vec![Repository::new("lichess-org", "dartchess")].into(),
         },
@@ -351,6 +420,68 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error
     .interact()
 }
 
+fn hostname(mut config: Config) -> std::io::Result<()> {
+    let local_ip = match local_ip() {
+        Ok(ip) => ip.to_string(),
+        _ => "127.0.0.1".to_string(),
+    };
+
+    let hostname: String = match select("Select a hostname to access your local Lichess instance:")
+        .initial_value("localhost")
+        .item("localhost", "localhost", "default")
+        .item(
+            local_ip.as_str(),
+            local_ip.as_str(),
+            "Your private IP address, for accessing from other devices on your local network",
+        )
+        .item(
+            "10.0.2.2",
+            "10.0.2.2",
+            "For accessing from an Android emulator running on this machine",
+        )
+        .item("other", "Other", "Enter a custom hostname")
+        .interact()?
+    {
+        "other" => input("Enter a custom hostname:  (It must be resolvable)").interact()?,
+        selection => selection.to_string(),
+    };
+
+    config.hostname = Some(hostname);
+    config.save();
+
+    Ok(())
+}
+
+fn mobile_setup(mut config: Config) -> std::io::Result<()> {
+    let phone_ip: String = input("Your phone's private IP address")
+        .placeholder("192.168.x.x or 10.x.x.x")
+        .interact()?;
+    let connection_port: u16 = input("Wireless debugging port")
+        .validate(|input: &String| validate_string_length(input, 5))
+        .interact()?;
+    let pairing_port: u16 = input("Pairing port")
+        .validate(|input: &String| validate_string_length(input, 5))
+        .interact()?;
+    let pairing_code: u32 = input("Pairing code")
+        .validate(|input: &String| validate_string_length(input, 6))
+        .interact()?;
+
+    config.phone_ip = Some(phone_ip);
+    config.connection_port = Some(connection_port);
+    config.pairing_port = Some(pairing_port);
+    config.pairing_code = Some(pairing_code);
+    config.save();
+
+    Ok(())
+}
+
+fn validate_string_length(input: &String, length: usize) -> Result<(), String> {
+    match input.len() {
+        len if len == length => Ok(()),
+        _ => Err(format!("Value should be {length} digits in length")),
+    }
+}
+
 fn gitpod_welcome() {
     println!("{}", "################".green());
     println!(
@@ -366,4 +497,47 @@ fn gitpod_welcome() {
         "{}",
         "For full documentation, see: https://lichess-org.github.io/lila-gitpod/".green()
     );
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_repository() {
+        let repo = Repository::new("lichess-org", "lila");
+        assert_eq!(repo.org, "lichess-org");
+        assert_eq!(repo.project, "lila");
+        assert_eq!(repo.full_name(), "lichess-org/lila");
+        assert_eq!(repo.url(), "https://github.com/lichess-org/lila");
+        assert_eq!(repo.clone_path(), Path::new("repos/lila"));
+    }
+
+    #[test]
+    fn test_set_env_vars_from_struct() {
+        let contents = Config {
+            compose_profiles: Some(vec!["foo".to_string(), "bar".to_string()]),
+            setup_database: Some(true),
+            enable_monitoring: Some(false),
+            su_password: Some("foo".to_string()),
+            password: Some("bar".to_string()),
+            hostname: Some("baz".to_string()),
+            phone_ip: Some("1.2.3.4".to_string()),
+            connection_port: Some(1234),
+            pairing_port: Some(5678),
+            pairing_code: Some(901234),
+        }
+        .to_env();
+
+        assert!(contents.contains("COMPOSE_PROFILES=foo,bar"));
+        assert!(contents.contains("CONNECTION_PORT=1234"));
+        assert!(contents.contains("ENABLE_MONITORING=false"));
+        assert!(contents.contains("HOSTNAME=baz"));
+        assert!(contents.contains("PAIRING_CODE=901234"));
+        assert!(contents.contains("PAIRING_PORT=5678"));
+        assert!(contents.contains("PASSWORD=bar"));
+        assert!(contents.contains("PHONE_IP=1.2.3.4"));
+        assert!(contents.contains("SETUP_DATABASE=true"));
+        assert!(contents.contains("SU_PASSWORD=foo"));
+    }
 }

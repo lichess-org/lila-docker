@@ -3,13 +3,13 @@
 if [ ! -z "$GITPOD_WORKSPACE_ID" ]; then
     export IS_GITPOD=true
     export SCHEME=https
+    export LICHESS_URL=$(gp url 8080)
     export LILA_DOMAIN=$(gp url 8080 | cut -c9-)
     export PICFIT_DOMAIN=$(gp url 3001 | cut -c9-)
 fi
 
 run_setup() {
     rust_cmd setup
-    export $(cat .env | xargs)
 
     docker compose build
     docker compose --profile utils build
@@ -79,6 +79,27 @@ run_formatter() {
     docker compose exec lila sbt scalafmtAll || docker compose run --rm --entrypoint "sbt scalafmtAll" lila
 }
 
+run_hostname() {
+    if [ "$IS_GITPOD" = "true" ]; then
+        echo "Setting of hostname not available on Gitpod"
+        echo "Use $(gp url 8080)"
+        exit 1
+    fi
+
+    rust_cmd hostname
+
+    if [ ! -z "$(docker compose ps -a --services | xargs)" ]; then
+        docker compose down lila lila_ws nginx
+        docker compose up -d lila lila_ws nginx
+    fi
+}
+
+run_mobile() {
+    rust_cmd mobile
+    docker compose exec mobile adb pair $PHONE_IP:$PAIRING_PORT $PAIRING_CODE
+    docker compose exec mobile adb connect $PHONE_IP:$CONNECTION_PORT
+}
+
 rust_cmd() {
     if command -v rustup &> /dev/null; then
         # if the host has Rust installed, use it directly
@@ -93,6 +114,8 @@ rust_cmd() {
             cargo zigbuild --release
         ./command/target/release/command "$@"
     fi
+
+    export $(cat settings.env | xargs)
 }
 
 show_help() {
@@ -121,6 +144,12 @@ case $1 in
         ;;
     format)
         run_formatter
+        ;;
+    hostname)
+        run_hostname
+        ;;
+    mobile)
+        run_mobile
         ;;
     *)
         show_help
