@@ -59,8 +59,12 @@ setup_database() {
         sleep 1
     done
 
-    docker compose run --rm python bash -c \
-        "python /lila-db-seed/spamdb/spamdb.py --uri=mongodb://mongodb/lichess --password=$PASSWORD --su-password=$SU_PASSWORD --es --es-host=elasticsearch:9200"
+    docker compose run --rm python python /lila-db-seed/spamdb/spamdb.py \
+        --uri=mongodb://mongodb/lichess \
+        --password=$PASSWORD \
+        --su-password=$SU_PASSWORD \
+        --streamers \
+        --es --es-host=elasticsearch:9200
 
     docker compose run --rm mongodb mongo --quiet --host mongodb lichess /lila/bin/mongodb/indexes.js
     docker compose run --rm mongodb mongo --quiet --host mongodb lichess /scripts/mongodb/users.js

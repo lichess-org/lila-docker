@@ -97,7 +97,7 @@ docker compose run --rm ui /lila/ui/build -w
 If you edit the `conf/routes` file, you'll need to update the route cache.
 
 ```bash
-docker compose exec lila bash -c "./lila playRoutes"
+docker compose exec lila ./lila playRoutes
 ```
 
 ### To add translation keys:
@@ -155,7 +155,7 @@ If you're making changes to the Scalachess library, you can have lila use it ins
 3. Publish the local scalachess changes and restart lila:
 
     ```bash
-    docker compose exec lila bash -c "cd /scalachess && sbt publishLocal"
+    docker compose exec -w /scalachess lila sbt publishLocal
     docker compose restart lila
     ```
 
@@ -211,7 +211,7 @@ By default, your local lila instance will use the version of chessground that is
 2. Start the chessground compiler in watch mode:
 
     ```bash
-    docker compose run --rm ui bash -c "cd /chessground && pnpm install && pnpm run compile --watch"
+    docker compose run --rm -w /chessground ui bash -c "pnpm install && pnpm run compile --watch"
     ```
 
 3. Start the lila ui build in watch mode:
@@ -227,7 +227,7 @@ Then you can see the updated chessground demo at http://localhost:8090/demo.html
 To re-compile the PGN Viewer after making changes:
 
 ```bash
-docker compose run --rm ui bash -c "cd /pgn-viewer && pnpm run sass-dev && pnpm run bundle-dev"
+docker compose run --rm -w /pgn-viewer ui bash -c "pnpm run sass-dev && pnpm run bundle-dev"
 ```
 
 See the changes on the PGN Viewer demo page: http://localhost:8091/
