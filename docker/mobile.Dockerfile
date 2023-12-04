@@ -1,4 +1,4 @@
-FROM ghcr.io/cirruslabs/flutter:3.16.1
+FROM ghcr.io/cirruslabs/flutter:3.16.0
 
 RUN apt-get update
 RUN apt install --yes \

@@ -94,11 +94,11 @@ rust_cmd() {
         cargo build --release --manifest-path command/Cargo.toml
         ./command/target/release/command "$@"
     elif [ "$(uname)" = "Darwin" ]; then
-        docker run --rm -v "$PWD/command:/command" -w /command messense/cargo-zigbuild:0.18.0 \
+        docker run --rm -v "$PWD/command:/command" -w /command messense/cargo-zigbuild:0.18.1 \
             cargo zigbuild --release --target universal2-apple-darwin
         ./command/target/universal2-apple-darwin/release/command "$@"
     else
-        docker run --rm -v "$PWD/command:/command" -w /command messense/cargo-zigbuild:0.18.0 \
+        docker run --rm -v "$PWD/command:/command" -w /command messense/cargo-zigbuild:0.18.1 \
             cargo zigbuild --release
         ./command/target/release/command "$@"
     fi
