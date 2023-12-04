@@ -278,7 +278,7 @@ curl --get http://localhost:8086/query \
         ```bash
         docker compose exec -it mobile bash
 
-        # see your phone
+        # verify your phone is listed
         adb devices
         ```
 
@@ -291,4 +291,5 @@ curl --get http://localhost:8086/query \
         ```bash
         flutter run -v --dart-define=LICHESS_HOST=$LICHESS_URL --dart-define=LICHESS_WS_HOST=$LICHESS_URL
         ```
+        - First time you run it, it might take a while
         - No substitutions necessary. The `$LICHESS_URL` environment variable will already be set on the container.

@@ -1,5 +1,8 @@
-use cliclack::{confirm, input, intro, log, multiselect, select, spinner};
-use colored::Colorize;
+use cliclack::{
+    confirm, input, intro,
+    log::{self, info},
+    multiselect, note, outro, select, spinner,
+};
 use local_ip_address::local_ip;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -149,10 +152,7 @@ fn main() -> std::io::Result<()> {
         "setup" => setup(config),
         "hostname" => hostname(config),
         "mobile" => mobile_setup(config),
-        "welcome" => {
-            welcome();
-            Ok(())
-        }
+        "welcome" => welcome(),
         _ => panic!("Unknown command"),
     }
 }
@@ -248,10 +248,10 @@ fn setup(mut config: Config) -> std::io::Result<()> {
             output
         );
 
-        progress.stop(format!("Clone {} ✓", repo.full_name()));
+        progress.stop(format!("Cloned {} ✓", repo.full_name()));
     }
 
-    Ok(())
+    outro("Starting services...")
 }
 
 fn create_placeholder_dirs() {
@@ -371,7 +371,7 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error
     )
     .item(
         OptionalService {
-            compose_profile: None,
+            compose_profile: None ,
             repositories: vec![Repository::new("lichess-org", "scalachess")].into(),
         },
         "Scalachess",
@@ -422,8 +422,7 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error
 
 fn hostname(mut config: Config) -> std::io::Result<()> {
     if on_gitpod() {
-        println!("Setting of hostname not available on Gitpod");
-        return Ok(());
+        return log::error("Setting of hostname not available on Gitpod");
     }
 
     let local_ip = match local_ip() {
@@ -454,20 +453,26 @@ fn hostname(mut config: Config) -> std::io::Result<()> {
     config.lila_hostname = Some(hostname);
     config.save();
 
-    Ok(())
+    outro("✔ Hostname updated")
 }
 
 fn mobile_setup(mut config: Config) -> std::io::Result<()> {
-    log::info("On your Android phone, open Developer Options > Wireless Debugging")?;
+    intro("On your Android phone, open Developer Options > Wireless Debugging")?;
 
-    let phone_ip: String = input("Your phone's private IP address")
-        .placeholder("192.168.x.x or 10.x.x.x")
-        .interact()?;
+    let phone_ip = match config.phone_ip {
+        Some(ip) => input("Your phone's private IP address")
+            .default_input(&ip)
+            .interact()?,
+        None => input("Your phone's private IP address")
+            .placeholder("192.168.x.x or 10.x.x.x")
+            .interact()?,
+    };
+
     let connection_port: u16 = input("Connection port")
         .validate(|input: &String| validate_string_length(input, 5))
         .interact()?;
 
-    log::info("Tap `Pair device with pairing code`")?;
+    info("Tap `Pair device with pairing code`")?;
 
     let pairing_code: u32 = input("Pairing code")
         .validate(|input: &String| validate_string_length(input, 6))
@@ -482,7 +487,7 @@ fn mobile_setup(mut config: Config) -> std::io::Result<()> {
     config.pairing_port = Some(pairing_port);
     config.save();
 
-    Ok(())
+    outro("Pairing and connecting to phone...")
 }
 
 fn validate_string_length(input: &String, length: usize) -> Result<(), String> {
@@ -496,22 +501,21 @@ fn on_gitpod() -> bool {
     std::env::var("GITPOD_WORKSPACE_ID").is_ok()
 }
 
-fn welcome() {
-    for line in &[
-        "################".green(),
-        "Your Lichess development environment is starting!".green(),
-        "Monitor the progress in the 'lila' container with the command:".green(),
-        " docker compose logs lila --follow".green().bold(),
-    ] {
-        println!("{line}");
-    }
+fn welcome() -> std::io::Result<()> {
+    intro("Your Lichess development environment is starting!")?;
 
     if on_gitpod() {
-        println!(
-            "{}",
-            "For full documentation, see: https://lichess-org.github.io/lila-gitpod/".green()
-        );
+        info("For full documentation, see: https://lichess-org.github.io/lila-gitpod/")?;
+    } else {
+        info("For full documentation, see: https://github.com/lichess-org/lila-docker")?;
     }
+
+    note(
+        "To monitor the progress:",
+        "docker compose logs lila --follow",
+    )?;
+
+    outro("🚀")
 }
 
 #[cfg(test)]
