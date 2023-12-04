@@ -1,7 +1,6 @@
 #!/bin/bash -e
 
 if [ ! -z "$GITPOD_WORKSPACE_ID" ]; then
-    export IS_GITPOD=true
     export SCHEME=https
     export LICHESS_URL=$(gp url 8080)
     export LILA_DOMAIN=$(gp url 8080 | cut -c9-)
@@ -13,19 +12,14 @@ run_setup() {
 
     docker compose build
     docker compose --profile utils build
-
     docker compose up -d
-
-    echo "Compiling js/css..."
     docker compose run --rm ui /lila/ui/build
 
     if [ "$SETUP_DATABASE" = "true" ]; then
         setup_database
     fi
 
-    if [ "$IS_GITPOD" = "true" ]; then
-        rust_cmd gitpod-welcome
-    fi
+    rust_cmd welcome
 }
 
 run_start() {
@@ -80,12 +74,6 @@ run_formatter() {
 }
 
 run_hostname() {
-    if [ "$IS_GITPOD" = "true" ]; then
-        echo "Setting of hostname not available on Gitpod"
-        echo "Use $(gp url 8080)"
-        exit 1
-    fi
-
     rust_cmd hostname
 
     if [ ! -z "$(docker compose ps -a --services | xargs)" ]; then

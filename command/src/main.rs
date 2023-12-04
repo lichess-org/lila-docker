@@ -149,8 +149,8 @@ fn main() -> std::io::Result<()> {
         "setup" => setup(config),
         "hostname" => hostname(config),
         "mobile" => mobile_setup(config),
-        "gitpod-welcome" => {
-            gitpod_welcome();
+        "welcome" => {
+            welcome();
             Ok(())
         }
         _ => panic!("Unknown command"),
@@ -421,6 +421,11 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error
 }
 
 fn hostname(mut config: Config) -> std::io::Result<()> {
+    if on_gitpod() {
+        println!("Setting of hostname not available on Gitpod");
+        return Ok(());
+    }
+
     let local_ip = match local_ip() {
         Ok(ip) => ip.to_string(),
         _ => "127.0.0.1".to_string(),
@@ -482,15 +487,25 @@ fn validate_string_length(input: &String, length: usize) -> Result<(), String> {
     }
 }
 
-fn gitpod_welcome() {
+fn on_gitpod() -> bool {
+    std::env::var("GITPOD_WORKSPACE_ID").is_ok()
+}
+
+fn welcome() {
     for line in &[
         "################".green(),
         "Your Lichess development environment is starting!".green(),
         "Monitor the progress in the 'lila' container with the command:".green(),
         " docker compose logs lila --follow".green().bold(),
-        "For full documentation, see: https://lichess-org.github.io/lila-gitpod/".green(),
     ] {
         println!("{line}");
+    }
+
+    if on_gitpod() {
+        println!(
+            "{}",
+            "For full documentation, see: https://lichess-org.github.io/lila-gitpod/".green()
+        );
     }
 }
 
@@ -525,14 +540,14 @@ mod tests {
         .to_env();
 
         assert!(contents.contains("COMPOSE_PROFILES=foo,bar"));
-        assert!(contents.contains("CONNECTION_PORT=1234"));
-        assert!(contents.contains("ENABLE_MONITORING=false"));
-        assert!(contents.contains("HOSTNAME=baz"));
-        assert!(contents.contains("PAIRING_CODE=901234"));
-        assert!(contents.contains("PAIRING_PORT=5678"));
-        assert!(contents.contains("PASSWORD=bar"));
-        assert!(contents.contains("PHONE_IP=1.2.3.4"));
         assert!(contents.contains("SETUP_DATABASE=true"));
+        assert!(contents.contains("ENABLE_MONITORING=false"));
         assert!(contents.contains("SU_PASSWORD=foo"));
+        assert!(contents.contains("PASSWORD=bar"));
+        assert!(contents.contains("HOSTNAME=baz"));
+        assert!(contents.contains("PHONE_IP=1.2.3.4"));
+        assert!(contents.contains("CONNECTION_PORT=1234"));
+        assert!(contents.contains("PAIRING_PORT=5678"));
+        assert!(contents.contains("PAIRING_CODE=901234"));
     }
 }
