@@ -147,7 +147,7 @@ impl Gitpod {
         let workspace_url = std::env::var("GITPOD_WORKSPACE_URL").unwrap();
 
         Self {
-            workspace_domain: workspace_url.replace("https://", ""),
+            workspace_domain: workspace_url.replace("https://", "8080-"),
             workspace_url: workspace_url.replace("https://", "https://8080-"),
         }
     }
@@ -597,7 +597,7 @@ mod tests {
         let gitpod = Gitpod::load();
         assert_eq!(
             gitpod.workspace_domain,
-            "lichessorg-liladocker-abc123.ws-us123.gitpod.io"
+            "8080-lichessorg-liladocker-abc123.ws-us123.gitpod.io"
         );
         assert_eq!(
             gitpod.workspace_url,
