@@ -46,7 +46,6 @@ build_all_profiles() {
 }
 
 setup_database() {
-    # wait for mongodb to be ready
     while ! docker compose exec mongodb mongo --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
         echo "Waiting for mongodb to be ready..."
         sleep 1
