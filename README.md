@@ -247,33 +247,28 @@ curl --get http://localhost:8086/query \
 
 ### Mobile
 
-1. On your host machine:
+1. On your Android phone:
+    1. Connect your phone to the same wifi network as your host machine
+    2. Enable Developer Mode
+    3. In Developer Options, enable Wireless Debugging and tap into its menu
+2. On your host machine:
+
     1. Have the lila-docker services running, with the `Mobile` optional service started
     2. Configure lila to run with your host's IP address or hostname instead of localhost
+
         ```bash
         ./lila-docker hostname
         ```
+
+        - Then verify that your phone can access the site at `http://[your-selection]:8080`
+
     3. Connect to your phone
+
         ```bash
         ./lila-docker mobile
         ```
-        Get the values from the steps below.
-2. On your Android phone:
-    1. Connect your phone to the same wifi network as your host machine
-    2. Ensure your phone and can access lila in your browser app using the host value you set above
-        ```
-        http://[your-selection]:8080
-        ```
-    3. Enable Developer Mode
-    4. In Developer Options
-        1. enable wireless debugging
-        2. Tap into the wireless debugging settings
-            1. Use the "IP address & Port" value in the prompt on your host
-            2. Tap "Pair device with pairing code"
-                1. Enter the pairing port and code in the prompt on your host
-3. On your host machine:
 
-    1. Get a shell on the container:
+    4. Get a shell on the container:
 
         ```bash
         docker compose exec -it mobile bash
@@ -282,14 +277,16 @@ curl --get http://localhost:8086/query \
         adb devices
         ```
 
-    2. Install the app dependencies:
+    5. Install the app dependencies:
         ```bash
         flutter pub get
         dart run build_runner build
         ```
-    3. Run the app:
+    6. Run the app:
         ```bash
-        flutter run -v --dart-define=LICHESS_HOST=$LILA_URL --dart-define=LICHESS_WS_HOST=$LILA_URL
+        flutter run -v \
+            --dart-define LICHESS_HOST=$LILA_URL \
+            --dart-define LICHESS_WS_HOST=$LILA_URL
         ```
-        - First time you run it, it might take a while
         - No substitutions necessary. The `$LILA_URL` environment variable will already be set on the container.
+        - First time you run it, it might take a while
