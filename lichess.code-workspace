@@ -1,0 +1,52 @@
+{
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "repos/lila"
+    },
+    {
+      "path": "repos/lila-ws"
+    },
+    {
+      "path": "repos/lila-db-seed"
+    },
+    {
+      "path": "repos/lifat"
+    },
+    {
+      "path": "repos/lila-fishnet"
+    },
+    {
+      "path": "repos/lila-engine"
+    },
+    {
+      "path": "repos/lila-search"
+    },
+    {
+      "path": "repos/lila-gif"
+    },
+    {
+      "path": "repos/api"
+    },
+    {
+      "path": "repos/chessground"
+    },
+    {
+      "path": "repos/pgn-viewer"
+    },
+    {
+      "path": "repos/scalachess"
+    },
+    {
+      "path": "repos/dartchess"
+    },
+    {
+      "path": "repos/berserk"
+    },
+    {
+      "path": "repos/bbpPairings"
+    }
+  ]
+}
