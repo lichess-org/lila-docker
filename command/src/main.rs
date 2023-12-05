@@ -138,17 +138,17 @@ impl Repository {
     }
 }
 struct Gitpod {
-    workspace_domain: String,
-    workspace_url: String,
+    domain: String,
+    url: String,
 }
 
 impl Gitpod {
     fn load() -> Self {
-        let workspace_url = std::env::var("GITPOD_WORKSPACE_URL").unwrap();
+        let workspace_url = std::env::var("GITPOD_WORKSPACE_URL").expect("Not running in Gitpod");
 
         Self {
-            workspace_domain: workspace_url.replace("https://", "8080-"),
-            workspace_url: workspace_url.replace("https://", "https://8080-"),
+            domain: workspace_url.replace("https://", "8080-"),
+            url: workspace_url.replace("https://", "https://8080-"),
         }
     }
 
@@ -224,8 +224,8 @@ fn setup(mut config: Config) -> std::io::Result<()> {
 
     if Gitpod::is_host() {
         let gitpod = Gitpod::load();
-        config.lila_domain = Some(gitpod.workspace_domain);
-        config.lila_url = Some(gitpod.workspace_url);
+        config.lila_domain = Some(gitpod.domain);
+        config.lila_url = Some(gitpod.url);
     }
 
     config.save();
@@ -596,11 +596,11 @@ mod tests {
 
         let gitpod = Gitpod::load();
         assert_eq!(
-            gitpod.workspace_domain,
+            gitpod.domain,
             "8080-lichessorg-liladocker-abc123.ws-us123.gitpod.io"
         );
         assert_eq!(
-            gitpod.workspace_url,
+            gitpod.url,
             "https://8080-lichessorg-liladocker-abc123.ws-us123.gitpod.io"
         );
     }
