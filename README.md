@@ -289,7 +289,7 @@ curl --get http://localhost:8086/query \
         ```
     3. Run the app:
         ```bash
-        flutter run -v --dart-define=LICHESS_HOST=$LICHESS_URL --dart-define=LICHESS_WS_HOST=$LICHESS_URL
+        flutter run -v --dart-define=LICHESS_HOST=$LILA_URL --dart-define=LICHESS_WS_HOST=$LILA_URL
         ```
         - First time you run it, it might take a while
-        - No substitutions necessary. The `$LICHESS_URL` environment variable will already be set on the container.
+        - No substitutions necessary. The `$LILA_URL` environment variable will already be set on the container.

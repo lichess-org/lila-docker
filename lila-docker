@@ -1,11 +1,5 @@
 #!/bin/bash -e
 
-if [ ! -z "$GITPOD_WORKSPACE_ID" ]; then
-    export SCHEME=https
-    export LICHESS_URL=$(gp url 8080)
-    export LILA_DOMAIN=$(gp url 8080 | cut -c9-)
-fi
-
 run_setup() {
     rust_cmd setup
 

@@ -28,7 +28,8 @@ struct Config {
     enable_monitoring: Option<bool>,
     su_password: Option<String>,
     password: Option<String>,
-    lila_hostname: Option<String>,
+    lila_domain: Option<String>,
+    lila_url: Option<String>,
     phone_ip: Option<String>,
     connection_port: Option<u16>,
     pairing_code: Option<u32>,
@@ -46,7 +47,8 @@ impl Config {
             enable_monitoring: None,
             su_password: None,
             password: None,
-            lila_hostname: None,
+            lila_domain: None,
+            lila_url: None,
             phone_ip: None,
             connection_port: None,
             pairing_code: None,
@@ -135,6 +137,25 @@ impl Repository {
         Path::new("repos").join(&self.project)
     }
 }
+struct Gitpod {
+    workspace_domain: String,
+    workspace_url: String,
+}
+
+impl Gitpod {
+    fn load() -> Self {
+        let workspace_url = std::env::var("GITPOD_WORKSPACE_URL").unwrap();
+
+        Self {
+            workspace_domain: workspace_url.replace("https://", ""),
+            workspace_url: workspace_url.replace("https://", "https://8080-"),
+        }
+    }
+
+    fn is_host() -> bool {
+        std::env::var("GITPOD_WORKSPACE_URL").is_ok()
+    }
+}
 
 #[derive(Default, Clone, Eq, PartialEq, Debug)]
 struct OptionalService<'a> {
@@ -200,6 +221,13 @@ fn setup(mut config: Config) -> std::io::Result<()> {
     );
     config.su_password = Some(su_password);
     config.password = Some(password);
+
+    if Gitpod::is_host() {
+        let gitpod = Gitpod::load();
+        config.lila_domain = Some(gitpod.workspace_domain);
+        config.lila_url = Some(gitpod.workspace_url);
+    }
+
     config.save();
 
     create_placeholder_dirs();
@@ -421,7 +449,7 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error
 }
 
 fn hostname(mut config: Config) -> std::io::Result<()> {
-    if on_gitpod() {
+    if Gitpod::is_host() {
         return log::error("Setting of hostname not available on Gitpod");
     }
 
@@ -450,7 +478,8 @@ fn hostname(mut config: Config) -> std::io::Result<()> {
         selection => selection.to_string(),
     };
 
-    config.lila_hostname = Some(hostname);
+    config.lila_domain = Some(format!("{hostname}:8080"));
+    config.lila_url = Some(format!("http://{hostname}:8080"));
     config.save();
 
     outro("✔ Hostname updated")
@@ -497,14 +526,10 @@ fn validate_string_length(input: &String, length: usize) -> Result<(), String> {
     }
 }
 
-fn on_gitpod() -> bool {
-    std::env::var("GITPOD_WORKSPACE_ID").is_ok()
-}
-
 fn welcome() -> std::io::Result<()> {
     intro("Your Lichess development environment is starting!")?;
 
-    if on_gitpod() {
+    if Gitpod::is_host() {
         info("For full documentation, see: https://lichess-org.github.io/lila-gitpod/")?;
     } else {
         info("For full documentation, see: https://github.com/lichess-org/lila-docker")?;
@@ -540,7 +565,8 @@ mod tests {
             enable_monitoring: Some(false),
             su_password: Some("foo".to_string()),
             password: Some("bar".to_string()),
-            lila_hostname: Some("baz".to_string()),
+            lila_domain: Some("baz:8080".to_string()),
+            lila_url: Some("http://baz:8080".to_string()),
             phone_ip: Some("1.2.3.4".to_string()),
             connection_port: Some(1234),
             pairing_code: Some(901234),
@@ -553,10 +579,29 @@ mod tests {
         assert!(contents.contains("ENABLE_MONITORING=false"));
         assert!(contents.contains("SU_PASSWORD=foo"));
         assert!(contents.contains("PASSWORD=bar"));
-        assert!(contents.contains("LILA_HOSTNAME=baz"));
+        assert!(contents.contains("LILA_DOMAIN=baz:8080"));
+        assert!(contents.contains("LILA_URL=http://baz:8080"));
         assert!(contents.contains("PHONE_IP=1.2.3.4"));
         assert!(contents.contains("CONNECTION_PORT=1234"));
         assert!(contents.contains("PAIRING_CODE=901234"));
         assert!(contents.contains("PAIRING_PORT=5678"));
+    }
+
+    #[test]
+    fn test_gitpod_lila_url() {
+        std::env::set_var(
+            "GITPOD_WORKSPACE_URL",
+            "https://lichessorg-liladocker-abc123.ws-us123.gitpod.io",
+        );
+
+        let gitpod = Gitpod::load();
+        assert_eq!(
+            gitpod.workspace_domain,
+            "lichessorg-liladocker-abc123.ws-us123.gitpod.io"
+        );
+        assert_eq!(
+            gitpod.workspace_url,
+            "https://8080-lichessorg-liladocker-abc123.ws-us123.gitpod.io"
+        );
     }
 }

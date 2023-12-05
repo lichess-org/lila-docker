@@ -22,8 +22,7 @@ services:
     networks:
       - lila-network
     environment:
-      - SCHEME=${SCHEME:-http}
-      - LILA_DOMAIN=${LILA_DOMAIN:-${LILA_HOSTNAME:-localhost}:8080}
+      - LILA_DOMAIN=${LILA_DOMAIN:-localhost:8080}
       - ENABLE_MONITORING=${ENABLE_MONITORING:-false}
     volumes:
       - ./repos/lila:/lila
@@ -41,8 +40,7 @@ services:
     networks:
       - lila-network
     environment:
-      - SCHEME=${SCHEME:-http}
-      - LILA_DOMAIN=${LILA_DOMAIN:-${LILA_HOSTNAME:-localhost}:8080}
+      - LILA_URL=${LILA_URL:-http://localhost:8080}
     volumes:
       - ./repos/lila-ws:/lila-ws
       - ./conf/lila-ws.conf:/lila-ws.conf
@@ -67,7 +65,7 @@ services:
       context: docker
       dockerfile: mobile.Dockerfile
     environment:
-      - LICHESS_URL=${LICHESS_URL:-http://${LILA_HOSTNAME:-localhost}:8080}
+      - LILA_URL=${LILA_URL:-http://localhost:8080}
     tty: true
     volumes:
       - ./repos/dartchess:/dartchess
