@@ -24,7 +24,6 @@ services:
     environment:
       - SCHEME=${SCHEME:-http}
       - LILA_DOMAIN=${LILA_DOMAIN:-${LILA_HOSTNAME:-localhost}:8080}
-      - PICFIT_DOMAIN=${PICFIT_DOMAIN:-${LILA_HOSTNAME:-localhost}:3001}
       - ENABLE_MONITORING=${ENABLE_MONITORING:-false}
     volumes:
       - ./repos/lila:/lila
