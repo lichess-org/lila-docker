@@ -108,6 +108,12 @@ After modifying a `translation/source/*.xml` file, run:
 docker compose run --rm ui /lila/bin/trans-dump
 ```
 
+### Make the database persistent
+
+```bash
+docker cp lila-docker-mongodb-1:/data/db ./database
+```
+
 ### Code formatting:
 
 ```bash
