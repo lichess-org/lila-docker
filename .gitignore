@@ -4,3 +4,6 @@
 command/.cargo
 command/repos
 command/target
+
+settings.env
+settings.toml

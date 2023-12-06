@@ -1,31 +1,18 @@
 #!/bin/bash -e
 
-if [ ! -z "$GITPOD_WORKSPACE_ID" ]; then
-    export IS_GITPOD=true
-    export SCHEME=https
-    export LILA_DOMAIN=$(gp url 8080 | cut -c9-)
-    export PICFIT_DOMAIN=$(gp url 3001 | cut -c9-)
-fi
-
 run_setup() {
     rust_cmd setup
-    export $(cat .env | xargs)
 
     docker compose build
     docker compose --profile utils build
-
     docker compose up -d
-
-    echo "Compiling js/css..."
     docker compose run --rm ui /lila/ui/build
 
     if [ "$SETUP_DATABASE" = "true" ]; then
         setup_database
     fi
 
-    if [ "$IS_GITPOD" = "true" ]; then
-        rust_cmd gitpod-welcome
-    fi
+    rust_cmd welcome
 }
 
 run_start() {
@@ -59,7 +46,6 @@ build_all_profiles() {
 }
 
 setup_database() {
-    # wait for mongodb to be ready
     while ! docker compose exec mongodb mongo --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
         echo "Waiting for mongodb to be ready..."
         sleep 1
@@ -83,20 +69,37 @@ run_formatter() {
     docker compose exec lila sbt scalafmtAll || docker compose run --rm --entrypoint "sbt scalafmtAll" lila
 }
 
+run_hostname() {
+    rust_cmd hostname
+
+    if [ ! -z "$(docker compose ps -a --services | xargs)" ]; then
+        docker compose down lila lila_ws mobile nginx
+        docker compose up -d lila lila_ws mobile nginx
+    fi
+}
+
+run_mobile() {
+    rust_cmd mobile
+    docker compose exec mobile adb pair $PHONE_IP:$PAIRING_PORT $PAIRING_CODE
+    docker compose exec mobile adb connect $PHONE_IP:$CONNECTION_PORT
+}
+
 rust_cmd() {
     if command -v rustup &> /dev/null; then
         # if the host has Rust installed, use it directly
         cargo build --release --manifest-path command/Cargo.toml
         ./command/target/release/command "$@"
     elif [ "$(uname)" = "Darwin" ]; then
-        docker run --rm -v "$PWD/command:/command" -w /command messense/cargo-zigbuild:0.18.0 \
+        docker run --rm -v "$PWD/command:/command" -w /command messense/cargo-zigbuild:0.18.1 \
             cargo zigbuild --release --target universal2-apple-darwin
         ./command/target/universal2-apple-darwin/release/command "$@"
     else
-        docker run --rm -v "$PWD/command:/command" -w /command messense/cargo-zigbuild:0.18.0 \
+        docker run --rm -v "$PWD/command:/command" -w /command messense/cargo-zigbuild:0.18.1 \
             cargo zigbuild --release
         ./command/target/release/command "$@"
     fi
+
+    export $(cat settings.env | xargs)
 }
 
 show_help() {
@@ -125,6 +128,12 @@ case $1 in
         ;;
     format)
         run_formatter
+        ;;
+    hostname)
+        run_hostname
+        ;;
+    mobile)
+        run_mobile
         ;;
     *)
         show_help

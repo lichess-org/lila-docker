@@ -63,6 +63,9 @@
                     window.location.reload();
                 }
             };
+            xhr.onerror = function() {
+                window.location.reload();
+            };
             xhr.send();
         }, 5*1000);
     </script>
