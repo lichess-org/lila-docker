@@ -137,6 +137,7 @@ impl Repository {
         Path::new("repos").join(&self.project)
     }
 }
+
 struct Gitpod {
     domain: String,
     url: String,
@@ -254,7 +255,7 @@ fn setup(mut config: Config) -> std::io::Result<()> {
         progress.start(&format!("Cloning {}...", repo.full_name()));
 
         if repo.clone_path().read_dir()?.next().is_some() {
-            progress.stop(format!("Clone {} ✓", repo.full_name()));
+            progress.stop(format!("Already cloned {} ✓", repo.full_name()));
             continue;
         }
 
@@ -574,17 +575,23 @@ mod tests {
         }
         .to_env();
 
-        assert!(contents.contains("COMPOSE_PROFILES=foo,bar"));
-        assert!(contents.contains("SETUP_DATABASE=true"));
-        assert!(contents.contains("ENABLE_MONITORING=false"));
-        assert!(contents.contains("SU_PASSWORD=foo"));
-        assert!(contents.contains("PASSWORD=bar"));
-        assert!(contents.contains("LILA_DOMAIN=baz:8080"));
-        assert!(contents.contains("LILA_URL=http://baz:8080"));
-        assert!(contents.contains("PHONE_IP=1.2.3.4"));
-        assert!(contents.contains("CONNECTION_PORT=1234"));
-        assert!(contents.contains("PAIRING_CODE=901234"));
-        assert!(contents.contains("PAIRING_PORT=5678"));
+        let vars = contents
+            .split("\n")
+            .map(|line| line.split("="))
+            .map(|mut parts| (parts.next().unwrap(), parts.next().unwrap()))
+            .collect::<HashMap<&str, &str>>();
+
+        assert_eq!(vars["COMPOSE_PROFILES"], "foo,bar");
+        assert_eq!(vars["SETUP_DATABASE"], "true");
+        assert_eq!(vars["ENABLE_MONITORING"], "false");
+        assert_eq!(vars["SU_PASSWORD"], "foo");
+        assert_eq!(vars["PASSWORD"], "bar");
+        assert_eq!(vars["LILA_DOMAIN"], "baz:8080");
+        assert_eq!(vars["LILA_URL"], "http://baz:8080");
+        assert_eq!(vars["PHONE_IP"], "1.2.3.4");
+        assert_eq!(vars["CONNECTION_PORT"], "1234");
+        assert_eq!(vars["PAIRING_CODE"], "901234");
+        assert_eq!(vars["PAIRING_PORT"], "5678");
     }
 
     #[test]
