@@ -9,5 +9,4 @@ edition = "2021"
 cliclack = "0.1.6"
 local-ip-address = "0.5.6"
 serde = { version = "1.0.193", features = ["derive"] }
-struct_iterable = "0.1.1"
 toml = "0.8.8"
