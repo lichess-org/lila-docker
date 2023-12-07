@@ -59,9 +59,9 @@ impl Config {
             .unwrap_or_else(|_| Self::default())
     }
 
-    fn save(&self) {
-        std::fs::write(Self::SETTINGS_TOML, self.to_toml()).unwrap();
-        std::fs::write(Self::SETTINGS_ENV, self.to_env()).unwrap();
+    fn save(&self) -> std::io::Result<()> {
+        std::fs::write(Self::SETTINGS_TOML, self.to_toml())?;
+        std::fs::write(Self::SETTINGS_ENV, self.to_env())
     }
 
     fn to_toml(&self) -> String {
@@ -221,7 +221,7 @@ fn setup(mut config: Config) -> std::io::Result<()> {
         config.lila_url = Some(gitpod.url);
     }
 
-    config.save();
+    config.save()?;
 
     create_placeholder_dirs();
 
@@ -473,7 +473,7 @@ fn hostname(mut config: Config) -> std::io::Result<()> {
 
     config.lila_domain = Some(format!("{hostname}:8080"));
     config.lila_url = Some(format!("http://{hostname}:8080"));
-    config.save();
+    config.save()?;
 
     outro(format!("✔ Local Lichess URL set to http://{hostname}:8080"))
 }
@@ -507,7 +507,7 @@ fn mobile_setup(mut config: Config) -> std::io::Result<()> {
     config.connection_port = Some(connection_port);
     config.pairing_code = Some(pairing_code);
     config.pairing_port = Some(pairing_port);
-    config.save();
+    config.save()?;
 
     outro("Pairing and connecting to phone...")
 }
