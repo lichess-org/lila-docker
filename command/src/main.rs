@@ -171,6 +171,16 @@ fn main() -> std::io::Result<()> {
     }
 }
 
+fn pwd_input(user_type: &str) -> std::io::Result<String> {
+    input(format!(
+        "Choose a password for {user_type} users (blank for 'password')"
+    ))
+    .placeholder("password")
+    .default_input("password")
+    .required(false)
+    .interact()
+}
+
 fn setup(mut config: Config) -> std::io::Result<()> {
     intro(BANNER)?;
 
@@ -182,18 +192,7 @@ fn setup(mut config: Config) -> std::io::Result<()> {
             .interact()?;
 
     let (su_password, password) = if setup_database {
-        (
-            input("Choose a password for admin users (blank for 'password')")
-                .placeholder("password")
-                .default_input("password")
-                .required(false)
-                .interact()?,
-            input("Choose a password for regular users (blank for 'password')")
-                .placeholder("password")
-                .default_input("password")
-                .required(false)
-                .interact()?,
-        )
+        (pwd_input("admin")?, pwd_input("regular")?)
     } else {
         (String::new(), String::new())
     };
