@@ -54,9 +54,10 @@ impl Config {
     const SETTINGS_ENV: &'static str = "settings.env";
 
     fn load() -> Self {
-        std::fs::read_to_string(Self::SETTINGS_TOML)
-            .map(|toml_str| toml::from_str(&toml_str).unwrap())
-            .unwrap_or_else(|_| Self::default())
+        std::fs::read_to_string(Self::SETTINGS_TOML).map_or_else(
+            |_| Self::default(),
+            |contents| toml::from_str(&contents).unwrap_or_default(),
+        )
     }
 
     fn save(&self) -> std::io::Result<()> {
