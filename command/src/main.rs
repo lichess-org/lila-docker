@@ -22,7 +22,7 @@ const BANNER: &str = r"
                                                    |___/
 ";
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 struct Config {
     compose_profiles: Option<Vec<String>>,
     setup_database: Option<bool>,
@@ -35,24 +35,6 @@ struct Config {
     connection_port: Option<u16>,
     pairing_code: Option<u32>,
     pairing_port: Option<u16>,
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            compose_profiles: None,
-            setup_database: None,
-            enable_monitoring: None,
-            su_password: None,
-            password: None,
-            lila_domain: None,
-            lila_url: None,
-            phone_ip: None,
-            connection_port: None,
-            pairing_code: None,
-            pairing_port: None,
-        }
-    }
 }
 
 macro_rules! to_env {
