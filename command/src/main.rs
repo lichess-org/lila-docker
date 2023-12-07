@@ -54,12 +54,9 @@ impl Config {
     const SETTINGS_ENV: &'static str = "settings.env";
 
     fn load() -> Self {
-        if !Path::new(Self::SETTINGS_TOML).exists() {
-            return Self::default();
-        }
-
-        let toml = std::fs::read_to_string(Self::SETTINGS_TOML).unwrap();
-        toml::from_str(&toml).unwrap()
+        std::fs::read_to_string(Self::SETTINGS_TOML)
+            .map(|toml_str| toml::from_str(&toml_str).unwrap())
+            .unwrap_or_else(|_| Self::default())
     }
 
     fn save(&self) {
