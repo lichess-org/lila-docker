@@ -8,11 +8,10 @@ use cliclack::{
 use local_ip_address::local_ip;
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::HashMap,
+    format,
     io::Error,
     path::{Path, PathBuf},
 };
-use struct_iterable::Iterable;
 
 const BANNER: &str = r"
    |\_    _ _      _
@@ -23,7 +22,7 @@ const BANNER: &str = r"
                                                    |___/
 ";
 
-#[derive(Serialize, Deserialize, Iterable, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 struct Config {
     compose_profiles: Option<Vec<String>>,
     setup_database: Option<bool>,
@@ -56,6 +55,18 @@ impl Default for Config {
     }
 }
 
+macro_rules! to_env {
+    ($name_opt:ident) => {
+        $name_opt
+            .clone()
+            .map(|v| format!("{}={}", stringify!($name_opt).to_uppercase(), v.to_string()))
+            .unwrap_or_default()
+    };
+    ($key:ident, $value:expr) => {
+        format!("{}={}", stringify!($key).to_uppercase(), $value)
+    };
+}
+
 impl Config {
     const SETTINGS_TOML: &'static str = "settings.toml";
     const SETTINGS_ENV: &'static str = "settings.env";
@@ -79,39 +90,37 @@ impl Config {
     }
 
     fn to_env(&self) -> String {
-        let mut contents: HashMap<&str, String> = HashMap::new();
-
-        for (key, value) in self.iter() {
-            if let Some(string_opt) = value.downcast_ref::<Option<String>>() {
-                if let Some(string_opt) = string_opt {
-                    contents.insert(key, string_opt.to_string());
-                }
-            } else if let Some(bool_opt) = value.downcast_ref::<Option<bool>>() {
-                if let Some(bool_opt) = bool_opt {
-                    contents.insert(key, bool_opt.to_string());
-                }
-            } else if let Some(u16_opt) = value.downcast_ref::<Option<u16>>() {
-                if let Some(u16_opt) = u16_opt {
-                    contents.insert(key, u16_opt.to_string());
-                }
-            } else if let Some(u32_opt) = value.downcast_ref::<Option<u32>>() {
-                if let Some(u32_opt) = u32_opt {
-                    contents.insert(key, u32_opt.to_string());
-                }
-            } else if let Some(vec_string) = value.downcast_ref::<Option<Vec<String>>>() {
-                if let Some(vec_string) = vec_string {
-                    contents.insert(key, vec_string.join(","));
-                }
-            } else {
-                panic!("Unsupported type: Could not write [{key}] to env");
-            }
-        }
-
-        contents
-            .iter()
-            .map(|(k, v)| format!("{}={}", k.to_uppercase(), v))
-            .collect::<Vec<String>>()
-            .join("\n")
+        let Self {
+            compose_profiles,
+            setup_database,
+            enable_monitoring,
+            su_password,
+            password,
+            lila_domain,
+            lila_url,
+            phone_ip,
+            connection_port,
+            pairing_code,
+            pairing_port,
+        } = self;
+        let compose_profiles_string = compose_profiles
+            .clone()
+            .map(|v| v.join(","))
+            .unwrap_or_default();
+        format!(
+            "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n",
+            to_env!(compose_profiles, compose_profiles_string),
+            to_env!(setup_database),
+            to_env!(enable_monitoring),
+            to_env!(su_password),
+            to_env!(password),
+            to_env!(lila_domain),
+            to_env!(lila_url),
+            to_env!(phone_ip),
+            to_env!(connection_port),
+            to_env!(pairing_code),
+            to_env!(pairing_port)
+        )
     }
 }
 
@@ -551,6 +560,7 @@ fn welcome() -> std::io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::collections::HashMap;
 
     #[test]
     fn test_repository() {
@@ -560,6 +570,12 @@ mod tests {
         assert_eq!(repo.full_name(), "lichess-org/lila");
         assert_eq!(repo.url(), "https://github.com/lichess-org/lila");
         assert_eq!(repo.clone_path(), Path::new("repos/lila"));
+    }
+
+    #[test]
+    fn test_to_env_proc() {
+        let foo = Some("test");
+        assert_eq!(to_env!(foo), "FOO=test");
     }
 
     #[test]
@@ -581,8 +597,7 @@ mod tests {
 
         let vars = contents
             .split("\n")
-            .map(|line| line.split("="))
-            .map(|mut parts| (parts.next().unwrap(), parts.next().unwrap()))
+            .flat_map(|line| line.split_once("="))
             .collect::<HashMap<&str, &str>>();
 
         assert_eq!(vars["COMPOSE_PROFILES"], "foo,bar");
