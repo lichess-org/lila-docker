@@ -1,3 +1,5 @@
+#![warn(clippy::pedantic)]
+
 use cliclack::{
     confirm, input, intro,
     log::{self, info},
@@ -36,10 +38,7 @@ struct Config {
     pairing_port: Option<u16>,
 }
 
-impl Config {
-    const SETTINGS_TOML: &'static str = "settings.toml";
-    const SETTINGS_ENV: &'static str = "settings.env";
-
+impl Default for Config {
     fn default() -> Self {
         Self {
             compose_profiles: None,
@@ -55,6 +54,11 @@ impl Config {
             pairing_port: None,
         }
     }
+}
+
+impl Config {
+    const SETTINGS_TOML: &'static str = "settings.toml";
+    const SETTINGS_ENV: &'static str = "settings.env";
 
     fn load() -> Self {
         if !Path::new(Self::SETTINGS_TOML).exists() {
