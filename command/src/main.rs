@@ -56,7 +56,7 @@ impl Config {
     fn load() -> Self {
         std::fs::read_to_string(Self::SETTINGS_TOML).map_or_else(
             |_| Self::default(),
-            |contents| toml::from_str(&contents).unwrap_or_default(),
+            |contents| toml::from_str(&contents).unwrap(),
         )
     }
 
