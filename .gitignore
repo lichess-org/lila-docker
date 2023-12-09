@@ -4,3 +4,4 @@
 command/.cargo
 command/repos
 command/target
+database
