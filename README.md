@@ -182,16 +182,13 @@ docker compose run --rm -w /scalachess --entrypoint="sbt package" lila
 
 ```bash
 ## run formatter
-docker run --rm -v $(pwd)/repos/dartchess:/mnt --workdir /mnt dart:3.1.5-sdk \
-    dart format .
+docker compose run --rm -w /dartchess mobile dart format .
 
 ## analyze
-docker run --rm -v $(pwd)/repos/dartchess:/mnt --workdir /mnt dart:3.1.5-sdk \
-    bash -c "dart pub get && dart analyze"
+docker compose run --rm -w /dartchess mobile bash -c "dart pub get && dart analyze"
 
 ## run tests
-docker run --rm -v $(pwd)/repos/dartchess:/mnt --workdir /mnt dart:3.1.5-sdk \
-    bash -c "dart pub get && dart test -x full_perft"
+docker compose run --rm -w /dartchess mobile bash -c "dart pub get && dart test -x full_perft"
 ```
 
 ### bbpPairings:
@@ -253,3 +250,49 @@ curl --get http://localhost:8086/query \
     --data-urlencode "db=kamon"  \
     --data-urlencode "q=show measurements;"
 ```
+
+### Mobile
+
+1. On your Android phone:
+    1. Connect your phone to the same wifi network as your host machine
+    2. Enable Developer Mode
+    3. In Developer Options, enable Wireless Debugging and tap into its menu
+2. On your host machine:
+
+    1. Have the lila-docker services running, with the `Mobile` optional service started
+    2. Configure lila to run with your host's IP address or hostname instead of localhost
+
+        ```bash
+        ./lila-docker hostname
+        ```
+
+        - Then verify that your phone can access the site at `http://[your-selection]:8080`
+
+    3. Connect to your phone
+
+        ```bash
+        ./lila-docker mobile
+        ```
+
+    4. Get a shell on the container:
+
+        ```bash
+        docker compose exec -it mobile bash
+
+        # verify your phone is listed
+        adb devices
+        ```
+
+    5. Install the app dependencies:
+        ```bash
+        flutter pub get
+        dart run build_runner build
+        ```
+    6. Run the app:
+        ```bash
+        flutter run -v \
+            --dart-define LICHESS_HOST=$LILA_URL \
+            --dart-define LICHESS_WS_HOST=$LILA_URL
+        ```
+        - No substitutions necessary. The `$LILA_URL` environment variable will already be set on the container.
+        - First time you run it, it might take a while

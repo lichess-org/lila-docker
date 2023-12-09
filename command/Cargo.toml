@@ -7,4 +7,6 @@ edition = "2021"
 
 [dependencies]
 cliclack = "0.1.6"
-colored = "2.0.4"
+local-ip-address = "0.5.6"
+serde = { version = "1.0.193", features = ["derive"] }
+toml = "0.8.8"
