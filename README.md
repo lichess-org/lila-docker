@@ -114,6 +114,14 @@ docker compose run --rm ui /lila/bin/trans-dump
 ./lila-docker format
 ```
 
+### Optional: Make the database persistent
+
+```bash
+docker compose cp mongodb:/data/db ./database
+```
+
+Then in `docker-compose.yml`add `- ./database:/data/db` to mongodb volumes
+
 ### Berserk (Python library):
 
 To install the development version of [Berserk](https://github.com/lichess-org/berserk) and run a sample script against your local development site:

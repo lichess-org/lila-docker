@@ -4,6 +4,7 @@
 command/.cargo
 command/repos
 command/target
+database
 
 settings.env
 settings.toml
