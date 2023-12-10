@@ -111,8 +111,9 @@ docker compose run --rm ui /lila/bin/trans-dump
 ### Make the database persistent
 
 ```bash
-docker cp lila-docker-mongodb-1:/data/db ./database
+docker compose cp mongodb:/data/db ./database
 ```
+then in `docker-compose.yml`add `- ./database:/data/db` to mongodb volumes
 
 ### Code formatting:
 
