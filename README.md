@@ -108,18 +108,19 @@ After modifying a `translation/source/*.xml` file, run:
 docker compose run --rm ui /lila/bin/trans-dump
 ```
 
-### Make the database persistent
-
-```bash
-docker compose cp mongodb:/data/db ./database
-```
-then in `docker-compose.yml`add `- ./database:/data/db` to mongodb volumes
-
 ### Code formatting:
 
 ```bash
 ./lila-docker format
 ```
+
+### Optional: Make the database persistent
+
+```bash
+docker compose cp mongodb:/data/db ./database
+```
+
+Then in `docker-compose.yml`add `- ./database:/data/db` to mongodb volumes
 
 ### Berserk (Python library):
 
