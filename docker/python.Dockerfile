@@ -1,7 +1,8 @@
 FROM eclipse-temurin:21.0.1_12-jdk-alpine
 
-COPY --from=python:3.12.0-alpine3.18 / /
+COPY --from=python:3.12.1-alpine3.19 / /
 
-RUN pip install pymongo requests
+RUN pip install --upgrade pip
+RUN pip install berserk pymongo requests
 
 WORKDIR /lila-db-seed

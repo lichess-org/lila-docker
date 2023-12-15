@@ -9,7 +9,7 @@ services:
       - ./scripts:/scripts
 
   redis:
-    image: redis:7.2.3-alpine3.18
+    image: redis:7.2.3-alpine3.19
     restart: unless-stopped
     networks:
       - lila-network
