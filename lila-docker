@@ -56,6 +56,7 @@ setup_database() {
         --password=$PASSWORD \
         --su-password=$SU_PASSWORD \
         --streamers \
+        --tokens \
         --es --es-host=elasticsearch:9200
 
     docker compose run --rm mongodb mongo --quiet --host mongodb lichess /lila/bin/mongodb/indexes.js
