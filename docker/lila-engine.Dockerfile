@@ -1,4 +1,4 @@
-FROM rust:1.74.1-slim-bookworm
+FROM rust:1.75.0-slim-bookworm
 
 ENV LILA_ENGINE_LOG=lila_engine=debug,tower_http=debug
 

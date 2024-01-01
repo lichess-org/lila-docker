@@ -1,4 +1,4 @@
-FROM rust:1.74.1-slim-bookworm
+FROM rust:1.75.0-slim-bookworm
 
 WORKDIR /lila-gif
 
