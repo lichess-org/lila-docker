@@ -53,6 +53,7 @@ setup_database() {
 
     docker compose run --rm python python /lila-db-seed/spamdb/spamdb.py \
         --uri=mongodb://mongodb/lichess \
+        --drop-db \
         --password=$PASSWORD \
         --su-password=$SU_PASSWORD \
         --streamers \
@@ -62,6 +63,11 @@ setup_database() {
     docker compose run --rm mongodb mongo --quiet --host mongodb lichess /lila/bin/mongodb/indexes.js
     docker compose run --rm mongodb mongo --quiet --host mongodb lichess /lila/bin/mongodb/create-trophy-kinds.js
     docker compose run --rm python python /scripts/users.py
+}
+
+reset_database() {
+    load_config_to_env
+    setup_database
 }
 
 run_formatter() {
@@ -101,6 +107,10 @@ rust_cmd() {
         ./command/target/release/command "$@"
     fi
 
+    load_config_to_env
+}
+
+load_config_to_env() {
     export $(cat settings.env | xargs)
 }
 
@@ -136,6 +146,9 @@ case $1 in
         ;;
     mobile)
         run_mobile
+        ;;
+    db)
+        reset_database
         ;;
     *)
         show_help
