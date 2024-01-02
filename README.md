@@ -89,7 +89,7 @@ docker compose restart lila
 To watch for Typescript/SCSS changes and automatically recompile:
 
 ```bash
-docker compose run --rm ui /lila/ui/build -w
+docker compose run --rm ui /lila/ui/build --debug --watch
 ```
 
 ### Updating Routes
@@ -225,7 +225,7 @@ By default, your local lila instance will use the version of chessground that is
 3. Start the lila ui build in watch mode:
 
     ```bash
-    docker compose run --rm ui /lila/ui/build -w
+    docker compose run --rm ui /lila/ui/build --debug --watch
     ```
 
 Then you can see the updated chessground demo at http://localhost:8090/demo.html and when you refresh lila, it will use the local copy of chessground.
