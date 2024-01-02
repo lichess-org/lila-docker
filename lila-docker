@@ -6,7 +6,7 @@ run_setup() {
     docker compose build
     docker compose --profile utils build
     docker compose up -d
-    docker compose run --rm ui /lila/ui/build
+    docker compose run --rm ui /lila/ui/build --debug
 
     setup_database
     rust_cmd welcome
