@@ -8,10 +8,7 @@ run_setup() {
     docker compose up -d
     docker compose run --rm ui /lila/ui/build
 
-    if [ "$SETUP_DATABASE" = "true" ]; then
-        setup_database
-    fi
-
+    setup_database
     rust_cmd welcome
 }
 
@@ -46,6 +43,11 @@ build_all_profiles() {
 }
 
 setup_database() {
+    if [ "$SETUP_DATABASE" != "true" ]; then
+        echo "Skipping database setup"
+        return
+    fi
+
     while ! docker compose exec mongodb mongo --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
         echo "Waiting for mongodb to be ready..."
         sleep 1
