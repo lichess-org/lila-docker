@@ -8,10 +8,7 @@ run_setup() {
     docker compose up -d
     docker compose run --rm ui /lila/ui/build
 
-    if [ "$SETUP_DATABASE" = "true" ]; then
-        setup_database
-    fi
-
+    setup_database
     rust_cmd welcome
 }
 
@@ -46,6 +43,11 @@ build_all_profiles() {
 }
 
 setup_database() {
+    if [ "$SETUP_DATABASE" != "true" ]; then
+        echo "Skipping database setup"
+        return
+    fi
+
     while ! docker compose exec mongodb mongo --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
         echo "Waiting for mongodb to be ready..."
         sleep 1
@@ -53,6 +55,7 @@ setup_database() {
 
     docker compose run --rm python python /lila-db-seed/spamdb/spamdb.py \
         --uri=mongodb://mongodb/lichess \
+        --drop-db \
         --password=$PASSWORD \
         --su-password=$SU_PASSWORD \
         --streamers \
@@ -62,6 +65,11 @@ setup_database() {
     docker compose run --rm mongodb mongo --quiet --host mongodb lichess /lila/bin/mongodb/indexes.js
     docker compose run --rm mongodb mongo --quiet --host mongodb lichess /lila/bin/mongodb/create-trophy-kinds.js
     docker compose run --rm python python /scripts/users.py
+}
+
+reset_database() {
+    load_config_to_env
+    setup_database
 }
 
 run_formatter() {
@@ -101,6 +109,10 @@ rust_cmd() {
         ./command/target/release/command "$@"
     fi
 
+    load_config_to_env
+}
+
+load_config_to_env() {
     export $(cat settings.env | xargs)
 }
 
@@ -136,6 +148,9 @@ case $1 in
         ;;
     mobile)
         run_mobile
+        ;;
+    db)
+        reset_database
         ;;
     *)
         show_help
