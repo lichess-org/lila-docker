@@ -252,7 +252,7 @@ services:
       - thumbnails
 
   mailpit:
-    image: axllent/mailpit:v1.11.1
+    image: axllent/mailpit:v1.12.1
     restart: unless-stopped
     ports:
       - 8025:8025
@@ -260,7 +260,7 @@ services:
       - lila-network
 
   mongo_express:
-    image: mongo-express:1.0.0-20-alpine3.18
+    image: mongo-express:1.0.2-20-alpine3.19
     restart: unless-stopped
     ports:
       - 8081:8081
@@ -272,7 +272,7 @@ services:
       - mongodb
 
   influxdb:
-    image: influxdb:2.7.4-alpine
+    image: influxdb:2.7.5-alpine
     restart: unless-stopped
     ports:
       - 8086:8086
