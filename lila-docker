@@ -59,6 +59,7 @@ setup_database() {
         --password=$PASSWORD \
         --su-password=$SU_PASSWORD \
         --streamers \
+        --coaches \
         --tokens \
         --es --es-host=elasticsearch:9200
 
