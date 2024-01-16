@@ -1,6 +1,6 @@
 # lila-docker
 
-Lichess development environment using Docker Compose, for developing on Mac or Linux.
+Lichess development environment using Docker Compose, for developing on Mac, Linux, or Windows (via WSL).
 
 The only requirements for running on your local machine are `git` and Docker Desktop. All the other dependencies (Scala, MongoDB, Node.js, etc) are installed and run in Docker containers.
 
