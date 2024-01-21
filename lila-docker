@@ -118,7 +118,7 @@ load_config_to_env() {
 }
 
 show_help() {
-    echo "Usage: $0 [start|stop|restart|down|build|format]"
+    echo "Usage: $0 [start|stop|restart|down|build|format|hostname|mobile|db]"
 }
 
 case $1 in
