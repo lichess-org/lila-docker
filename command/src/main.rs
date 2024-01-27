@@ -355,8 +355,8 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error
             compose_profile: vec!["gifs"].into(),
             repositories: vec![Repository::new("lichess-org", "lila-gif")].into(),
         },
-        "GIF generation",
-        "for generating animated GIFs of games",
+        "GIF + image generation",
+        "for generating animated GIFs and screenshots of games",
     )
     .item(
         OptionalService {
