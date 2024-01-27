@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo:5.0.23-focal
+    image: mongo:5.0.24-focal
     restart: unless-stopped
     networks:
       - lila-network
@@ -9,7 +9,7 @@ services:
       - ./scripts:/scripts
 
   redis:
-    image: redis:7.2.3-alpine3.19
+    image: redis:7.2.4-alpine3.19
     restart: unless-stopped
     networks:
       - lila-network
@@ -252,7 +252,7 @@ services:
       - thumbnails
 
   mailpit:
-    image: axllent/mailpit:v1.12.1
+    image: axllent/mailpit:v1.13.1
     restart: unless-stopped
     ports:
       - 8025:8025
