@@ -1,6 +1,7 @@
 FROM ubuntu:focal
 
-RUN apt-get update
-RUN apt-get install --yes git make g++
+RUN apt-get update && \
+    apt-get install --yes git make g++ && \
+    apt-get clean
 
 WORKDIR /mnt

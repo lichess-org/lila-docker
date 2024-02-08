@@ -1,12 +1,8 @@
 FROM ghcr.io/cirruslabs/flutter:3.16.0
 
-RUN apt-get update
-RUN apt install --yes \
-  clang \
-  cmake \
-  libgtk-3-dev \
-  ninja-build \
-  pkg-config
+RUN apt-get update && \
+    apt-get install --yes clang cmake libgtk-3-dev ninja-build pkg-config && \
+    apt-get clean
 
 RUN dart --disable-analytics
 RUN flutter precache
@@ -21,8 +17,8 @@ RUN flutter doctor -v
 
 # Pre-install mobile app + Flutter dependencies
 RUN git clone --depth 1 https://github.com/lichess-org/mobile.git /opt/mobile && \
-  cd /opt/mobile && \
-  flutter pub get && \
-  dart run build_runner build
+    cd /opt/mobile && \
+    flutter pub get && \
+    dart run build_runner build
 
 WORKDIR /app

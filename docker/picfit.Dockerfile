@@ -1,6 +1,6 @@
 FROM golang:1.21.6-alpine3.19
 
-RUN apk add git make
+RUN apk --no-cache add git make
 
 COPY assets/coach.png /uploads/coach.png
 COPY assets/streamer.png /uploads/streamer.png
