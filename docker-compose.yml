@@ -252,7 +252,7 @@ services:
       - thumbnails
 
   mailpit:
-    image: axllent/mailpit:v1.13.1
+    image: axllent/mailpit:v1.13.3
     restart: unless-stopped
     ports:
       - 8025:8025
