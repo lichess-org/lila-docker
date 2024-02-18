@@ -8,6 +8,7 @@ run_setup() {
     docker compose up -d
     docker compose run --rm ui /lila/ui/build --debug
 
+    setup_bbppairings
     setup_database
     rust_cmd welcome
 }
@@ -66,6 +67,18 @@ setup_database() {
     docker compose run --rm mongodb mongo --quiet --host mongodb lichess /lila/bin/mongodb/indexes.js
     docker compose run --rm mongodb mongo --quiet --host mongodb lichess /lila/bin/mongodb/create-trophy-kinds.js
     docker compose run --rm python python /scripts/users.py
+}
+
+setup_bbppairings() {
+    if [ "$SETUP_BBPPAIRINGS" != "true" ]; then
+        return
+    fi
+
+    docker build -f docker/bbpPairings.Dockerfile . -t bbppairings
+    docker run --rm -v ./repos/bbpPairings:/mnt bbppairings make
+
+    ## verify it compiled
+    ./repos/bbpPairings/bbpPairings.exe
 }
 
 reset_database() {
