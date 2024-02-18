@@ -193,16 +193,6 @@ docker compose run --rm -w /dartchess mobile bash -c "dart pub get && dart analy
 docker compose run --rm -w /dartchess mobile bash -c "dart pub get && dart test -x full_perft"
 ```
 
-### bbpPairings:
-
-```bash
-docker build -f docker/bbpPairings.Dockerfile . -t bbppairings
-docker run --rm -v $(pwd)/repos/bbpPairings:/mnt bbppairings make
-
-## verify
-./repos/bbpPairings/bbpPairings.exe
-```
-
 ### Developing Chessground locally
 
 By default, your local lila instance will use the version of chessground that is published to npm. If you want to make changes to that library and see them reflected in your local lila instance, you can do the following:

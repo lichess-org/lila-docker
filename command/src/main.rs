@@ -26,6 +26,7 @@ const BANNER: &str = r"
 struct Config {
     compose_profiles: Option<Vec<String>>,
     setup_database: Option<bool>,
+    setup_bbppairings: Option<bool>,
     enable_monitoring: Option<bool>,
     su_password: Option<String>,
     password: Option<String>,
@@ -73,6 +74,7 @@ impl Config {
         let Self {
             compose_profiles,
             setup_database,
+            setup_bbppairings,
             enable_monitoring,
             su_password,
             password,
@@ -88,9 +90,10 @@ impl Config {
             .map(|v| v.join(","))
             .unwrap_or_default();
         format!(
-            "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n",
+            "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n",
             to_env!(compose_profiles, compose_profiles_string),
             to_env!(setup_database),
+            to_env!(setup_bbppairings),
             to_env!(enable_monitoring),
             to_env!(su_password),
             to_env!(password),
@@ -207,6 +210,13 @@ fn setup(mut config: Config) -> std::io::Result<()> {
             .collect(),
     );
     config.setup_database = Some(setup_database);
+
+    config.setup_bbppairings = Some(
+        services
+            .iter()
+            .any(|service| service.compose_profile == Some(vec!["swiss-pairings"])),
+    );
+
     config.enable_monitoring = Some(
         services
             .iter()
@@ -432,7 +442,7 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error
     )
     .item(
         OptionalService {
-            compose_profile: None,
+            compose_profile: vec!["swiss-pairings"].into(),
             repositories: vec![Repository::new("cyanfish", "bbpPairings")].into(),
         },
         "Swiss Pairings",
@@ -512,7 +522,7 @@ fn mobile_setup(mut config: Config) -> std::io::Result<()> {
     outro("Pairing and connecting to phone...")
 }
 
-fn validate_string_length(input: &String, length: usize) -> Result<(), String> {
+fn validate_string_length(input: &str, length: usize) -> Result<(), String> {
     match input.len() {
         len if len == length => Ok(()),
         _ => Err(format!("Value should be {length} digits in length")),
@@ -562,6 +572,7 @@ mod tests {
         let contents = Config {
             compose_profiles: Some(vec!["foo".to_string(), "bar".to_string()]),
             setup_database: Some(true),
+            setup_bbppairings: Some(false),
             enable_monitoring: Some(false),
             su_password: Some("foo".to_string()),
             password: Some("bar".to_string()),
@@ -581,6 +592,7 @@ mod tests {
 
         assert_eq!(vars["COMPOSE_PROFILES"], "foo,bar");
         assert_eq!(vars["SETUP_DATABASE"], "true");
+        assert_eq!(vars["SETUP_BBPPAIRINGS"], "false");
         assert_eq!(vars["ENABLE_MONITORING"], "false");
         assert_eq!(vars["SU_PASSWORD"], "foo");
         assert_eq!(vars["PASSWORD"], "bar");
