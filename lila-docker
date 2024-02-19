@@ -134,6 +134,8 @@ show_help() {
     echo "Usage: $0 [start|stop|restart|down|build|format|hostname|mobile|db]"
 }
 
+cd "$(dirname "$0")"
+
 case $1 in
     --help|-h)
         show_help
