@@ -285,11 +285,8 @@ fn setup(mut config: Config) -> std::io::Result<()> {
     
     let mut cmd = std::process::Command::new("git");
 
-    let workspace_context = match std::env::var("GITPOD_WORKSPACE_CONTEXT") {
-        Ok(value) => value,
-        Err(_) => {
-            return outro("Environment variable GITPOD_WORKSPACE_CONTEXT is not set, skipping PR checkout\n Starting services...");
-        }
+    let Ok(workspace_context) = std::env::var("GITPOD_WORKSPACE_CONTEXT") else {
+        return outro("Environment variable GITPOD_WORKSPACE_CONTEXT is not set, skipping PR checkout\n Starting services...");
     };
     
     let workspace_context: Value = serde_json::from_str(&workspace_context)
@@ -312,7 +309,7 @@ fn setup(mut config: Config) -> std::io::Result<()> {
     cmd.current_dir("repos/lila")
     .arg("fetch")
     .arg("upstream")
-    .arg(format!("pull/{}/head:pr-{}", pr_no, pr_no));
+    .arg(format!("pull/{pr_no}/head:pr-{pr_no}"));
 
     let status = cmd.status().unwrap();
     if !status.success() {
