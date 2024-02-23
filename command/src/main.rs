@@ -301,7 +301,7 @@ fn setup(mut config: Config) -> std::io::Result<()> {
             .and_then(|array| {
                 array
                     .iter()
-                    .find(|envvar| envvar.get("name").map_or(false, |name| name == "GITPOD_GIT_PR_NUMBER"))
+                    .find(|envvar| envvar.get("name").map_or(false, |name| name == "LILA_PR"))
                     .and_then(|envvar| envvar.get("value").and_then(Value::as_str))
             })
     }).unwrap_or("");
