@@ -7,6 +7,7 @@ use cliclack::{
 };
 use local_ip_address::local_ip;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::{
     format,
     io::Error,
@@ -185,6 +186,7 @@ fn pwd_input(user_type: &str) -> std::io::Result<String> {
     .interact()
 }
 
+#[allow(clippy::too_many_lines)]
 fn setup(mut config: Config) -> std::io::Result<()> {
     intro(BANNER)?;
 
@@ -280,6 +282,49 @@ fn setup(mut config: Config) -> std::io::Result<()> {
         );
 
         progress.stop(format!("Cloned {} ✓", repo.full_name()));
+    }
+    
+    let mut cmd = std::process::Command::new("git");
+
+    let Ok(workspace_context) = std::env::var("GITPOD_WORKSPACE_CONTEXT") else {
+        return outro("Environment variable GITPOD_WORKSPACE_CONTEXT is not set, skipping PR checkout\n Starting services...");
+    };
+    
+    let workspace_context: Value = serde_json::from_str(&workspace_context)
+        .expect("Failed to parse GITPOD_WORKSPACE_CONTEXT as JSON");
+    
+    let pr_no = workspace_context.get("envvars").and_then(|envvars| {
+        envvars
+            .as_array()
+            .and_then(|array| {
+                array
+                    .iter()
+                    .find(|envvar| envvar.get("name").map_or(false, |name| name == "LILA_PR"))
+                    .and_then(|envvar| envvar.get("value").and_then(Value::as_str))
+            })
+    }).unwrap_or("");
+    
+    if pr_no.is_empty() {
+        return outro("No PR number found, skipping PR checkout\n Starting services...");
+    }
+    cmd.current_dir("repos/lila")
+    .arg("fetch")
+    .arg("upstream")
+    .arg(format!("pull/{pr_no}/head:pr-{pr_no}"));
+
+    let status = cmd.status().unwrap();
+    if !status.success() {
+        println!("Failed to fetch PR");
+    }
+
+    let mut cmd = std::process::Command::new("git");
+    cmd.current_dir("repos/lila")
+        .arg("checkout")
+        .arg(format!("pr-{pr_no}"));
+
+    let status = cmd.status().unwrap();
+    if !status.success() {
+        println!("Failed to checkout PR branch");
     }
 
     outro("Starting services...")
