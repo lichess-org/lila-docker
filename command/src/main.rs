@@ -283,13 +283,7 @@ fn setup(mut config: Config) -> std::io::Result<()> {
         progress.stop(format!("Cloned {} ✓", repo.full_name()));
     }
     
-    // checkout a pr branch in repos/lila
     let mut cmd = std::process::Command::new("git");
-
-    // print all the env vars to the console
-    for (key, value) in std::env::vars() {
-        println!("{}: {}", key, value);
-    }
 
     let workspace_context = match std::env::var("GITPOD_WORKSPACE_CONTEXT") {
         Ok(value) => value,
@@ -298,11 +292,9 @@ fn setup(mut config: Config) -> std::io::Result<()> {
         }
     };
     
-    // parse the workspace context as JSON
     let workspace_context: Value = serde_json::from_str(&workspace_context)
         .expect("Failed to parse GITPOD_WORKSPACE_CONTEXT as JSON");
     
-    // get the pr no from the workspace context
     let pr_no = workspace_context.get("envvars").and_then(|envvars| {
         envvars
             .as_array()
@@ -314,10 +306,8 @@ fn setup(mut config: Config) -> std::io::Result<()> {
             })
     }).unwrap_or("");
     
-    // dont checkout if the pr_no is empty
     if pr_no.is_empty() {
         return outro("No PR number found, skipping PR checkout\n Starting services...");
-        
     }
     cmd.current_dir("repos/lila")
     .arg("fetch")
@@ -326,13 +316,18 @@ fn setup(mut config: Config) -> std::io::Result<()> {
 
     let status = cmd.status().unwrap();
     if !status.success() {
-        // If the checkout failed, checkout to the master branch
-        let mut cmd = std::process::Command::new("git");
-        cmd.current_dir("repos/lila")
-            .arg("checkout")
-            .arg("master")
-            .status()
-            .expect("Failed to checkout to master branch");
+        println!("Failed to fetch PR");
+    }
+
+    // Checkout the PR
+    let mut cmd = std::process::Command::new("git");
+    cmd.current_dir("repos/lila")
+        .arg("checkout")
+        .arg(format!("pr-{}", pr_no));
+
+    let status = cmd.status().unwrap();
+    if !status.success() {
+        println!("Failed to checkout PR branch");
     }
 
     outro("Starting services...")
