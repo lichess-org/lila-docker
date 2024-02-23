@@ -186,6 +186,7 @@ fn pwd_input(user_type: &str) -> std::io::Result<String> {
     .interact()
 }
 
+#[allow(clippy::too_many_lines)]
 fn setup(mut config: Config) -> std::io::Result<()> {
     intro(BANNER)?;
 
@@ -316,7 +317,6 @@ fn setup(mut config: Config) -> std::io::Result<()> {
         println!("Failed to fetch PR");
     }
 
-    // Checkout the PR
     let mut cmd = std::process::Command::new("git");
     cmd.current_dir("repos/lila")
         .arg("checkout")
