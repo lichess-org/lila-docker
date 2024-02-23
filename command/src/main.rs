@@ -320,7 +320,7 @@ fn setup(mut config: Config) -> std::io::Result<()> {
     let mut cmd = std::process::Command::new("git");
     cmd.current_dir("repos/lila")
         .arg("checkout")
-        .arg(format!("pr-{}", pr_no));
+        .arg(format!("pr-{pr_no}"));
 
     let status = cmd.status().unwrap();
     if !status.success() {
