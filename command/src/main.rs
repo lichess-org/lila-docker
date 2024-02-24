@@ -349,10 +349,10 @@ fn load_lila_pr_no() -> Option<Result<u32, std::num::TryFromIntError>> {
                     .and_then(|envvar| envvar.get("value").and_then(Value::as_u64))
             })
         })
-        .map(|pr_no| u32::try_from(pr_no))
+        .map(u32::try_from)
 }
 
-fn gitpod_checkout_pr() -> () {
+fn gitpod_checkout_pr() {
     let pr_no = Gitpod::get_lila_pr_no(Gitpod::load());
     let mut cmd = std::process::Command::new("git");
 
