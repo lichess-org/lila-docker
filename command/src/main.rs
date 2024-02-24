@@ -310,7 +310,7 @@ fn setup(mut config: Config) -> std::io::Result<()> {
     }
 
     let mut progress = spinner();
-    progress.start(&format!("Fetching  PR-{} from lila", pr_no));
+    progress.start(&format!("Fetching  PR-{pr_no} from lila"));
     
     cmd.current_dir("repos/lila")
         .arg("fetch")
