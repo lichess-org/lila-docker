@@ -10,4 +10,3 @@ settings.env
 settings.toml
 
 .metals
-Cargo.lock
