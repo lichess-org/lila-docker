@@ -138,20 +138,32 @@ impl Repository {
 struct Gitpod {
     domain: String,
     url: String,
+    lila_pr_no: u32,
 }
 
 impl Gitpod {
     fn load() -> Self {
         let workspace_url = std::env::var("GITPOD_WORKSPACE_URL").expect("Not running in Gitpod");
+        
+        let pr_no = load_lila_pr_no().unwrap_or(0);
 
         Self {
             domain: workspace_url.replace("https://", "8080-"),
             url: workspace_url.replace("https://", "https://8080-"),
+            lila_pr_no: pr_no,
         }
     }
 
     fn is_host() -> bool {
         std::env::var("GITPOD_WORKSPACE_URL").is_ok()
+    }
+
+    fn has_lila_pr_no(self) -> bool {
+        self.lila_pr_no > 0
+    }
+
+    fn get_lila_pr_no(self) -> u32 {
+        self.lila_pr_no
     }
 }
 
@@ -283,7 +295,7 @@ fn setup(mut config: Config) -> std::io::Result<()> {
         progress.stop(format!("Cloned {} ✓", repo.full_name()));
     }
 
-    if Gitpod::is_host() {
+    if Gitpod::is_host() && Gitpod::has_lila_pr_no(Gitpod::load()) {
         gitpod_checkout_pr()?;
     }
 
@@ -319,31 +331,30 @@ fn create_placeholder_dirs() {
     });
 }
 
-fn gitpod_checkout_pr() -> std::io::Result<()> {
-    let mut cmd = std::process::Command::new("git");
-
+fn load_lila_pr_no() -> Option<u32> {
     let Ok(workspace_context) = std::env::var("GITPOD_WORKSPACE_CONTEXT") else {
-        return outro("Environment variable GITPOD_WORKSPACE_CONTEXT is not set, skipping PR checkout\n Starting services...");
+        return None;
     };
 
     let workspace_context: Value = serde_json::from_str(&workspace_context)
         .expect("Failed to parse GITPOD_WORKSPACE_CONTEXT as JSON");
 
-    let pr_no = workspace_context
+    workspace_context
         .get("envvars")
         .and_then(|envvars| {
             envvars.as_array().and_then(|array| {
                 array
                     .iter()
                     .find(|envvar| envvar.get("name").map_or(false, |name| name == "LILA_PR"))
-                    .and_then(|envvar| envvar.get("value").and_then(Value::as_str))
+                    .and_then(|envvar| envvar.get("value").and_then(Value::as_u64))
             })
         })
-        .unwrap_or("");
+        .map(|pr_no| pr_no as u32)
+}
 
-    if pr_no.is_empty() {
-        return outro("No PR number found, skipping PR checkout\n Starting services...");
-    }
+fn gitpod_checkout_pr() -> std::io::Result<()> {
+    let pr_no = Gitpod::get_lila_pr_no(Gitpod::load());
+    let mut cmd = std::process::Command::new("git");
 
     let mut progress = spinner();
     progress.start(&format!("Fetching  PR-{pr_no} from lila"));
