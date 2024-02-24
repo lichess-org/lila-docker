@@ -368,7 +368,7 @@ fn gitpod_checkout_pr() ->  std::io::Result<()> {
         } else {
             progress.stop("Failed to checkout PR branch ✗");
         }
-        Ok(())
+        return Ok(());
     }
     progress.stop("Failed to fetch PR ✗");
     Ok(())
