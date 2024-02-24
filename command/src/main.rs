@@ -351,7 +351,7 @@ fn gitpod_checkout_pr() -> std::io::Result<()> {
     cmd.current_dir("repos/lila")
         .arg("fetch")
         .arg("upstream")
-        .arg(format!("pull/{pr_no}/head:pr-{pr_no}"));
+        .arg(format!("pull/{pr_no}/head:pr-{pr_no}"))
         .arg("--depth")
         .arg("1")
         .arg("--recurse-submodules")
