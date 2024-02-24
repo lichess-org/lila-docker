@@ -145,7 +145,7 @@ impl Gitpod {
     fn load() -> Self {
         let workspace_url = std::env::var("GITPOD_WORKSPACE_URL").expect("Not running in Gitpod");
         
-        let pr_no = load_lila_pr_no().unwrap_or(0);
+        let pr_no = load_lila_pr_no().unwrap_or(Ok(0)).unwrap_or(0);
 
         Self {
             domain: workspace_url.replace("https://", "8080-"),
@@ -296,7 +296,7 @@ fn setup(mut config: Config) -> std::io::Result<()> {
     }
 
     if Gitpod::is_host() && Gitpod::has_lila_pr_no(Gitpod::load()) {
-        gitpod_checkout_pr()?;
+        gitpod_checkout_pr();
     }
 
     outro("Starting services...")
@@ -331,7 +331,7 @@ fn create_placeholder_dirs() {
     });
 }
 
-fn load_lila_pr_no() -> Option<u32> {
+fn load_lila_pr_no() -> Option<Result<u32, std::num::TryFromIntError>> {
     let Ok(workspace_context) = std::env::var("GITPOD_WORKSPACE_CONTEXT") else {
         return None;
     };
@@ -349,10 +349,10 @@ fn load_lila_pr_no() -> Option<u32> {
                     .and_then(|envvar| envvar.get("value").and_then(Value::as_u64))
             })
         })
-        .map(|pr_no| pr_no as u32)
+        .map(|pr_no| u32::try_from(pr_no))
 }
 
-fn gitpod_checkout_pr() -> std::io::Result<()> {
+fn gitpod_checkout_pr() -> () {
     let pr_no = Gitpod::get_lila_pr_no(Gitpod::load());
     let mut cmd = std::process::Command::new("git");
 
@@ -382,10 +382,9 @@ fn gitpod_checkout_pr() -> std::io::Result<()> {
         } else {
             progress.stop("Failed to checkout PR branch ✗");
         }
-        return Ok(());
+        return ;
     }
     progress.stop("Failed to fetch PR ✗");
-    Ok(())
 }
 
 #[allow(clippy::too_many_lines)]
