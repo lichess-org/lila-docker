@@ -48,7 +48,7 @@ services:
       - ./conf/lila-ws.conf:/lila-ws.conf
 
   nginx:
-    image: nginx:1.25.3-alpine3.18-slim
+    image: nginx:1.25.4-alpine3.18-slim
     restart: unless-stopped
     networks:
       - lila-network
