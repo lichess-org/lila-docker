@@ -313,19 +313,28 @@ fn setup(mut config: Config) -> std::io::Result<()> {
         .arg("upstream")
         .arg(format!("pull/{pr_no}/head:pr-{pr_no}"));
 
+    
+    let mut progress = spinner();
+    progress.start(&format!("Fetching  PR-{} from lila", pr_no));
+
     let status = cmd.status().unwrap();
     if !status.success() {
-        println!("Failed to fetch PR");
+        progress.stop("Failed to fetch PR ✗");
     }
+    else {
+        progress.stop("Fetched PR ✓");
+        let mut cmd = std::process::Command::new("git");
+        cmd.current_dir("repos/lila")
+            .arg("checkout")
+            .arg(format!("pr-{pr_no}"));
 
-    let mut cmd = std::process::Command::new("git");
-    cmd.current_dir("repos/lila")
-        .arg("checkout")
-        .arg(format!("pr-{pr_no}"));
-
-    let status = cmd.status().unwrap();
-    if !status.success() {
-        println!("Failed to checkout PR branch");
+        let status = cmd.status().unwrap();
+        let mut progress = spinner();
+        if status.success() {
+            progress.stop("Switched to branch 'pr-{pr_no}' ✓");
+        } else {
+            progress.stop("Failed to checkout PR branch ✗");
+        }
     }
 
     outro("Starting services...")
