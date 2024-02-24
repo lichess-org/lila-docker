@@ -308,14 +308,16 @@ fn setup(mut config: Config) -> std::io::Result<()> {
     if pr_no.is_empty() {
         return outro("No PR number found, skipping PR checkout\n Starting services...");
     }
+
+    let mut progress = spinner();
+    progress.start(&format!("Fetching  PR-{} from lila", pr_no));
+    
     cmd.current_dir("repos/lila")
         .arg("fetch")
         .arg("upstream")
         .arg(format!("pull/{pr_no}/head:pr-{pr_no}"));
 
     
-    let mut progress = spinner();
-    progress.start(&format!("Fetching  PR-{} from lila", pr_no));
 
     let status = cmd.status().unwrap();
     if !status.success() {
@@ -331,7 +333,7 @@ fn setup(mut config: Config) -> std::io::Result<()> {
         let status = cmd.status().unwrap();
         let mut progress = spinner();
         if status.success() {
-            progress.stop("Switched to branch 'pr-{pr_no}' ✓");
+            progress.stop(format!("Switched to branch 'pr-{pr_no}' ✓"));
         } else {
             progress.stop("Failed to checkout PR branch ✗");
         }
