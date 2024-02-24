@@ -186,7 +186,6 @@ fn pwd_input(user_type: &str) -> std::io::Result<String> {
     .interact()
 }
 
-#[allow(clippy::too_many_lines)]
 fn setup(mut config: Config) -> std::io::Result<()> {
     intro(BANNER)?;
 
@@ -284,6 +283,43 @@ fn setup(mut config: Config) -> std::io::Result<()> {
         progress.stop(format!("Cloned {} ✓", repo.full_name()));
     }
 
+    if Gitpod::is_host() {
+        gitpod_checkout_pr()?;
+    }
+
+    outro("Starting services...")
+}
+
+fn create_placeholder_dirs() {
+    // Create a placeholder directory for each of the repos
+    // otherwise the directories will be created by Docker
+    // when the volumes are mounted and they may be owned by root
+    [
+        Repository::new("lichess-org", "lila"),
+        Repository::new("lichess-org", "lila-ws"),
+        Repository::new("lichess-org", "lila-db-seed"),
+        Repository::new("lichess-org", "lifat"),
+        Repository::new("lichess-org", "lila-fishnet"),
+        Repository::new("lichess-org", "lila-engine"),
+        Repository::new("lichess-org", "lila-search"),
+        Repository::new("lichess-org", "lila-gif"),
+        Repository::new("lichess-org", "api"),
+        Repository::new("lichess-org", "chessground"),
+        Repository::new("lichess-org", "pgn-viewer"),
+        Repository::new("lichess-org", "scalachess"),
+        Repository::new("lichess-org", "mobile"),
+        Repository::new("lichess-org", "dartchess"),
+        Repository::new("lichess-org", "berserk"),
+        Repository::new("cyanfish", "bbpPairings"),
+    ]
+    .iter()
+    .map(Repository::clone_path)
+    .for_each(|path| {
+        std::fs::create_dir_all(path).unwrap();
+    });
+}
+
+fn gitpod_checkout_pr() ->  std::io::Result<()> {
     let mut cmd = std::process::Command::new("git");
 
     let Ok(workspace_context) = std::env::var("GITPOD_WORKSPACE_CONTEXT") else {
@@ -336,37 +372,6 @@ fn setup(mut config: Config) -> std::io::Result<()> {
     else {
         progress.stop("Failed to fetch PR ✗");
     }
-
-    outro("Starting services...")
-}
-
-fn create_placeholder_dirs() {
-    // Create a placeholder directory for each of the repos
-    // otherwise the directories will be created by Docker
-    // when the volumes are mounted and they may be owned by root
-    [
-        Repository::new("lichess-org", "lila"),
-        Repository::new("lichess-org", "lila-ws"),
-        Repository::new("lichess-org", "lila-db-seed"),
-        Repository::new("lichess-org", "lifat"),
-        Repository::new("lichess-org", "lila-fishnet"),
-        Repository::new("lichess-org", "lila-engine"),
-        Repository::new("lichess-org", "lila-search"),
-        Repository::new("lichess-org", "lila-gif"),
-        Repository::new("lichess-org", "api"),
-        Repository::new("lichess-org", "chessground"),
-        Repository::new("lichess-org", "pgn-viewer"),
-        Repository::new("lichess-org", "scalachess"),
-        Repository::new("lichess-org", "mobile"),
-        Repository::new("lichess-org", "dartchess"),
-        Repository::new("lichess-org", "berserk"),
-        Repository::new("cyanfish", "bbpPairings"),
-    ]
-    .iter()
-    .map(Repository::clone_path)
-    .for_each(|path| {
-        std::fs::create_dir_all(path).unwrap();
-    });
 }
 
 #[allow(clippy::too_many_lines)]
