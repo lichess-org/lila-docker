@@ -368,12 +368,10 @@ fn gitpod_checkout_pr() ->  std::io::Result<()> {
         } else {
             progress.stop("Failed to checkout PR branch ✗");
         }
-        return Ok(());
+        Ok(())
     }
-    else {
-        progress.stop("Failed to fetch PR ✗");
-        return Ok(());
-    }
+    progress.stop("Failed to fetch PR ✗");
+    Ok(())
 }
 
 #[allow(clippy::too_many_lines)]
