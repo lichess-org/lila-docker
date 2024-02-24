@@ -319,7 +319,7 @@ fn create_placeholder_dirs() {
     });
 }
 
-fn gitpod_checkout_pr() ->  std::io::Result<()> {
+fn gitpod_checkout_pr() -> std::io::Result<()> {
     let mut cmd = std::process::Command::new("git");
 
     let Ok(workspace_context) = std::env::var("GITPOD_WORKSPACE_CONTEXT") else {
@@ -347,7 +347,7 @@ fn gitpod_checkout_pr() ->  std::io::Result<()> {
 
     let mut progress = spinner();
     progress.start(&format!("Fetching  PR-{pr_no} from lila"));
-    
+
     cmd.current_dir("repos/lila")
         .arg("fetch")
         .arg("upstream")
@@ -360,7 +360,7 @@ fn gitpod_checkout_pr() ->  std::io::Result<()> {
         cmd.current_dir("repos/lila")
             .arg("checkout")
             .arg(format!("pr-{pr_no}"));
-    
+
         let status = cmd.status().unwrap();
         let mut progress = spinner();
         if status.success() {
