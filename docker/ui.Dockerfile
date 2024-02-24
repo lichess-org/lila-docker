@@ -1,4 +1,4 @@
-FROM node:20.11.0-bookworm
+FROM node:20.11.1-bookworm
 
 RUN git config --global --add safe.directory /chessground
 RUN git config --global --add safe.directory /lila
