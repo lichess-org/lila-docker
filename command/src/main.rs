@@ -337,7 +337,7 @@ fn create_placeholder_dirs() {
 fn gitpod_checkout_pr() -> std::io::Result<()> {
     let gitpod = Gitpod::load();
 
-    let pr_no = match gitpod
+    let Some(pr_no) = gitpod
         .workspace_context
         .envvars
         .as_ref()
@@ -346,9 +346,9 @@ fn gitpod_checkout_pr() -> std::io::Result<()> {
                 .iter()
                 .find(|envvar| envvar.name == "LILA_PR")
                 .map(|envvar| envvar.value.clone())
-        }) {
-        Some(pr_no) => pr_no,
-        None => return remark("No lila PR specified, using default branch"),
+        })
+    else {
+        return remark("No lila PR specified, using default branch");
     };
 
     let pr_url = format!("https://github.com/lichess-org/lila/pull/{pr_no}");
