@@ -352,6 +352,9 @@ fn gitpod_checkout_pr() -> std::io::Result<()> {
         .arg("fetch")
         .arg("upstream")
         .arg(format!("pull/{pr_no}/head:pr-{pr_no}"));
+        .arg("--depth")
+        .arg("1")
+        .arg("--recurse-submodules")
 
     let status = cmd.status().unwrap();
     if status.success() {
