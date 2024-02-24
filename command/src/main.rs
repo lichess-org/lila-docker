@@ -144,7 +144,7 @@ struct Gitpod {
 impl Gitpod {
     fn load() -> Self {
         let workspace_url = std::env::var("GITPOD_WORKSPACE_URL").expect("Not running in Gitpod");
-        
+
         let pr_no = load_lila_pr_no().unwrap_or(Ok(0)).unwrap_or(0);
 
         Self {
@@ -382,7 +382,7 @@ fn gitpod_checkout_pr() {
         } else {
             progress.stop("Failed to checkout PR branch ✗");
         }
-        return ;
+        return;
     }
     progress.stop("Failed to fetch PR ✗");
 }
