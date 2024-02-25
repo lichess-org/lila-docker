@@ -141,7 +141,7 @@ services:
       - stockfish-play
 
   fishnet_play:
-    image: niklasf/fishnet:2.8.2
+    image: niklasf/fishnet:2.9.0
     restart: unless-stopped
     entrypoint: /fishnet --endpoint http://lila_fishnet:9665/fishnet --max-backoff 5
     networks:
@@ -150,7 +150,7 @@ services:
       - stockfish-play
 
   fishnet_analysis:
-    image: niklasf/fishnet:2.8.2
+    image: niklasf/fishnet:2.9.0
     restart: unless-stopped
     entrypoint: /fishnet --endpoint http://lila:9663/fishnet --max-backoff 5
     networks:
@@ -252,7 +252,7 @@ services:
       - thumbnails
 
   mailpit:
-    image: axllent/mailpit:v1.13.3
+    image: axllent/mailpit:v1.14.0
     restart: unless-stopped
     ports:
       - 8025:8025
