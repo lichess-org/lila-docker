@@ -131,12 +131,24 @@ load_config_to_env() {
 }
 
 show_help() {
-    echo "Usage: $0 [start|stop|restart|down|build|format|hostname|mobile|db]"
+    echo "Usage: $0 <action>"
+
+    echo "Actions:"
+    echo "  start         Start the containers"
+    echo "  stop          Stop the containers"
+    echo "  restart       Restart the containers"
+    echo "  down          Stop the containers and remove their volumes"
+    echo "  build         Pre-fetch and pre-build all the images necessary for the containers"
+    echo "  format        Run the code formatter to match Lichess code style"
+    echo "  hostname      Set the hostname to something different than the default localhost"
+    echo "  mobile        For mobile app development.Pair and connect to a mobile device"
+    echo "  db            Reset and re-seed the database with fresh fake data"
+    echo "  lila clean    Run 'sbt clean' in the lila container. Useful if there are compilation errors"
+    echo "  lila restart  Restart the lila container to apply changes to the codebase"
+    echo "  ui            Compile the frontend code. Runs in watch mode to automatically recompile on changes"
 }
 
-cd "$(dirname "$0")"
-
-case $1 in
+case "$@" in
     --help|-h)
         show_help
         exit 0
@@ -167,6 +179,15 @@ case $1 in
         ;;
     db)
         reset_database
+        ;;
+    "lila clean")
+        docker compose run --rm --entrypoint "sbt clean" lila
+        ;;
+    "lila restart")
+        docker compose restart lila
+        ;;
+    ui)
+        docker compose run --rm ui /lila/ui/build --debug --watch
         ;;
     *)
         show_help
