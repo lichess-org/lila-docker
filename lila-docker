@@ -136,6 +136,7 @@ show_help() {
     echo "Actions:"
     echo "  start         Start the containers"
     echo "  stop          Stop the containers"
+    echo "  restart       Restart the containers"
     echo "  down          Stop the containers and remove their volumes"
     echo "  build         Pre-fetch and pre-build all the images necessary for the containers"
     echo "  format        Run the code formatter to match Lichess code style"
@@ -157,6 +158,9 @@ case "$@" in
         ;;
     stop)
         run_stop
+        ;;
+    restart)
+        run_stop && run_start
         ;;
     down)
         run_down
