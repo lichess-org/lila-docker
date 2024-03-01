@@ -569,13 +569,10 @@ fn mobile_setup(mut config: Config) -> std::io::Result<()> {
     intro("On your Android phone, open Developer Options > Wireless Debugging")?;
 
     let phone_ip = match config.phone_ip {
-        Some(ip) => input("Your phone's private IP address")
-            .default_input(&ip)
-            .interact()?,
-        None => input("Your phone's private IP address")
-            .placeholder("192.168.x.x or 10.x.x.x")
-            .interact()?,
-    };
+        Some(ip) => input("Your phone's private IP address").default_input(&ip),
+        None => input("Your phone's private IP address").placeholder("192.168.x.x or 10.x.x.x"),
+    }
+    .interact()?;
 
     let connection_port: u16 = input("Connection port")
         .validate(|input: &String| validate_string_length(input, 5))
