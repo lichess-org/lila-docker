@@ -600,9 +600,10 @@ fn mobile_setup(mut config: Config) -> std::io::Result<()> {
 }
 
 fn validate_string_length(input: &str, length: usize) -> Result<(), String> {
-    match input.len() {
-        len if len == length => Ok(()),
-        _ => Err(format!("Value should be {length} digits in length")),
+    if input.len() == length {
+        Ok(())
+    } else {
+        Err(format!("Value should be {length} digits in length"))
     }
 }
 
