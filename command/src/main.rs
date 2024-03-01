@@ -7,6 +7,7 @@ use cliclack::{
 };
 use local_ip_address::local_ip;
 use serde::{Deserialize, Serialize};
+use std::process::Command;
 use std::{
     format,
     io::Error,
@@ -291,7 +292,7 @@ fn setup(mut config: Config) -> std::io::Result<()> {
             continue;
         }
 
-        let mut cmd = std::process::Command::new("git");
+        let mut cmd = Command::new("git");
         cmd.arg("clone")
             .arg("--origin")
             .arg("upstream")
@@ -360,7 +361,7 @@ fn gitpod_checkout_pr() -> std::io::Result<()> {
     let mut progress = spinner();
     progress.start(&format!("Checking out lila PR #{pr_no}: {pr_url}..."));
 
-    let mut cmd = std::process::Command::new("git");
+    let mut cmd = Command::new("git");
     cmd.current_dir("repos/lila")
         .arg("fetch")
         .arg("upstream")
@@ -375,7 +376,7 @@ fn gitpod_checkout_pr() -> std::io::Result<()> {
         "Failed to fetch upstream PR #{pr_no} - {output:?}",
     );
 
-    let mut cmd = std::process::Command::new("git");
+    let mut cmd = Command::new("git");
     cmd.current_dir("repos/lila")
         .arg("checkout")
         .arg(&branch_name);
