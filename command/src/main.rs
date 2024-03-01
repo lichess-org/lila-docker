@@ -302,7 +302,7 @@ fn setup(mut config: Config) -> std::io::Result<()> {
             .arg(repo.url())
             .arg(repo.clone_path());
 
-        let output = cmd.output().unwrap();
+        let output = cmd.output()?;
         assert!(
             output.status.success(),
             "Failed to clone repo: {} - {output:?}",
@@ -370,7 +370,7 @@ fn gitpod_checkout_pr() -> std::io::Result<()> {
         .arg("25")
         .arg("--recurse-submodules");
 
-    let output = cmd.output().unwrap();
+    let output = cmd.output()?;
     assert!(
         output.status.success(),
         "Failed to fetch upstream PR #{pr_no} - {output:?}",
@@ -381,7 +381,7 @@ fn gitpod_checkout_pr() -> std::io::Result<()> {
         .arg("checkout")
         .arg(&branch_name);
 
-    let output = cmd.output().unwrap();
+    let output = cmd.output()?;
     assert!(
         output.status.success(),
         "Failed to checkout PR branch {branch_name} - {output:?}",
