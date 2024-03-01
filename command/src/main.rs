@@ -2,11 +2,12 @@
 
 use cliclack::{
     confirm, input, intro,
-    log::{self, info},
+    log::{self, info, step},
     multiselect, note, outro, select, spinner,
 };
 use local_ip_address::local_ip;
 use serde::{Deserialize, Serialize};
+use std::process::Command;
 use std::{
     format,
     io::Error,
@@ -137,20 +138,48 @@ impl Repository {
 struct Gitpod {
     domain: String,
     url: String,
+    workspace_context: GitpodWorkspaceContext,
+}
+
+#[derive(Debug, Default, Deserialize, PartialEq)]
+struct GitpodWorkspaceContext {
+    envvars: Option<Vec<GitpodEnvVar>>,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+struct GitpodEnvVar {
+    name: String,
+    value: String,
 }
 
 impl Gitpod {
     fn load() -> Self {
-        let workspace_url = std::env::var("GITPOD_WORKSPACE_URL").expect("Not running in Gitpod");
+        let workspace_url =
+            std::env::var("GITPOD_WORKSPACE_URL").expect("Missing env GITPOD_WORKSPACE_URL");
+
+        let workspace_context: GitpodWorkspaceContext = serde_json::from_str(
+            &std::env::var("GITPOD_WORKSPACE_CONTEXT")
+                .expect("Missing env GITPOD_WORKSPACE_CONTEXT"),
+        )
+        .expect("Failed to parse GITPOD_WORKSPACE_CONTEXT");
 
         Self {
             domain: workspace_url.replace("https://", "8080-"),
             url: workspace_url.replace("https://", "https://8080-"),
+            workspace_context,
         }
     }
 
     fn is_host() -> bool {
         std::env::var("GITPOD_WORKSPACE_URL").is_ok()
+    }
+
+    fn get_context_for(&self, name: &str) -> Option<&str> {
+        self.workspace_context
+            .envvars
+            .as_ref()
+            .and_then(|envvars| envvars.iter().find(|envvar| envvar.name == name))
+            .map(|envvar| envvar.value.as_str())
     }
 }
 
@@ -257,11 +286,11 @@ fn setup(mut config: Config) -> std::io::Result<()> {
         progress.start(&format!("Cloning {}...", repo.full_name()));
 
         if repo.clone_path().read_dir()?.next().is_some() {
-            progress.stop(format!("Already cloned {} ✓", repo.full_name()));
+            progress.stop(format!("✓ Already cloned {}", repo.full_name()));
             continue;
         }
 
-        let mut cmd = std::process::Command::new("git");
+        let mut cmd = Command::new("git");
         cmd.arg("clone")
             .arg("--origin")
             .arg("upstream")
@@ -271,15 +300,18 @@ fn setup(mut config: Config) -> std::io::Result<()> {
             .arg(repo.url())
             .arg(repo.clone_path());
 
-        let output = cmd.output().unwrap();
+        let output = cmd.output()?;
         assert!(
             output.status.success(),
-            "Failed to clone repo: {} - {:?}",
-            repo.full_name(),
-            output
+            "Failed to clone repo: {} - {output:?}",
+            repo.full_name()
         );
 
-        progress.stop(format!("Cloned {} ✓", repo.full_name()));
+        progress.stop(format!("✓ Cloned {}", repo.full_name()));
+    }
+
+    if Gitpod::is_host() {
+        gitpod_checkout_pr()?;
     }
 
     outro("Starting services...")
@@ -312,6 +344,49 @@ fn create_placeholder_dirs() {
     .for_each(|path| {
         std::fs::create_dir_all(path).unwrap();
     });
+}
+
+fn gitpod_checkout_pr() -> std::io::Result<()> {
+    let gitpod = Gitpod::load();
+
+    let Some(pr_no) = gitpod.get_context_for("LILA_PR") else {
+        return step("No lila PR specified, using default branch");
+    };
+
+    let pr_url = format!("https://github.com/lichess-org/lila/pull/{pr_no}");
+    let branch_name = format!("pr-{pr_no}");
+
+    let mut progress = spinner();
+    progress.start(&format!("Checking out lila PR #{pr_no}: {pr_url}..."));
+
+    let mut cmd = Command::new("git");
+    cmd.current_dir("repos/lila")
+        .arg("fetch")
+        .arg("upstream")
+        .arg(format!("pull/{pr_no}/head:{branch_name}"))
+        .arg("--depth")
+        .arg("25")
+        .arg("--recurse-submodules");
+
+    let output = cmd.output()?;
+    assert!(
+        output.status.success(),
+        "Failed to fetch upstream PR #{pr_no} - {output:?}",
+    );
+
+    let mut cmd = Command::new("git");
+    cmd.current_dir("repos/lila")
+        .arg("checkout")
+        .arg(&branch_name);
+
+    let output = cmd.output()?;
+    assert!(
+        output.status.success(),
+        "Failed to checkout PR branch {branch_name} - {output:?}",
+    );
+
+    progress.stop(format!("✓ Checked out PR #{pr_no} - {pr_url}"));
+    Ok(())
 }
 
 #[allow(clippy::too_many_lines)]
@@ -492,13 +567,10 @@ fn mobile_setup(mut config: Config) -> std::io::Result<()> {
     intro("On your Android phone, open Developer Options > Wireless Debugging")?;
 
     let phone_ip = match config.phone_ip {
-        Some(ip) => input("Your phone's private IP address")
-            .default_input(&ip)
-            .interact()?,
-        None => input("Your phone's private IP address")
-            .placeholder("192.168.x.x or 10.x.x.x")
-            .interact()?,
-    };
+        Some(ip) => input("Your phone's private IP address").default_input(&ip),
+        None => input("Your phone's private IP address").placeholder("192.168.x.x or 10.x.x.x"),
+    }
+    .interact()?;
 
     let connection_port: u16 = input("Connection port")
         .validate(|input: &String| validate_string_length(input, 5))
@@ -523,9 +595,10 @@ fn mobile_setup(mut config: Config) -> std::io::Result<()> {
 }
 
 fn validate_string_length(input: &str, length: usize) -> Result<(), String> {
-    match input.len() {
-        len if len == length => Ok(()),
-        _ => Err(format!("Value should be {length} digits in length")),
+    if input.len() == length {
+        Ok(())
+    } else {
+        Err(format!("Value should be {length} digits in length"))
     }
 }
 
@@ -610,6 +683,7 @@ mod tests {
             "GITPOD_WORKSPACE_URL",
             "https://lichessorg-liladocker-abc123.ws-us123.gitpod.io",
         );
+        std::env::set_var("GITPOD_WORKSPACE_CONTEXT", "{}");
 
         let gitpod = Gitpod::load();
         assert_eq!(
@@ -620,5 +694,60 @@ mod tests {
             gitpod.url,
             "https://8080-lichessorg-liladocker-abc123.ws-us123.gitpod.io"
         );
+        assert_eq!(gitpod.workspace_context, GitpodWorkspaceContext::default());
+        assert_eq!(gitpod.get_context_for("LILA_PR"), None);
+    }
+
+    #[test]
+    fn test_gitpod_lila_url_with_pr_context() {
+        std::env::set_var(
+            "GITPOD_WORKSPACE_URL",
+            "https://lichessorg-liladocker-abc123.ws-us123.gitpod.io",
+        );
+        std::env::set_var(
+            "GITPOD_WORKSPACE_CONTEXT",
+            r#"{"envvars":[{"name":"LILA_PR","value":"12345"}]}"#,
+        );
+
+        let gitpod = Gitpod::load();
+
+        assert_eq!(
+            gitpod.workspace_context,
+            GitpodWorkspaceContext {
+                envvars: Some(vec![GitpodEnvVar {
+                    name: "LILA_PR".to_string(),
+                    value: "12345".to_string(),
+                }])
+            }
+        );
+
+        assert_eq!(gitpod.get_context_for("LILA_PR"), Some("12345"));
+    }
+
+    #[test]
+    fn test_gitpod_lila_url_with_context_but_no_pr() {
+        std::env::set_var(
+            "GITPOD_WORKSPACE_URL",
+            "https://lichessorg-liladocker-abc123.ws-us123.gitpod.io",
+        );
+        std::env::set_var(
+            "GITPOD_WORKSPACE_CONTEXT",
+            r#"{"envvars":[{"name":"FOO","value":"BAR"}]}"#,
+        );
+
+        let gitpod = Gitpod::load();
+
+        assert_eq!(
+            gitpod.workspace_context,
+            GitpodWorkspaceContext {
+                envvars: Some(vec![GitpodEnvVar {
+                    name: "FOO".to_string(),
+                    value: "BAR".to_string(),
+                }])
+            }
+        );
+
+        assert_eq!(gitpod.get_context_for("FOO"), Some("BAR"));
+        assert_eq!(gitpod.get_context_for("LILA_PR"), None);
     }
 }
