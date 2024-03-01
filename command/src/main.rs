@@ -135,12 +135,10 @@ impl Repository {
     }
 }
 
-#[allow(dead_code)]
 struct Gitpod {
     domain: String,
     url: String,
     workspace_context: GitpodWorkspaceContext,
-    lila_pr_no: Option<u32>,
 }
 
 #[derive(Debug, Default, Deserialize, PartialEq)]
@@ -165,23 +163,23 @@ impl Gitpod {
         )
         .expect("Failed to parse GITPOD_WORKSPACE_CONTEXT");
 
-        let lila_pr_no = workspace_context.envvars.as_ref().and_then(|envvars| {
-            envvars
-                .iter()
-                .find(|envvar| envvar.name == "LILA_PR")
-                .map(|envvar| envvar.value.parse::<u32>().unwrap())
-        });
-
         Self {
             domain: workspace_url.replace("https://", "8080-"),
             url: workspace_url.replace("https://", "https://8080-"),
             workspace_context,
-            lila_pr_no,
         }
     }
 
     fn is_host() -> bool {
         std::env::var("GITPOD_WORKSPACE_URL").is_ok()
+    }
+
+    fn get_context_for(&self, name: &str) -> Option<&str> {
+        self.workspace_context
+            .envvars
+            .as_ref()
+            .and_then(|envvars| envvars.iter().find(|envvar| envvar.name == name))
+            .map(|envvar| envvar.value.as_str())
     }
 }
 
@@ -351,7 +349,7 @@ fn create_placeholder_dirs() {
 fn gitpod_checkout_pr() -> std::io::Result<()> {
     let gitpod = Gitpod::load();
 
-    let Some(pr_no) = gitpod.lila_pr_no else {
+    let Some(pr_no) = gitpod.get_context_for("LILA_PR") else {
         return step("No lila PR specified, using default branch");
     };
 
@@ -697,7 +695,7 @@ mod tests {
             "https://8080-lichessorg-liladocker-abc123.ws-us123.gitpod.io"
         );
         assert_eq!(gitpod.workspace_context, GitpodWorkspaceContext::default());
-        assert_eq!(gitpod.lila_pr_no, None);
+        assert_eq!(gitpod.get_context_for("LILA_PR"), None);
     }
 
     #[test]
@@ -723,7 +721,7 @@ mod tests {
             }
         );
 
-        assert_eq!(gitpod.lila_pr_no, Some(12345));
+        assert_eq!(gitpod.get_context_for("LILA_PR"), Some("12345"));
     }
 
     #[test]
@@ -749,6 +747,7 @@ mod tests {
             }
         );
 
-        assert_eq!(gitpod.lila_pr_no, None);
+        assert_eq!(gitpod.get_context_for("FOO"), Some("BAR"));
+        assert_eq!(gitpod.get_context_for("LILA_PR"), None);
     }
 }
