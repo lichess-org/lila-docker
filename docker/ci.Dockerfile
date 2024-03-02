@@ -36,7 +36,7 @@ RUN mongod --fork --logpath /var/log/mongod.log \
         --tokens
 
 ## Pre-install dependencies for Berserk client
-RUN pip3 install berserk
+RUN pip3 install berserk pytest
 
 RUN git clone --depth 1 https://github.com/lichess-org/lila.git /lila
 WORKDIR /lila
