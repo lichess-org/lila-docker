@@ -634,13 +634,10 @@ fn flutter(config: Config) -> std::io::Result<()> {
         return note("To fix, run:", "./lila-docker hostname");
     }
 
-    let cmd = format!(
-        "flutter run -v \
-        --dart-define LICHESS_HOST={url} \
-        --dart-define LICHESS_WS_HOST={url}"
-    );
+    outro("On your local machine, start Flutter with this command:")?;
+    println!("\nflutter run -v \\\n  --dart-define LICHESS_HOST={url} \\\n  --dart-define LICHESS_WS_HOST={url}");
 
-    note("On your local machine, start Flutter with:", cmd)
+    Ok(())
 }
 
 fn gitpod_public() -> std::io::Result<()> {
@@ -658,8 +655,7 @@ fn gitpod_public() -> std::io::Result<()> {
     assert!(output.status.success(), "Failed to make port 8080 public");
 
     progress.stop("✓ Port 8080 is now publicly accessible");
-
-    Ok(())
+    outro(Gitpod::load().url)
 }
 
 #[cfg(test)]
