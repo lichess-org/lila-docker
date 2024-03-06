@@ -649,7 +649,7 @@ fn gitpod_public() -> std::io::Result<()> {
     progress.start("Making http port 8080 publicly accessible...");
 
     let mut cmd = Command::new("gp");
-    cmd.arg("ports").arg("visbility").arg("8080:public");
+    cmd.arg("ports").arg("visibility").arg("8080:public");
 
     let output = cmd.output()?;
     assert!(output.status.success(), "Failed to make port 8080 public");
