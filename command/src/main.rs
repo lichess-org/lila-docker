@@ -2,7 +2,7 @@
 
 use cliclack::{
     confirm, input, intro,
-    log::{self, info, step},
+    log::{self, error, info, step},
     multiselect, note, outro, select, spinner,
 };
 use local_ip_address::local_ip;
@@ -200,6 +200,8 @@ fn main() -> std::io::Result<()> {
         "hostname" => hostname(config),
         "mobile" => mobile_setup(config),
         "welcome" => welcome(),
+        "flutter" => flutter(config),
+        "gitpod_public" => gitpod_public(),
         _ => panic!("Unknown command"),
     }
 }
@@ -617,6 +619,47 @@ fn welcome() -> std::io::Result<()> {
     )?;
 
     outro("🚀")
+}
+
+fn flutter(config: Config) -> std::io::Result<()> {
+    let url = if Gitpod::is_host() {
+        gitpod_public()?;
+        Gitpod::load().url
+    } else {
+        config.lila_url.expect("Missing lila_url")
+    };
+
+    if url.contains("localhost") {
+        error("To connect the Flutter app to lila, change the Lichess URL to a public domain or IP address.")?;
+        return note("To fix, run:", "./lila-docker hostname");
+    }
+
+    let cmd = format!(
+        "flutter run -v \
+        --dart-define LICHESS_HOST={url} \
+        --dart-define LICHESS_WS_HOST={url}"
+    );
+
+    note("On your local machine, start Flutter with:", cmd)
+}
+
+fn gitpod_public() -> std::io::Result<()> {
+    if !Gitpod::is_host() {
+        return error("This command is only available on Gitpod");
+    }
+
+    let mut progress = spinner();
+    progress.start("Making http port 8080 publicly accessible...");
+
+    let mut cmd = Command::new("gp");
+    cmd.arg("ports").arg("visbility").arg("8080:public");
+
+    let output = cmd.output()?;
+    assert!(output.status.success(), "Failed to make port 8080 public");
+
+    progress.stop("✓ Port 8080 is now publicly accessible");
+
+    Ok(())
 }
 
 #[cfg(test)]

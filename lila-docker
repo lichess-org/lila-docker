@@ -189,6 +189,12 @@ case "$@" in
     ui)
         docker compose run --rm ui /lila/ui/build --debug --watch
         ;;
+    "gitpod public")
+        rust_cmd gitpod_public
+        ;;
+    "flutter")
+        rust_cmd flutter
+        ;;
     *)
         show_help
         exit 1
