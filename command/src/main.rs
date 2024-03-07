@@ -2,16 +2,16 @@
 
 use cliclack::{
     confirm, input, intro,
-    log::{self, info, step},
+    log::{error, info, step},
     multiselect, note, outro, select, spinner,
 };
 use local_ip_address::local_ip;
 use serde::{Deserialize, Serialize};
-use std::process::Command;
 use std::{
     format,
-    io::Error,
+    io::{Error, ErrorKind},
     path::{Path, PathBuf},
+    process::Command,
 };
 
 const BANNER: &str = r"
@@ -200,6 +200,8 @@ fn main() -> std::io::Result<()> {
         "hostname" => hostname(config),
         "mobile" => mobile_setup(config),
         "welcome" => welcome(),
+        "flutter" => flutter(config),
+        "gitpod_public" => gitpod_public(),
         _ => panic!("Unknown command"),
     }
 }
@@ -528,7 +530,7 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error
 
 fn hostname(mut config: Config) -> std::io::Result<()> {
     if Gitpod::is_host() {
-        return log::error("Setting of hostname not available on Gitpod");
+        return error("Setting of hostname not available on Gitpod");
     }
 
     let local_ip = match local_ip() {
@@ -617,6 +619,53 @@ fn welcome() -> std::io::Result<()> {
     )?;
 
     outro("🚀")
+}
+
+fn flutter(config: Config) -> std::io::Result<()> {
+    let url = if Gitpod::is_host() {
+        gitpod_public()?;
+        Gitpod::load().url
+    } else {
+        config.lila_url.expect("Missing lila_url")
+    };
+
+    if url.contains("localhost") {
+        error("To run the Flutter app against your development site, change the lila URL to a hostname that can be resolved from other network devices (instead of `localhost`).")?;
+        return note("To fix, run:", "./lila-docker hostname");
+    }
+
+    outro("On your local machine, start Flutter with this command:")?;
+    println!("\nflutter run -v \\\n  --dart-define LICHESS_HOST={url} \\\n  --dart-define LICHESS_WS_HOST={url}");
+
+    Ok(())
+}
+
+fn gitpod_public() -> std::io::Result<()> {
+    if !Gitpod::is_host() {
+        return Err(std::io::Error::new(
+            ErrorKind::Other,
+            "This command is only available on Gitpod",
+        ));
+    }
+
+    let mut progress = spinner();
+    progress.start("Making http port 8080 publicly accessible...");
+
+    let mut cmd = Command::new("gp");
+    cmd.arg("ports").arg("visibility").arg("8080:public");
+
+    let output = cmd.output().expect("Command failed");
+    let stdout = String::from_utf8(output.stdout).expect("Failed to parse stdout");
+
+    if !stdout.contains("port 8080 is now public") {
+        return Err(std::io::Error::new(
+            ErrorKind::Other,
+            "Failed to make port 8080 public",
+        ));
+    }
+
+    progress.stop("✓ Port 8080 is now publicly accessible");
+    outro(Gitpod::load().url)
 }
 
 #[cfg(test)]

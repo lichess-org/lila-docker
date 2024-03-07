@@ -142,9 +142,11 @@ show_help() {
     echo "  format        Run the code formatter to match Lichess code style"
     echo "  hostname      Set the hostname to something different than the default localhost"
     echo "  mobile        For mobile app development.Pair and connect to a mobile device"
+    echo "  flutter       Get the 'flutter run' command with the URL arguments pre-configured"
     echo "  db            Reset and re-seed the database with fresh fake data"
     echo "  lila clean    Run 'sbt clean' in the lila container. Useful if there are compilation errors"
     echo "  lila restart  Restart the lila container to apply changes to the codebase"
+    echo "  gitpod public Make http port 8080 public on the Gitpod instance"
     echo "  ui            Compile the frontend code. Runs in watch mode to automatically recompile on changes"
 }
 
@@ -188,6 +190,12 @@ case "$@" in
         ;;
     ui)
         docker compose run --rm ui /lila/ui/build --debug --watch
+        ;;
+    "gitpod public")
+        rust_cmd gitpod_public
+        ;;
+    "flutter")
+        rust_cmd flutter
         ;;
     *)
         show_help
