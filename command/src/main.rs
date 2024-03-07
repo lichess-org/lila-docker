@@ -2,16 +2,16 @@
 
 use cliclack::{
     confirm, input, intro,
-    log::{self, error, info, step},
+    log::{error, info, step},
     multiselect, note, outro, select, spinner,
 };
 use local_ip_address::local_ip;
 use serde::{Deserialize, Serialize};
-use std::process::Command;
 use std::{
     format,
-    io::Error,
+    io::{Error, ErrorKind},
     path::{Path, PathBuf},
+    process::Command,
 };
 
 const BANNER: &str = r"
@@ -530,7 +530,7 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error
 
 fn hostname(mut config: Config) -> std::io::Result<()> {
     if Gitpod::is_host() {
-        return log::error("Setting of hostname not available on Gitpod");
+        return error("Setting of hostname not available on Gitpod");
     }
 
     let local_ip = match local_ip() {
@@ -630,7 +630,7 @@ fn flutter(config: Config) -> std::io::Result<()> {
     };
 
     if url.contains("localhost") {
-        error("To connect the Flutter app to lila, change the Lichess URL to a public domain or IP address.")?;
+        error("To run the Flutter app against your development site, change the lila URL to a hostname that can be resolved from other network devices (instead of `localhost`).")?;
         return note("To fix, run:", "./lila-docker hostname");
     }
 
@@ -642,7 +642,10 @@ fn flutter(config: Config) -> std::io::Result<()> {
 
 fn gitpod_public() -> std::io::Result<()> {
     if !Gitpod::is_host() {
-        return error("This command is only available on Gitpod");
+        return Err(std::io::Error::new(
+            ErrorKind::Other,
+            "This command is only available on Gitpod",
+        ));
     }
 
     let mut progress = spinner();
@@ -651,8 +654,15 @@ fn gitpod_public() -> std::io::Result<()> {
     let mut cmd = Command::new("gp");
     cmd.arg("ports").arg("visibility").arg("8080:public");
 
-    let output = cmd.output()?;
-    assert!(output.status.success(), "Failed to make port 8080 public");
+    let output = cmd.output().expect("Command failed");
+    let stdout = String::from_utf8(output.stdout).expect("Failed to parse stdout");
+
+    if !stdout.contains("port 8080 is now public") {
+        return Err(std::io::Error::new(
+            ErrorKind::Other,
+            "Failed to make port 8080 public",
+        ));
+    }
 
     progress.stop("✓ Port 8080 is now publicly accessible");
     outro(Gitpod::load().url)
