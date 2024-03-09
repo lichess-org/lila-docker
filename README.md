@@ -56,11 +56,11 @@ To remove the containers:
 
 Always available:
 
-| Service            | URL                                 |
-| ------------------ | ----------------------------------- |
-| Main lila instance | http://localhost:8080/              |
-| Mongodb manager    | http://localhost:8081/ (admin/pass) |
-| Email inbox        | http://localhost:8025/              |
+| Service            | URL                    |
+| ------------------ | ---------------------- |
+| Main lila instance | http://localhost:8080/ |
+| Mongodb manager    | http://localhost:8081/ |
+| Email inbox        | http://localhost:8025/ |
 
 Depending on which optional services you start:
 

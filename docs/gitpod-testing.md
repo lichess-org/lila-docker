@@ -4,12 +4,12 @@
 cd command
 
 ## test with no PR specified
-GITPOD_WORKSPACE_URL=https://example.com \
+GITPOD_WORKSPACE_URL=https://test.example.com \
 GITPOD_WORKSPACE_CONTEXT={} \
 cargo run -- setup
 
 ## test with PR specified
-GITPOD_WORKSPACE_URL=https://example.com \
+GITPOD_WORKSPACE_URL=https://test.example.com \
 GITPOD_WORKSPACE_CONTEXT='{"envvars":[{"name":"LILA_PR","value":"14738"}]}' \
 cargo run -- setup
 ```
