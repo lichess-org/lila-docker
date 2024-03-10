@@ -132,6 +132,7 @@ services:
       dockerfile: lila-fishnet.Dockerfile
     environment:
       - KAMON_ENABLED=${ENABLE_MONITORING:-false}
+      # - HTTP_API_LOGGER=true
     restart: unless-stopped
     networks:
       - lila-network
