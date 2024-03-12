@@ -5,7 +5,7 @@ ENV CONFIG_FORCE_kamon_influxdb_hostname="influxdb"
 ENV REDIS_HOST="redis"
 
 ENV APP_BACKUP_FILE=/backup.json
-RUN touch $APP_BACKUP_FILE
+RUN touch "$APP_BACKUP_FILE"
 
 WORKDIR /lila-fishnet
 
