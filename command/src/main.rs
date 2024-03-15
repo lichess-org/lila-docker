@@ -399,6 +399,22 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error
     .required(false)
     .item(
         OptionalService {
+            compose_profile: vec!["mongo-express"].into(),
+            repositories: None,
+        },
+        "Database admin interface",
+        "Mongo Express for viewing database structure and data",
+    )
+    .item(
+        OptionalService {
+            compose_profile: vec!["email"].into(),
+            repositories: None,
+        },
+        "Outbound email testing",
+        "for capturing and debugging outbound email",
+    )
+    .item(
+        OptionalService {
             compose_profile: vec!["stockfish-play"].into(),
             repositories: vec![Repository::new("lichess-org", "lila-fishnet")].into(),
         },

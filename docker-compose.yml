@@ -259,6 +259,8 @@ services:
       - 8025:8025
     networks:
       - lila-network
+    profiles:
+      - email
 
   mongo_express:
     image: mongo-express:1.0.2-20-alpine3.19
@@ -272,6 +274,8 @@ services:
       - lila-network
     depends_on:
       - mongodb
+    profiles:
+      - mongo-express
 
   influxdb:
     image: influxdb:2.7.5-alpine
