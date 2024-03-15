@@ -194,20 +194,20 @@ services:
       - discovery.type=single-node
     networks:
       - lila-network
+    ports:
+      - 9200:9200
+    volumes:
+      - ./conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     profiles:
       - search
 
-  kibana:
-    image: kibana:7.17.4
+  elasticvue:
+    image: cars10/elasticvue:1.0.4
     restart: unless-stopped
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     ports:
-      - 5601:5601
+      - 8092:8080
     networks:
       - lila-network
-    depends_on:
-      - elasticsearch
     profiles:
       - search
 
