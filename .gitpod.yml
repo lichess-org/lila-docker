@@ -38,8 +38,8 @@ ports:
   - port: 3001
     name: picfit
     onOpen: ignore
-  - port: 5601
-    name: kibana
+  - port: 8092
+    name: elasticvue
     description: Elasticsearch manager
     onOpen: ignore
 
