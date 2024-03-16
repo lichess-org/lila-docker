@@ -132,6 +132,7 @@ services:
       dockerfile: lila-fishnet.Dockerfile
     environment:
       - KAMON_ENABLED=${ENABLE_MONITORING:-false}
+      # - HTTP_API_LOGGER=true
     restart: unless-stopped
     networks:
       - lila-network
@@ -189,24 +190,26 @@ services:
     image: elasticsearch:7.17.4
     restart: unless-stopped
     environment:
-      - xpack.security.enabled=false
       - discovery.type=single-node
+      - http.cors.allow-origin=/.*/
+      - http.cors.enabled=true
+      - xpack.security.enabled=false
     networks:
       - lila-network
+    ports:
+      - 9200:9200
     profiles:
       - search
 
-  kibana:
-    image: kibana:7.17.4
+  elasticvue:
+    image: cars10/elasticvue:1.0.4
     restart: unless-stopped
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    volumes:
+      - ./conf/elasticvue.json:/usr/share/nginx/html/api/default_clusters.json
     ports:
-      - 5601:5601
+      - 8092:8080
     networks:
       - lila-network
-    depends_on:
-      - elasticsearch
     profiles:
       - search
 
@@ -252,12 +255,14 @@ services:
       - thumbnails
 
   mailpit:
-    image: axllent/mailpit:v1.14.1
+    image: axllent/mailpit:v1.14.4
     restart: unless-stopped
     ports:
       - 8025:8025
     networks:
       - lila-network
+    profiles:
+      - email
 
   mongo_express:
     image: mongo-express:1.0.2-20-alpine3.19
@@ -271,6 +276,8 @@ services:
       - lila-network
     depends_on:
       - mongodb
+    profiles:
+      - mongo-express
 
   influxdb:
     image: influxdb:2.7.5-alpine

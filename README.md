@@ -59,16 +59,16 @@ Always available:
 | Service            | URL                    |
 | ------------------ | ---------------------- |
 | Main lila instance | http://localhost:8080/ |
-| Mongodb manager    | http://localhost:8081/ |
-| Email inbox        | http://localhost:8025/ |
 
 Depending on which optional services you start:
 
 | Service               | URL                                                      |
 | --------------------- | -------------------------------------------------------- |
+| Mongodb manager       | http://localhost:8081/                                   |
+| Email inbox           | http://localhost:8025/                                   |
 | lila-gif              | http://localhost:6175/image.gif?fen=4k3/6KP/8/8/8/8/7p/8 |
 | Picfit                | http://localhost:3001/healthcheck                        |
-| Elasticsearch manager | http://localhost:5601/                                   |
+| Elasticsearch manager | http://localhost:8092/                                   |
 | API docs              | http://localhost:8089/                                   |
 | Chessground           | http://localhost:8090/demo.html                          |
 | PGN Viewer            | http://localhost:8091/                                   |

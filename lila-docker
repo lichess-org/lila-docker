@@ -18,7 +18,7 @@ run_start() {
         run_setup
     else
         if [ ! -z "$(docker compose ps -a --services --status=exited | xargs)" ]; then
-            docker compose start
+            COMPOSE_PROFILES=$(all_profiles) docker compose start
         else
             echo "There are no stopped services to resume"
         fi
@@ -64,8 +64,9 @@ setup_database() {
         --tokens \
         --es --es-host=elasticsearch:9200
 
-    docker compose run --rm mongodb mongo --quiet --host mongodb lichess /lila/bin/mongodb/indexes.js
-    docker compose run --rm mongodb mongo --quiet --host mongodb lichess /lila/bin/mongodb/create-trophy-kinds.js
+    echo "Creating database indexes..."
+    docker compose exec mongodb mongo --quiet lichess /lila/bin/mongodb/indexes.js
+    docker compose exec mongodb mongo --quiet lichess /lila/bin/mongodb/create-trophy-kinds.js
     docker compose run --rm python python /scripts/users.py
 }
 
