@@ -46,6 +46,7 @@ ports:
     name: elasticsearch
     description: Elasticsearch
     onOpen: ignore
+    visibility: public
 
 vscode:
   extensions:
