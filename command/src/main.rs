@@ -199,7 +199,7 @@ fn main() -> std::io::Result<()> {
         "setup" => setup(config),
         "hostname" => hostname(config),
         "mobile" => mobile_setup(config),
-        "welcome" => welcome(),
+        "welcome" => welcome(config),
         "flutter" => flutter(config),
         "gitpod_public" => gitpod_public(),
         _ => panic!("Unknown command"),
@@ -620,13 +620,24 @@ fn validate_string_length(input: &str, length: usize) -> Result<(), String> {
     }
 }
 
-fn welcome() -> std::io::Result<()> {
+fn welcome(config: Config) -> std::io::Result<()> {
     intro("Your Lichess development environment is starting!")?;
 
+    note(
+        "Your development site will be available at:",
+        config.lila_url.unwrap_or_default(),
+    )?;
+
     if Gitpod::is_host() {
-        info("For full documentation, see: https://lichess-org.github.io/lila-gitpod/")?;
+        note(
+            "For full documentation, see:",
+            "https://lichess-org.github.io/lila-gitpod/",
+        )?;
     } else {
-        info("For full documentation, see: https://github.com/lichess-org/lila-docker")?;
+        note(
+            "For full documentation, see:",
+            "https://github.com/lichess-org/lila-docker",
+        )?;
     }
 
     note(
