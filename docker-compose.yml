@@ -190,20 +190,22 @@ services:
     image: elasticsearch:7.17.4
     restart: unless-stopped
     environment:
-      - xpack.security.enabled=false
       - discovery.type=single-node
+      - http.cors.allow-origin=/.*/
+      - http.cors.enabled=true
+      - xpack.security.enabled=false
     networks:
       - lila-network
     ports:
       - 9200:9200
-    volumes:
-      - ./conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     profiles:
       - search
 
   elasticvue:
     image: cars10/elasticvue:1.0.4
     restart: unless-stopped
+    volumes:
+      - ./conf/elasticvue.json:/usr/share/nginx/html/api/default_clusters.json
     ports:
       - 8092:8080
     networks:
@@ -253,7 +255,7 @@ services:
       - thumbnails
 
   mailpit:
-    image: axllent/mailpit:v1.14.1
+    image: axllent/mailpit:v1.14.4
     restart: unless-stopped
     ports:
       - 8025:8025
