@@ -42,6 +42,10 @@ ports:
     name: elasticvue
     description: Elasticsearch manager
     onOpen: ignore
+  - port: 9200
+    name: elasticsearch
+    description: Elasticsearch
+    onOpen: ignore
 
 vscode:
   extensions:
