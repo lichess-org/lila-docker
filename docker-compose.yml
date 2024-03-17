@@ -240,6 +240,18 @@ services:
     profiles:
       - gifs
 
+  lila_push:
+    build:
+      context: docker
+      dockerfile: lila-push.Dockerfile
+    restart: unless-stopped
+    networks:
+      - lila-network
+    volumes:
+      - ./repos/lila-push:/lila-push
+    profiles:
+      - push-notifications
+
   picfit:
     build:
       context: docker
