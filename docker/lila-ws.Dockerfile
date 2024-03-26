@@ -1,4 +1,6 @@
-FROM sbtscala/scala-sbt:eclipse-temurin-jammy-21.0.2_13_1.9.9_3.4.0
+FROM sbt-alpine
+
+RUN apk add --no-cache bash
 
 WORKDIR /lila-ws
 
