@@ -8,3 +8,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: ./lila-docker build
+      - run: docker image ls
