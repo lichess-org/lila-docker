@@ -46,7 +46,6 @@ all_profiles() {
 }
 
 build_all_profiles() {
-
     # build sbt-alpine image locally
     docker build -f docker/sbt-alpine.Dockerfile . -t sbt-alpine    
 
