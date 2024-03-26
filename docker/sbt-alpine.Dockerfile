@@ -28,6 +28,7 @@ RUN apk add --no-cache --virtual=.build-dependencies wget ca-certificates bash c
 # Start a new stage for the final image
 FROM eclipse-temurin:21.0.2_13-jdk-alpine
 
+COPY --from=builder /bin/bash /bin/bash
 COPY --from=builder /usr/share/scala /usr/share/scala
 COPY --from=builder /usr/local/sbt /usr/local/sbt
 COPY --from=builder /usr/local/bin/sbt /usr/local/bin/sbt
