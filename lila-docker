@@ -6,7 +6,8 @@ run_setup() {
     docker compose build
     docker compose --profile utils build
     docker compose up -d
-    docker compose run --rm ui /lila/ui/build --debug
+
+    run_ui_build --update
 
     setup_bbppairings
     setup_database
@@ -41,6 +42,10 @@ all_profiles() {
 build_all_profiles() {
     COMPOSE_PROFILES=$(all_profiles) docker compose pull
     COMPOSE_PROFILES=$(all_profiles) docker compose build
+}
+
+run_ui_build() {
+    docker compose run --rm ui /lila/ui/build --clean --debug --split $@
 }
 
 setup_database() {
@@ -98,8 +103,8 @@ run_hostname() {
     rust_cmd hostname
 
     if [ ! -z "$(docker compose ps -a --services | xargs)" ]; then
-        docker compose down lila lila_ws mobile nginx
-        docker compose up -d lila lila_ws mobile nginx
+        docker compose down lila lila_ws nginx
+        docker compose up -d lila lila_ws nginx
     fi
 }
 
@@ -190,7 +195,7 @@ case "$@" in
         docker compose restart lila
         ;;
     ui)
-        docker compose run --rm ui /lila/ui/build --debug --watch
+        run_ui_build --rebuild
         ;;
     "gitpod public")
         rust_cmd gitpod_public

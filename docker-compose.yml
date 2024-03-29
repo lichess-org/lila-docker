@@ -142,7 +142,7 @@ services:
       - stockfish-play
 
   fishnet_play:
-    image: niklasf/fishnet:2.9.0
+    image: niklasf/fishnet:2.9.2
     restart: unless-stopped
     entrypoint: /fishnet --endpoint http://lila_fishnet:9665/fishnet --max-backoff 5
     networks:
@@ -151,7 +151,7 @@ services:
       - stockfish-play
 
   fishnet_analysis:
-    image: niklasf/fishnet:2.9.0
+    image: niklasf/fishnet:2.9.2
     restart: unless-stopped
     entrypoint: /fishnet --endpoint http://lila:9663/fishnet --max-backoff 5
     networks:

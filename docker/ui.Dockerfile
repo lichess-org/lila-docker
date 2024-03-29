@@ -1,4 +1,6 @@
-FROM node:20.11.1-bookworm
+FROM node:20.11.1-bookworm-slim
+
+RUN apt update && apt install -y git && apt clean
 
 RUN git config --global --add safe.directory /chessground
 RUN git config --global --add safe.directory /lila

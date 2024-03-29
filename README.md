@@ -170,6 +170,10 @@ If you're making changes to the Scalachess library, you can have lila use it ins
 Other Scalachess commands:
 
 ```bash
+## formatting
+docker compose run --rm -w /scalachess --entrypoint="sbt check" lila
+docker compose run --rm -w /scalachess --entrypoint="sbt prepare" lila
+
 ## compile
 docker compose run --rm -w /scalachess --entrypoint="sbt compile" lila
 
