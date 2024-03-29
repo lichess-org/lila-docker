@@ -90,8 +90,8 @@ impl Config {
             .clone()
             .map(|v| v.join(","))
             .unwrap_or_default();
-        format!(
-            "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n",
+
+        vec![
             to_env!(compose_profiles, compose_profiles_string),
             to_env!(setup_database),
             to_env!(setup_bbppairings),
@@ -103,8 +103,13 @@ impl Config {
             to_env!(phone_ip),
             to_env!(connection_port),
             to_env!(pairing_code),
-            to_env!(pairing_port)
-        )
+            to_env!(pairing_port),
+        ]
+        .iter()
+        .filter(|line| !line.is_empty())
+        .map(std::string::ToString::to_string)
+        .collect::<Vec<String>>()
+        .join("\n")
     }
 }
 
@@ -700,7 +705,6 @@ fn gitpod_public() -> std::io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::collections::HashMap;
 
     #[test]
     fn test_repository() {
@@ -736,23 +740,53 @@ mod tests {
         }
         .to_env();
 
-        let vars = contents
-            .split("\n")
-            .flat_map(|line| line.split_once("="))
-            .collect::<HashMap<&str, &str>>();
+        assert_eq!(
+            contents,
+            vec![
+                "COMPOSE_PROFILES=foo,bar",
+                "SETUP_DATABASE=true",
+                "SETUP_BBPPAIRINGS=false",
+                "ENABLE_MONITORING=false",
+                "SU_PASSWORD=foo",
+                "PASSWORD=bar",
+                "LILA_DOMAIN=baz:8080",
+                "LILA_URL=http://baz:8080",
+                "PHONE_IP=1.2.3.4",
+                "CONNECTION_PORT=1234",
+                "PAIRING_CODE=901234",
+                "PAIRING_PORT=5678"
+            ]
+            .join("\n")
+        );
+    }
 
-        assert_eq!(vars["COMPOSE_PROFILES"], "foo,bar");
-        assert_eq!(vars["SETUP_DATABASE"], "true");
-        assert_eq!(vars["SETUP_BBPPAIRINGS"], "false");
-        assert_eq!(vars["ENABLE_MONITORING"], "false");
-        assert_eq!(vars["SU_PASSWORD"], "foo");
-        assert_eq!(vars["PASSWORD"], "bar");
-        assert_eq!(vars["LILA_DOMAIN"], "baz:8080");
-        assert_eq!(vars["LILA_URL"], "http://baz:8080");
-        assert_eq!(vars["PHONE_IP"], "1.2.3.4");
-        assert_eq!(vars["CONNECTION_PORT"], "1234");
-        assert_eq!(vars["PAIRING_CODE"], "901234");
-        assert_eq!(vars["PAIRING_PORT"], "5678");
+    #[test]
+    fn test_env_removes_empty_lines() {
+        let contents = Config {
+            compose_profiles: None,
+            setup_database: None,
+            setup_bbppairings: None,
+            enable_monitoring: None,
+            su_password: None,
+            password: None,
+            lila_domain: Some("baz:8080".to_string()),
+            lila_url: Some("http://baz:8080".to_string()),
+            phone_ip: None,
+            connection_port: None,
+            pairing_code: None,
+            pairing_port: None,
+        }
+        .to_env();
+
+        assert_eq!(
+            contents,
+            vec![
+                "COMPOSE_PROFILES=",
+                "LILA_DOMAIN=baz:8080",
+                "LILA_URL=http://baz:8080"
+            ]
+            .join("\n")
+        );
     }
 
     #[test]
