@@ -77,9 +77,9 @@ services:
       - mobile
 
   api_docs:
-    build:
-      context: docker
-      dockerfile: api-docs.Dockerfile
+    image: node:20.11.1-alpine3.19
+    working_dir: /api/doc
+    entrypoint: ["/bin/sh", "-c", "npm install && npm run serve -- --host=0.0.0.0"]
     restart: unless-stopped
     ports:
       - 8089:8089
@@ -113,10 +113,12 @@ services:
       - pgn-viewer
 
   lila_engine:
-    build:
-      context: docker
-      dockerfile: lila-engine.Dockerfile
+    image: rust:1.76.0-slim-bookworm
+    working_dir: /lila-engine
+    entrypoint: cargo run -- --bind 0.0.0.0:9666 --mongodb mongodb://mongodb
     restart: unless-stopped
+    environment:
+      - LILA_ENGINE_LOG=lila_engine=debug,tower_http=debug
     networks:
       - lila-network
     ports:
@@ -231,9 +233,9 @@ services:
       - search
 
   lila_gif:
-    build:
-      context: docker
-      dockerfile: lila-gif.Dockerfile
+    image: rust:1.76.0-slim-bookworm
+    working_dir: /lila-gif
+    entrypoint: cargo run -- --bind 0.0.0.0:6175
     restart: unless-stopped
     ports:
       - 6175:6175
@@ -245,9 +247,8 @@ services:
       - gifs
 
   picfit:
-    build:
-      context: docker
-      dockerfile: picfit.Dockerfile
+    image: carbrex/thoas-picfit:latest
+    entrypoint: /picfit -c /mnt/config.json
     restart: unless-stopped
     ports:
       - 3001:3001
@@ -255,6 +256,7 @@ services:
       - lila-network
     volumes:
       - ./conf/picfit.json:/mnt/config.json
+      - ./docker/assets:/uploads
     profiles:
       - thumbnails
 

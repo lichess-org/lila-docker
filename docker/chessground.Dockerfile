@@ -4,4 +4,6 @@ RUN npm install -g pnpm
 
 WORKDIR /chessground
 
-ENTRYPOINT pnpm install && pnpm run compile && pnpx http-server -p 8080
+ENTRYPOINT pnpm install \
+    && pnpm run compile \
+    && pnpx http-server -p 8080
