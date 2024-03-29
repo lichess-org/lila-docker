@@ -625,7 +625,9 @@ fn welcome(config: Config) -> std::io::Result<()> {
 
     note(
         "Your development site will be available at:",
-        config.lila_url.unwrap_or_default(),
+        config
+            .lila_url
+            .unwrap_or("http://localhost:8080".to_owned()),
     )?;
 
     if Gitpod::is_host() {
