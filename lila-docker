@@ -3,15 +3,9 @@
 run_setup() {
     rust_cmd setup
 
-    # build sbt-alpine image locally
-    docker build -f docker/sbt-alpine.Dockerfile . -t sbt-alpine
-
     docker compose build
     docker compose --profile utils build
     docker compose up -d
-
-    # we can now remove the sbt-alpine image
-    docker rmi sbt-alpine
 
     run_ui_build --update
 
@@ -46,14 +40,8 @@ all_profiles() {
 }
 
 build_all_profiles() {
-    # build sbt-alpine image locally
-    docker build -f docker/sbt-alpine.Dockerfile . -t sbt-alpine    
-
     COMPOSE_PROFILES=$(all_profiles) docker compose pull
     COMPOSE_PROFILES=$(all_profiles) docker compose build
-
-    # we can now remove the sbt-alpine image
-    docker rmi sbt-alpine
 }
 
 run_ui_build() {

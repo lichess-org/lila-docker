@@ -1,4 +1,4 @@
-FROM sbt-alpine
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.0
 
 ENV CONFIG_FORCE_kamon_influxdb_authentication_token="secret"
 ENV CONFIG_FORCE_kamon_influxdb_hostname="influxdb"
