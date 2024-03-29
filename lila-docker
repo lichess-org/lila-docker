@@ -6,6 +6,7 @@ run_setup() {
     docker compose build
     docker compose --profile utils build
     docker compose up -d
+
     run_ui_build --update
 
     setup_bbppairings
