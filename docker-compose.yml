@@ -247,9 +247,9 @@ services:
       - gifs
 
   picfit:
-    image: carbrex/thoas-picfit:latest
-    entrypoint: /picfit -c /mnt/config.json
-    restart: unless-stopped
+    build:
+      context: docker
+      dockerfile: picfit.Dockerfile
     ports:
       - 3001:3001
     networks:
