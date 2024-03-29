@@ -15,9 +15,9 @@ services:
       - lila-network
 
   lila:
-    build:
-      context: docker
-      dockerfile: lila.Dockerfile
+    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.0
+    working_dir: /lila
+    entrypoint: ./lila run
     restart: unless-stopped
     networks:
       - lila-network
@@ -34,9 +34,9 @@ services:
       - ./conf/lila.conf:/lila/conf/application.conf
 
   lila_ws:
-    build:
-      context: docker
-      dockerfile: lila-ws.Dockerfile
+    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.0
+    working_dir: /lila-ws
+    entrypoint: sbt run -Dconfig.file=/lila-ws.conf
     restart: unless-stopped
     networks:
       - lila-network
@@ -127,11 +127,15 @@ services:
       - external-engine
 
   lila_fishnet:
-    build:
-      context: docker
-      dockerfile: lila-fishnet.Dockerfile
+    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.0
+    working_dir: /lila-fishnet
+    entrypoint: sbt app/run
     environment:
+      - APP_BACKUP_FILE=/backup.json
+      - CONFIG_FORCE_kamon_influxdb_authentication_token=secret
+      - CONFIG_FORCE_kamon_influxdb_hostname=influxdb
       - KAMON_ENABLED=${ENABLE_MONITORING:-false}
+      - REDIS_HOST=redis
       # - HTTP_API_LOGGER=true
     restart: unless-stopped
     networks:
@@ -214,9 +218,9 @@ services:
       - search
 
   lila_search:
-    build:
-      context: docker
-      dockerfile: lila-search.Dockerfile
+    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_2.13.13
+    working_dir: /lila-search
+    entrypoint: ["/bin/sh", "-c", "sbt stage && ./target/universal/stage/bin/lila-search"]
     restart: unless-stopped
     networks:
       - lila-network
