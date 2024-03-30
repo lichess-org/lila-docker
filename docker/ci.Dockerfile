@@ -46,8 +46,6 @@ ENV JAVA_HOME=/jdk-21
 ENV PATH=/jdk-21/bin:$PATH
 ENV LANG=C.utf8
 
-LABEL version="0.0.1"
-
 WORKDIR /lila
 CMD mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /seeded \
     && redis-server --daemonize yes \
