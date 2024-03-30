@@ -92,7 +92,6 @@ services:
     build:
       context: docker
       dockerfile: ui.Dockerfile
-    pull_policy: never
     entrypoint: ["/bin/sh", "-c", "pnpm install && pnpm run compile && pnpx http-server -p 8080"]
     restart: unless-stopped
     ports:
