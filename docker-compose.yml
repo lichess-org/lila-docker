@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo:5.0.25-focal
+    image: mongo:5.0.26-focal
     restart: unless-stopped
     networks:
       - lila-network
@@ -15,7 +15,7 @@ services:
       - lila-network
 
   lila:
-    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.0
+    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.1
     working_dir: /lila
     entrypoint: ./lila run
     restart: unless-stopped
@@ -34,7 +34,7 @@ services:
       - ./conf/lila.conf:/lila/conf/application.conf
 
   lila_ws:
-    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.0
+    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.1
     working_dir: /lila-ws
     entrypoint: sbt run -Dconfig.file=/lila-ws.conf
     restart: unless-stopped
@@ -77,7 +77,7 @@ services:
       - mobile
 
   api_docs:
-    image: node:20.11.1-alpine3.19
+    image: node:20.12.0-alpine3.19
     working_dir: /api/doc
     entrypoint: ["/bin/sh", "-c", "npm install && npm run serve -- --host=0.0.0.0"]
     restart: unless-stopped
@@ -91,29 +91,31 @@ services:
   chessground:
     build:
       context: docker
-      dockerfile: chessground.Dockerfile
+      dockerfile: ui.Dockerfile
+    entrypoint: ["/bin/sh", "-c", "pnpm install && pnpm run compile && pnpx http-server -p 8080"]
     restart: unless-stopped
     ports:
       - 8090:8080
     volumes:
-      - ./repos/chessground:/chessground
+      - ./repos/chessground:/app
     profiles:
       - chessground
 
   pgn_viewer:
     build:
       context: docker
-      dockerfile: pgn-viewer.Dockerfile
+      dockerfile: ui.Dockerfile
+    entrypoint: ["/bin/sh", "-c", "pnpm install && pnpm run demo"]
     restart: unless-stopped
     ports:
       - 8091:8080
     volumes:
-      - ./repos/pgn-viewer:/pgn-viewer
+      - ./repos/pgn-viewer:/app
     profiles:
       - pgn-viewer
 
   lila_engine:
-    image: rust:1.76.0-slim-bookworm
+    image: rust:1.77.0-slim-bookworm
     working_dir: /lila-engine
     entrypoint: cargo run -- --bind 0.0.0.0:9666 --mongodb mongodb://mongodb
     restart: unless-stopped
@@ -129,7 +131,7 @@ services:
       - external-engine
 
   lila_fishnet:
-    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.0
+    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.1
     working_dir: /lila-fishnet
     entrypoint: sbt app/run
     environment:
@@ -233,7 +235,7 @@ services:
       - search
 
   lila_gif:
-    image: rust:1.76.0-slim-bookworm
+    image: rust:1.77.0-slim-bookworm
     working_dir: /lila-gif
     entrypoint: cargo run -- --bind 0.0.0.0:6175
     restart: unless-stopped
@@ -261,7 +263,7 @@ services:
       - thumbnails
 
   mailpit:
-    image: axllent/mailpit:v1.14.4
+    image: axllent/mailpit:v1.15.1
     restart: unless-stopped
     ports:
       - 8025:8025
