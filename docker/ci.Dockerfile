@@ -33,7 +33,7 @@ RUN ./lila stage
 ##################################################################################
 FROM mongo:7-jammy
 
-RUN apt update && apt install -y redis python3-pip && apt clean
+RUN apt update && apt install -y curl redis python3-pip && apt clean
 RUN pip3 install berserk pytest
 
 COPY --from=dbbuilder /seeded /seeded
