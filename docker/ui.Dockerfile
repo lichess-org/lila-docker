@@ -9,3 +9,5 @@ RUN git config --global --add safe.directory /pgn-viewer
 RUN npm install -g pnpm
 
 RUN pnpm config set store-dir /.pnpm-store
+
+WORKDIR /app
