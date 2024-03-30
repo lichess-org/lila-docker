@@ -2,8 +2,9 @@
 
 ```bash
 docker build -t lila-ci -f docker/ci.Dockerfile .
-
 docker run -it --rm -p 9663:9663 lila-ci
+```
 
+```bash
 curl localhost:9663/api/user/lichess
 ```
