@@ -105,7 +105,6 @@ services:
     build:
       context: docker
       dockerfile: ui.Dockerfile
-    pull_policy: never
     entrypoint: ["/bin/sh", "-c", "pnpm install && pnpm run demo"]
     restart: unless-stopped
     ports:
