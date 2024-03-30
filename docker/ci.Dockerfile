@@ -1,4 +1,12 @@
 ##################################################################################
+FROM node:lts-bookworm as node
+
+RUN npm install --global pnpm
+RUN git clone --depth 1 https://github.com/lichess-org/lila.git /lila
+COPY conf/ci.conf /lila/conf/application.conf
+RUN /lila/ui/build --clean --debug --split
+
+##################################################################################
 FROM mongo:7-jammy as dbbuilder
 
 RUN apt update && apt install -y git python3-pip curl
@@ -20,14 +28,10 @@ RUN mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /seeded \
         --tokens
 
 ##################################################################################
-FROM sbtscala/scala-sbt:eclipse-temurin-jammy-21.0.2_13_1.9.9_3.4.0 as lilabuilder
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.1 as lilabuilder
 
-RUN apt update && apt install -y git
-
-RUN mkdir /lila
+COPY --from=node /lila /lila
 WORKDIR /lila
-RUN git clone --depth 1 https://github.com/lichess-org/lila.git .
-COPY conf/ci.conf ./conf/application.conf
 RUN ./lila stage
 
 ##################################################################################
