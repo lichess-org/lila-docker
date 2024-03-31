@@ -2,7 +2,7 @@
 
 ```bash
 docker build -t lila-ci -f docker/ci.Dockerfile .
-docker run -it --rm -p 9663:9663 --name lichess lila-ci
+docker run -it --rm -p 9663:9663 -p 9664:9664 --name lichess lila-ci
 ```
 
 Visit: <http://localhost:9663/>

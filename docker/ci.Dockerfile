@@ -28,6 +28,13 @@ RUN mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /seeded \
         --tokens
 
 ##################################################################################
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.1 as lilawsbuilder
+
+COPY repos/lila-ws /lila-ws
+WORKDIR /lila-ws
+RUN sbt stage
+
+##################################################################################
 FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.1 as lilabuilder
 
 COPY --from=node /lila /lila
@@ -42,10 +49,12 @@ RUN pip3 install berserk pytest
 
 COPY --from=dbbuilder /seeded /seeded
 COPY --from=dbbuilder /jdk-21 /jdk-21
+COPY --from=lilawsbuilder /lila-ws/target /lila-ws/target
 COPY --from=lilabuilder /lila/target /lila/target
 COPY --from=lilabuilder /lila/public /lila/public
 COPY --from=lilabuilder /lila/conf   /lila/conf
 COPY --from=node /lila/public /lila/target/universal/stage/public
+COPY --from=thegeeklab/wait-for /usr/local/bin/wait-for /usr/local/bin/wait-for
 
 ENV JAVA_HOME=/jdk-21
 ENV PATH=/jdk-21/bin:$PATH
@@ -54,4 +63,8 @@ ENV LANG=C.utf8
 WORKDIR /lila
 CMD mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /seeded \
     && redis-server --daemonize yes \
+    && wait-for localhost:27017 --timeout=15 \
+    && wait-for localhost:6379 --timeout=15 \
+    && /lila-ws/target/universal/stage/bin/lila-ws \
+    & wait-for localhost:9664 --timeout=15 \
     && JAVA_OPTS="-Xms4g -Xmx4g" ./target/universal/stage/bin/lila -Dconfig.file="/lila/conf/application.conf" -Dlogger.file="/lila/conf/logger.dev.xml"
