@@ -2,7 +2,7 @@
 FROM node:lts-bookworm as node
 
 RUN npm install --global pnpm
-RUN git clone --depth 1 https://github.com/lichess-org/lila.git /lila
+COPY repos/lila /lila
 COPY conf/ci.conf /lila/conf/application.conf
 RUN /lila/ui/build --clean --debug --split
 
