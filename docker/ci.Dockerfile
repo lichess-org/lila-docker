@@ -45,6 +45,7 @@ COPY --from=dbbuilder /jdk-21 /jdk-21
 COPY --from=lilabuilder /lila/target /lila/target
 COPY --from=lilabuilder /lila/public /lila/public
 COPY --from=lilabuilder /lila/conf   /lila/conf
+COPY --from=node /lila/public /lila/target/universal/stage/public
 
 ENV JAVA_HOME=/jdk-21
 ENV PATH=/jdk-21/bin:$PATH
