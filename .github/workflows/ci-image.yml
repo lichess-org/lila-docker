@@ -27,6 +27,12 @@ jobs:
           repository: 'lichess-org/lila'
           path: 'repos/lila'
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Checkout lila-ws
         uses: actions/checkout@v4
         with:
@@ -50,6 +56,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          platforms: linux/amd64,linux/arm64
           file: docker/ci.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
