@@ -27,6 +27,12 @@ jobs:
           repository: 'lichess-org/lila'
           path: 'repos/lila'
 
+      - name: Checkout lila-ws
+        uses: actions/checkout@v4
+        with:
+          repository: 'lichess-org/lila-ws'
+          path: 'repos/lila-ws'
+
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
