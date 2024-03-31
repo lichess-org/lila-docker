@@ -27,17 +27,23 @@ jobs:
           repository: 'lichess-org/lila'
           path: 'repos/lila'
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Checkout lila-ws
         uses: actions/checkout@v4
         with:
           repository: 'lichess-org/lila-ws'
           path: 'repos/lila-ws'
+
+      - name: Checkout lila-db-seed
+        uses: actions/checkout@v4
+        with:
+          repository: 'lichess-org/lila-db-seed'
+          path: 'repos/lila-db-seed'
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Log in to the Container registry
         uses: docker/login-action@v3

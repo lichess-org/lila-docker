@@ -9,14 +9,14 @@ RUN /lila/ui/build --clean --debug --split
 ##################################################################################
 FROM mongo:7-jammy as dbbuilder
 
-RUN apt update && apt install -y git python3-pip curl
+RUN apt update && apt install -y python3-pip curl
 RUN pip3 install pymongo requests
 
 ENV JAVA_HOME=/opt/java/openjdk
-COPY --from=eclipse-temurin:21 $JAVA_HOME $JAVA_HOME
+COPY --from=eclipse-temurin:21-jdk $JAVA_HOME $JAVA_HOME
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
-RUN git clone --depth 1 https://github.com/lichess-org/lila-db-seed /lila-db-seed
+COPY repos/lila-db-seed /lila-db-seed
 WORKDIR /lila-db-seed
 
 RUN mkdir /seeded
@@ -58,7 +58,7 @@ COPY --from=node /lila/public /lila/target/universal/stage/public
 COPY --from=thegeeklab/wait-for /usr/local/bin/wait-for /usr/local/bin/wait-for
 
 ENV JAVA_HOME=/opt/java/openjdk
-COPY --from=eclipse-temurin:21 $JAVA_HOME $JAVA_HOME
+COPY --from=eclipse-temurin:21-jdk $JAVA_HOME $JAVA_HOME
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 ENV LANG=C.utf8
 
