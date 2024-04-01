@@ -39,6 +39,6 @@ docker exec -it lichess bash
 # Run ghcr-hosted image
 
 ```bash
-docker pull ghcr.io/lichess-org/lila-docker:lila-ws
-docker run -it --rm -p 9663:9663 -p 9664:9664 ghcr.io/lichess-org/lila-docker:lila-ws
+docker pull ghcr.io/lichess-org/lila-docker:main
+docker run -it --rm -p 9663:9663 -p 9664:9664 ghcr.io/lichess-org/lila-docker:main
 ```
