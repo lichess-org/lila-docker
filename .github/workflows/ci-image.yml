@@ -24,7 +24,8 @@ jobs:
       - name: Checkout lila
         uses: actions/checkout@v4
         with:
-          repository: 'lichess-org/lila'
+          repository: 'schlawg/lila'
+          ref: asset-hash-caching
           path: 'repos/lila'
 
       - name: Checkout lila-ws
