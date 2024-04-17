@@ -45,7 +45,7 @@ build_all_profiles() {
 }
 
 run_ui_build() {
-    docker compose run --rm ui /lila/ui/build --clean --debug --split $@
+    docker compose run --rm ui /lila/ui/build --update --clean-build --debug $@
 }
 
 setup_database() {
