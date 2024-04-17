@@ -1,7 +1,7 @@
 ##################################################################################
 FROM node:lts-bookworm AS node
 
-RUN npm install --global pnpm
+RUN npm install --global pnpm@8
 COPY repos/lila /lila
 COPY conf/ci.conf /lila/conf/application.conf
 RUN /lila/ui/build --clean --debug --split
