@@ -1,5 +1,5 @@
 ##################################################################################
-FROM node:lts-bookworm as node
+FROM node:lts-bookworm AS node
 
 RUN npm install --global pnpm
 COPY repos/lila /lila
@@ -7,9 +7,9 @@ COPY conf/ci.conf /lila/conf/application.conf
 RUN /lila/ui/build --clean --debug --split
 
 ##################################################################################
-FROM mongo:7-jammy as dbbuilder
+FROM mongo:7-jammy AS dbbuilder
 
-RUN apt update && apt install -y python3-pip curl
+RUN apt update && apt install -y python3-pip curl && apt clean
 RUN pip3 install pymongo requests
 
 ENV JAVA_HOME=/opt/java/openjdk
@@ -30,14 +30,14 @@ RUN mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /seeded \
         --tokens
 
 ##################################################################################
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.1 as lilawsbuilder
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.1 AS lilawsbuilder
 
 COPY repos/lila-ws /lila-ws
 WORKDIR /lila-ws
 RUN sbt stage
 
 ##################################################################################
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.1 as lilabuilder
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_3.4.1 AS lilabuilder
 
 COPY --from=node /lila /lila
 WORKDIR /lila
