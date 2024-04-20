@@ -59,6 +59,8 @@ setup_database() {
         sleep 1
     done
 
+    [[ $SETUP_API_TOKENS == "true" ]] && params+=(--tokens)
+
     docker compose run --rm python python /lila-db-seed/spamdb/spamdb.py \
         --uri=mongodb://mongodb/lichess \
         --drop-db \
@@ -66,8 +68,8 @@ setup_database() {
         --su-password=$SU_PASSWORD \
         --streamers \
         --coaches \
-        --tokens \
-        --es --es-host=elasticsearch:9200
+        --es --es-host=elasticsearch:9200 \
+        "${params[@]}"
 
     echo "Creating database indexes..."
     docker compose exec mongodb mongo --quiet lichess /lila/bin/mongodb/indexes.js
