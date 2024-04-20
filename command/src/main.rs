@@ -31,6 +31,7 @@ struct Config {
     enable_monitoring: Option<bool>,
     su_password: Option<String>,
     password: Option<String>,
+    setup_api_tokens: Option<bool>,
     lila_domain: Option<String>,
     lila_url: Option<String>,
     phone_ip: Option<String>,
@@ -79,6 +80,7 @@ impl Config {
             enable_monitoring,
             su_password,
             password,
+            setup_api_tokens,
             lila_domain,
             lila_url,
             phone_ip,
@@ -98,6 +100,7 @@ impl Config {
             to_env!(enable_monitoring),
             to_env!(su_password),
             to_env!(password),
+            to_env!(setup_api_tokens),
             to_env!(lila_domain),
             to_env!(lila_url),
             to_env!(phone_ip),
@@ -236,6 +239,13 @@ fn setup(mut config: Config) -> std::io::Result<()> {
     } else {
         (String::new(), String::new())
     };
+
+    config.setup_api_tokens = Some(if password != "password" || su_password != "password" {
+        confirm("Do you want to setup default API tokens for the admin and regular users? Will be created with `lip_{username}` format")
+            .interact()?
+    } else {
+        true
+    });
 
     config.compose_profiles = Some(
         services
@@ -731,6 +741,7 @@ mod tests {
             enable_monitoring: Some(false),
             su_password: Some("foo".to_string()),
             password: Some("bar".to_string()),
+            setup_api_tokens: Some(false),
             lila_domain: Some("baz:8080".to_string()),
             lila_url: Some("http://baz:8080".to_string()),
             phone_ip: Some("1.2.3.4".to_string()),
@@ -749,6 +760,7 @@ mod tests {
                 "ENABLE_MONITORING=false",
                 "SU_PASSWORD=foo",
                 "PASSWORD=bar",
+                "SETUP_API_TOKENS=false",
                 "LILA_DOMAIN=baz:8080",
                 "LILA_URL=http://baz:8080",
                 "PHONE_IP=1.2.3.4",
@@ -769,6 +781,7 @@ mod tests {
             enable_monitoring: None,
             su_password: None,
             password: None,
+            setup_api_tokens: None,
             lila_domain: Some("baz:8080".to_string()),
             lila_url: Some("http://baz:8080".to_string()),
             phone_ip: None,
