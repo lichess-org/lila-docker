@@ -98,6 +98,7 @@ services:
       - 8090:8080
     volumes:
       - ./repos/chessground:/app
+      - ./.pnpm-store:/.pnpm-store
     profiles:
       - chessground
 
@@ -111,6 +112,7 @@ services:
       - 8091:8080
     volumes:
       - ./repos/pgn-viewer:/app
+      - ./.pnpm-store:/.pnpm-store
     profiles:
       - pgn-viewer
 
@@ -191,6 +193,7 @@ services:
       - ./repos/lila:/lila
       - ./repos/chessground:/chessground
       - ./repos/pgn-viewer:/pgn-viewer
+      - ./.pnpm-store:/.pnpm-store
     profiles:
       - utils
 
