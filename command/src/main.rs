@@ -374,7 +374,7 @@ fn gitpod_checkout_pr() -> std::io::Result<()> {
     let branch_name = format!("pr-{pr_no}");
 
     let progress = spinner();
-    progress.start(&format!("Checking out lila PR #{pr_no}: {pr_url}..."));
+    progress.start(format!("Checking out lila PR #{pr_no}: {pr_url}..."));
 
     let mut cmd = Command::new("git");
     cmd.current_dir("repos/lila")
