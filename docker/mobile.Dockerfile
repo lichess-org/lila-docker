@@ -1,4 +1,4 @@
-FROM ghcr.io/cirruslabs/flutter:3.19.5
+FROM ghcr.io/cirruslabs/flutter:3.19.6
 
 RUN apt-get update && \
     apt-get install --yes clang cmake libgtk-3-dev ninja-build pkg-config && \
