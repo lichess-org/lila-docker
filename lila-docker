@@ -191,7 +191,7 @@ case "$@" in
         reset_database
         ;;
     "lila clean")
-        docker compose run --rm --entrypoint "sbt clean" lila
+        docker compose run --rm --entrypoint bash lila -c "rm .sbtopts || true; sbt clean"
         ;;
     "lila restart")
         docker compose restart lila
