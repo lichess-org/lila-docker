@@ -227,13 +227,13 @@ services:
   lila_search:
     image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.9.9_2.13.13
     working_dir: /lila-search
-    entrypoint: ["/bin/sh", "-c", "sbt stage && ./target/universal/stage/bin/lila-search"]
+    entrypoint: ["/bin/sh", "-c", "sbt stage && ./play/target/universal/stage/bin/lila-search"]
     restart: unless-stopped
     networks:
       - lila-network
     volumes:
       - ./repos/lila-search:/lila-search
-      - ./conf/lila-search.conf:/lila-search/conf/application.conf
+      - ./conf/lila-search.conf:/lila-search/play/conf/application.conf
     profiles:
       - search
 
