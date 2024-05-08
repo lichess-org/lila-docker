@@ -6,7 +6,7 @@ RUN git config --global --add safe.directory /chessground
 RUN git config --global --add safe.directory /lila
 RUN git config --global --add safe.directory /pgn-viewer
 
-RUN npm install --global pnpm@8
+RUN npm install --global pnpm@9
 
 RUN pnpm config set store-dir /.pnpm-store
 
