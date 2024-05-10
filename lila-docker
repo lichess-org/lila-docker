@@ -12,6 +12,10 @@ run_setup() {
     setup_bbppairings
     setup_database
     rust_cmd welcome
+    if [ -n "$GITPOD_WORKSPACE_ID" ]; then
+        rust_cmd gitpod_public
+        echo "Http port 8080 set public on the Gitpod instance"
+    fi
 }
 
 run_start() {
