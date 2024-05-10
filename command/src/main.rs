@@ -247,11 +247,13 @@ fn setup(mut config: Config) -> std::io::Result<()> {
         true
     });
 
-    let public_gitpod_dev = confirm(
-        "By default, only this browser session can access your Gitpod development site.\nWould you like it to be accessible to other clients?",
-    )
-    .initial_value(false)
-    .interact()?;
+    if Gitpod::is_host()
+        && confirm("By default, only this browser session can access your Gitpod development site.\nWould you like it to be accessible to other clients?")
+            .initial_value(false)
+            .interact()?
+    {
+        gitpod_public()?;
+    }
 
     config.compose_profiles = Some(
         services
@@ -335,10 +337,6 @@ fn setup(mut config: Config) -> std::io::Result<()> {
 
     if Gitpod::is_host() {
         gitpod_checkout_pr()?;
-
-        if public_gitpod_dev {
-            gitpod_public()?;
-        }
     }
 
     outro("Starting services...")
