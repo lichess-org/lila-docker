@@ -250,7 +250,7 @@ fn setup(mut config: Config) -> std::io::Result<()> {
     let public_gitpod_dev = confirm(
         "By default, only this browser session can access your Gitpod development site.\nWould you like it to be accessible to other clients?",
     )
-    .initial_value(true)
+    .initial_value(false)
     .interact()?;
 
     config.compose_profiles = Some(
