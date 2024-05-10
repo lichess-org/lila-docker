@@ -14,7 +14,6 @@ run_setup() {
     rust_cmd welcome
     if [ -n "$GITPOD_WORKSPACE_ID" ]; then
         rust_cmd gitpod_public
-        echo "Http port 8080 set public on the Gitpod instance"
     fi
 }
 
