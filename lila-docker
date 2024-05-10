@@ -12,9 +12,6 @@ run_setup() {
     setup_bbppairings
     setup_database
     rust_cmd welcome
-    if [ -n "$GITPOD_WORKSPACE_ID" ]; then
-        rust_cmd gitpod_public
-    fi
 }
 
 run_start() {
