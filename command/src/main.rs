@@ -247,11 +247,11 @@ fn setup(mut config: Config) -> std::io::Result<()> {
         true
     });
 
-    let public_gitpod_dev = 
-        confirm("By default, only this browser session can access your Gitpod development site.
-        Would you like it to be accessible to other clients?")
-        .initial_value(true)
-        .interact()?;
+    let public_gitpod_dev = confirm(
+        "By default, only this browser session can access your Gitpod development site.\nWould you like it to be accessible to other clients?",
+    )
+    .initial_value(true)
+    .interact()?;
 
     config.compose_profiles = Some(
         services
