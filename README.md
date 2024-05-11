@@ -69,6 +69,7 @@ Depending on which optional services you start:
 | lila-gif              | http://localhost:6175/image.gif?fen=4k3/6KP/8/8/8/8/7p/8 |
 | Picfit                | http://localhost:3001/healthcheck                        |
 | Elasticsearch manager | http://localhost:8092/                                   |
+| lila-search docs      | http://localhost:9673/docs/                              |
 | API docs              | http://localhost:8089/                                   |
 | Chessground           | http://localhost:8090/demo.html                          |
 | PGN Viewer            | http://localhost:8091/                                   |
