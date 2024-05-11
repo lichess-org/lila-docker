@@ -229,13 +229,15 @@ services:
     working_dir: /lila-search
     entrypoint: sbt app/run
     restart: unless-stopped
+    environment:
+      - ELASTIC_URI=http://elasticsearch:9200
+      - HTTP_API_LOGGER=true
     ports:
       - 9673:9673
     networks:
       - lila-network
     volumes:
       - ./repos/lila-search:/lila-search
-      - ./conf/lila-search.conf:/lila-search/play/conf/application.conf
     profiles:
       - search
 
