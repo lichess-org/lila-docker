@@ -232,6 +232,7 @@ services:
     environment:
       - ELASTIC_URI=http://elasticsearch:9200
       - HTTP_API_LOGGER=true
+      - HTTP_ENABLE_DOCS=true
     ports:
       - 9673:9673
     networks:
