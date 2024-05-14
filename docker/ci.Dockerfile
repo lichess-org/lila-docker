@@ -3,6 +3,7 @@ FROM node:lts-bookworm AS node
 
 COPY repos/lila /lila
 COPY conf/ci.conf /lila/conf/application.conf
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable
 RUN /lila/ui/build --clean-build --debug
 
