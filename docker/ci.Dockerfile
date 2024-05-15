@@ -1,9 +1,10 @@
 ##################################################################################
 FROM node:lts-bookworm AS node
 
-RUN npm install --global pnpm@9
 COPY repos/lila /lila
 COPY conf/ci.conf /lila/conf/application.conf
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN corepack enable
 RUN /lila/ui/build --clean-build --debug
 
 ##################################################################################
