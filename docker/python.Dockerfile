@@ -1,4 +1,4 @@
-FROM eclipse-temurin:22_36-jdk-alpine
+FROM eclipse-temurin:22.0.1_8-jdk-alpine
 
 COPY --from=python:3.12.3-alpine3.19 / /
 
