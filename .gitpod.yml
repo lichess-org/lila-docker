@@ -13,7 +13,7 @@ ports:
     onOpen: ignore
   - port: 8081
     name: mongo-express
-    description: "Database explorer (u: admin / p: pass)"
+    description: "Database explorer"
     onOpen: ignore
   - port: 8086
     name: influxdb

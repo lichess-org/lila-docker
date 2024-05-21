@@ -1,4 +1,4 @@
-FROM node:20.12.2-bookworm-slim
+FROM node:20.13.1-bookworm-slim
 
 RUN apt update && apt install -y git && apt clean
 
