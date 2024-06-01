@@ -225,7 +225,7 @@ services:
       - search
 
   lila_search:
-    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.0_2.13.14
+    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.0_3.4.2
     working_dir: /lila-search
     entrypoint: sbt app/run
     restart: unless-stopped
