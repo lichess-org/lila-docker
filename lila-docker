@@ -43,6 +43,9 @@ all_profiles() {
 }
 
 build_all_profiles() {
+    echo "USER_ID=$(id -u)" > .env
+    echo "GROUP_ID=$(id -g)" >> .env
+
     COMPOSE_PROFILES=$(all_profiles) docker compose pull
     COMPOSE_PROFILES=$(all_profiles) docker compose build
 }
