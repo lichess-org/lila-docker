@@ -1,6 +1,9 @@
 #!/bin/bash -e
 
 run_setup() {
+    echo "USER_ID=$(id -u)" > .env
+    echo "GROUP_ID=$(id -g)" >> .env
+
     rust_cmd setup
 
     docker compose build
