@@ -225,13 +225,13 @@ fn pwd_input(user_type: &str) -> std::io::Result<String> {
     .interact()
 }
 
+#[allow(clippy::too_many_lines)]
 fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
     intro(BANNER)?;
 
     if !first_setup {
-        note(
-            "Already running services will not be affected by this setup.",
-            "Only the new services you select will be added."
+        info(
+            "NOTE: This will not affect the existing services.\nOnly the new ones among the selected services will be added."
         )?;
     }
     let services = prompt_for_optional_services()?;

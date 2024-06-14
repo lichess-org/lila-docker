@@ -61,7 +61,8 @@ To add a new optional service after the initial setup has already been done:
 ```
 
 Select the service you want to add from the list of options.
-NOTE: This will not affect the existing services, only the new ones selected will be added.
+
+NOTE: This will not affect the existing services, only the new ones among the selected services will be added.
 
 ## URLs
 
