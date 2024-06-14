@@ -14,6 +14,13 @@ run_setup() {
     rust_cmd welcome
 }
 
+add_services() {
+    rust_cmd add_services
+    
+    docker compose build
+    docker compose up -d
+}
+
 run_start() {
     if [ -z "$(docker compose ps -a --services | xargs)" ]; then
         run_setup
@@ -156,7 +163,10 @@ show_help() {
     echo "  lila restart  Restart the lila container to apply changes to the codebase"
     echo "  gitpod public Make http port 8080 public on the Gitpod instance"
     echo "  ui            Compile the frontend code. Runs in watch mode to automatically recompile on changes"
+    echo "  add-services  Add new services to the existing setup"
 }
+
+cd "$(dirname "$0")"
 
 case "$@" in
     --help|-h)
@@ -204,6 +214,9 @@ case "$@" in
         ;;
     "flutter")
         rust_cmd flutter
+        ;;
+    "add-services")
+        add_services
         ;;
     *)
         show_help
