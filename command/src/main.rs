@@ -249,9 +249,6 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
             (String::new(), String::new())
         };
 
-        config.su_password = Some(su_password.clone());
-        config.password = Some(password.clone());
-
         config.setup_api_tokens = Some(if password != "password" || su_password != "password" {
             confirm("Do you want to setup default API tokens for the admin and regular users? Will be created with `lip_{username}` format")
             .interact()?
@@ -260,6 +257,8 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
         });
 
         config.setup_database = Some(setup_database);
+        config.su_password = Some(su_password);
+        config.password = Some(password);
 
         if Gitpod::is_host()
         && confirm("By default, only this browser session can access your Gitpod development site.\nWould you like it to be accessible to other clients?")
