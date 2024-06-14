@@ -258,7 +258,7 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
         } else {
             true
         });
-        
+
         config.setup_database = Some(setup_database);
 
         if Gitpod::is_host()
@@ -271,7 +271,7 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
     } else {
         setup_database = false;
     }
-    
+
     let new_profiles: Vec<String> = services
         .iter()
         .filter_map(|service| service.compose_profile.as_ref())
