@@ -258,6 +258,8 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
         } else {
             true
         });
+        
+        config.setup_database = Some(setup_database);
 
         if Gitpod::is_host()
         && confirm("By default, only this browser session can access your Gitpod development site.\nWould you like it to be accessible to other clients?")
@@ -269,19 +271,23 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
     } else {
         setup_database = false;
     }
+    
+    let new_profiles: Vec<String> = services
+        .iter()
+        .filter_map(|service| service.compose_profile.as_ref())
+        .flatten()
+        .map(ToString::to_string)
+        .collect();
 
-    config.compose_profiles = Some(
-        services
-            .iter()
-            .filter_map(|service| service.compose_profile.clone())
-            .flatten()
-            .map(std::string::ToString::to_string)
-            .collect(),
-    );
-
-    if first_setup {
-        config.setup_database = Some(setup_database);
-    }
+    config.compose_profiles = match config.compose_profiles.take() {
+        Some(mut existing_profiles) => {
+            existing_profiles.extend(new_profiles);
+            existing_profiles.sort();
+            existing_profiles.dedup();
+            Some(existing_profiles)
+        }
+        None => Some(new_profiles),
+    };
 
     config.setup_bbppairings = Some(
         services
