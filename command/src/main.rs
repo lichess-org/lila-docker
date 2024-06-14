@@ -236,7 +236,7 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
     }
     let services = prompt_for_optional_services()?;
 
-    let setup_database: bool; 
+    let setup_database: bool;
     if first_setup {
         setup_database =
             confirm("Do you want to seed the database with test users, games, etc? (Recommended)")
@@ -248,7 +248,7 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
         } else {
             (String::new(), String::new())
         };
-        
+
         config.su_password = Some(su_password.clone());
         config.password = Some(password.clone());
 
@@ -266,8 +266,7 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
         {
             gitpod_public()?;
         }
-    }
-    else {
+    } else {
         setup_database = false;
     }
 
@@ -283,7 +282,7 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
     if first_setup {
         config.setup_database = Some(setup_database);
     }
-    
+
     config.setup_bbppairings = Some(
         services
             .iter()
