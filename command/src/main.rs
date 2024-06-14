@@ -236,39 +236,37 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
     }
     let services = prompt_for_optional_services()?;
 
-    let setup_database: bool;
-    if first_setup {
-        setup_database =
-            confirm("Do you want to seed the database with test users, games, etc? (Recommended)")
-                .initial_value(true)
-                .interact()?;
-
-        let (su_password, password) = if setup_database {
-            (pwd_input("admin")?, pwd_input("regular")?)
-        } else {
-            (String::new(), String::new())
-        };
-
-        config.setup_api_tokens = Some(if password != "password" || su_password != "password" {
-            confirm("Do you want to setup default API tokens for the admin and regular users? Will be created with `lip_{username}` format")
-            .interact()?
-        } else {
-            true
-        });
-
-        config.setup_database = Some(setup_database);
-        config.su_password = Some(su_password);
-        config.password = Some(password);
-
-        if Gitpod::is_host()
-        && confirm("By default, only this browser session can access your Gitpod development site.\nWould you like it to be accessible to other clients?")
-        .initial_value(false)
-        .interact()?
-        {
-            gitpod_public()?;
-        }
+    let setup_database = confirm(if first_setup {
+        "Do you want to seed the database with test users, games, etc? (Recommended)"
     } else {
-        setup_database = false;
+        "Do you want to re-seed the database with test users, games, etc?"
+    })
+    .initial_value(true)
+    .interact()?;
+
+    let (su_password, password) = if setup_database {
+        (pwd_input("admin")?, pwd_input("regular")?)
+    } else {
+        (String::new(), String::new())
+    };
+
+    config.setup_api_tokens = Some(if password != "password" || su_password != "password" {
+        confirm("Do you want to setup default API tokens for the admin and regular users? Will be created with `lip_{username}` format")
+        .interact()?
+    } else {
+        true
+    });
+
+    config.setup_database = Some(setup_database);
+    config.su_password = Some(su_password);
+    config.password = Some(password);
+
+    if Gitpod::is_host()
+    && confirm("By default, only this browser session can access your Gitpod development site.\nWould you like it to be accessible to other clients?")
+    .initial_value(false)
+    .interact()?
+    {
+        gitpod_public()?;
     }
 
     let new_profiles: Vec<String> = services
