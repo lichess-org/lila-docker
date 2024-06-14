@@ -19,6 +19,8 @@ add_services() {
     
     docker compose build
     docker compose up -d
+    setup_bbppairings
+    setup_database
 }
 
 run_start() {
