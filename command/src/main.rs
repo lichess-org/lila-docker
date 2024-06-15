@@ -2,7 +2,7 @@
 
 use cliclack::{
     confirm, input, intro,
-    log::{error, info, step},
+    log::{error, info, step, warning},
     multiselect, note, outro, select, spinner,
 };
 use local_ip_address::local_ip;
@@ -204,7 +204,8 @@ fn main() -> std::io::Result<()> {
     let config = Config::load();
 
     match args[1].as_str() {
-        "setup" => setup(config),
+        "setup" => setup(config, true),
+        "add_services" => setup(config, false),
         "hostname" => hostname(config),
         "mobile" => mobile_setup(config),
         "welcome" => welcome(config),
@@ -224,15 +225,25 @@ fn pwd_input(user_type: &str) -> std::io::Result<String> {
     .interact()
 }
 
-fn setup(mut config: Config) -> std::io::Result<()> {
-    intro(BANNER)?;
-
+#[allow(clippy::too_many_lines)]
+fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
+    if first_setup {
+        intro(BANNER)?;
+    } else {
+        intro("Adding services...")?;
+        warning(
+            "NOTE: This will not remove any existing services that may be running.\nOnly the newly selected ones will be added."
+        )?;
+    }
     let services = prompt_for_optional_services()?;
 
-    let setup_database =
-        confirm("Do you want to seed the database with test users, games, etc? (Recommended)")
-            .initial_value(true)
-            .interact()?;
+    let setup_database = confirm(if first_setup {
+        "Do you want to seed the database with test users, games, etc? (Recommended)"
+    } else {
+        "Do you want to re-seed the database with test users, games, etc?"
+    })
+    .initial_value(first_setup)
+    .interact()?;
 
     let (su_password, password) = if setup_database {
         (pwd_input("admin")?, pwd_input("regular")?)
@@ -240,30 +251,41 @@ fn setup(mut config: Config) -> std::io::Result<()> {
         (String::new(), String::new())
     };
 
-    config.setup_api_tokens = Some(if password != "password" || su_password != "password" {
-        confirm("Do you want to setup default API tokens for the admin and regular users? Will be created with `lip_{username}` format")
-            .interact()?
-    } else {
-        true
-    });
+    config.setup_api_tokens = Some(
+        setup_database
+            && if password != "password" || su_password != "password" {
+                confirm("Do you want to setup default API tokens for the admin and regular users? Will be created with `lip_{username}` format")
+        .interact()?
+            } else {
+                true
+            },
+    );
+
+    config.setup_database = Some(setup_database);
+    config.su_password = Some(su_password);
+    config.password = Some(password);
 
     if Gitpod::is_host()
-        && confirm("By default, only this browser session can access your Gitpod development site.\nWould you like it to be accessible to other clients?")
-            .initial_value(false)
-            .interact()?
+    && confirm("By default, only this browser session can access your Gitpod development site.\nWould you like it to be accessible to other clients?")
+    .initial_value(false)
+    .interact()?
     {
         gitpod_public()?;
     }
 
-    config.compose_profiles = Some(
-        services
-            .iter()
-            .filter_map(|service| service.compose_profile.clone())
-            .flatten()
-            .map(std::string::ToString::to_string)
-            .collect(),
-    );
-    config.setup_database = Some(setup_database);
+    let selected_profiles: Vec<String> = services
+        .iter()
+        .filter_map(|service| service.compose_profile.as_ref())
+        .flatten()
+        .map(ToString::to_string)
+        .collect();
+
+    let mut profiles: Vec<String> = config.compose_profiles.take().unwrap_or_default().clone();
+    profiles.extend(selected_profiles);
+    profiles.sort();
+    profiles.dedup();
+
+    config.compose_profiles = Some(profiles);
 
     config.setup_bbppairings = Some(
         services
@@ -276,8 +298,6 @@ fn setup(mut config: Config) -> std::io::Result<()> {
             .iter()
             .any(|service| service.compose_profile == Some(vec!["monitoring"])),
     );
-    config.su_password = Some(su_password);
-    config.password = Some(password);
 
     if Gitpod::is_host() {
         let gitpod = Gitpod::load();

@@ -52,6 +52,18 @@ To remove the containers:
 ./lila-docker down
 ```
 
+### Adding a new service
+
+To add a new optional service after the initial setup has already been done:
+
+```bash
+./lila-docker add-services
+```
+
+Select the service you want to add from the list of options.
+
+NOTE: This will not affect the existing services, only the new ones among the selected services will be added.
+
 ## URLs
 
 Always available:
