@@ -2,7 +2,7 @@
 
 use cliclack::{
     confirm, input, intro,
-    log::{error, info, step},
+    log::{error, info, step, warning},
     multiselect, note, outro, select, spinner,
 };
 use local_ip_address::local_ip;
@@ -227,11 +227,12 @@ fn pwd_input(user_type: &str) -> std::io::Result<String> {
 
 #[allow(clippy::too_many_lines)]
 fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
-    intro(BANNER)?;
-
-    if !first_setup {
-        info(
-            "NOTE: This will not affect the existing services.\nOnly the new ones among the selected services will be added."
+    if first_setup {
+        intro(BANNER)?;
+    } else {
+        intro("Adding services...")?;
+        warning(
+            "NOTE: This will not remove any existing services that may be running.\nOnly the newly selected ones will be added."
         )?;
     }
     let services = prompt_for_optional_services()?;
@@ -241,7 +242,7 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
     } else {
         "Do you want to re-seed the database with test users, games, etc?"
     })
-    .initial_value(true)
+    .initial_value(first_setup)
     .interact()?;
 
     let (su_password, password) = if setup_database {
@@ -250,12 +251,15 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
         (String::new(), String::new())
     };
 
-    config.setup_api_tokens = Some(if password != "password" || su_password != "password" {
-        confirm("Do you want to setup default API tokens for the admin and regular users? Will be created with `lip_{username}` format")
+    config.setup_api_tokens = Some(
+        setup_database
+            && if password != "password" || su_password != "password" {
+                confirm("Do you want to setup default API tokens for the admin and regular users? Will be created with `lip_{username}` format")
         .interact()?
-    } else {
-        true
-    });
+            } else {
+                true
+            },
+    );
 
     config.setup_database = Some(setup_database);
     config.su_password = Some(su_password);
@@ -269,22 +273,19 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
         gitpod_public()?;
     }
 
-    let new_profiles: Vec<String> = services
+    let selected_profiles: Vec<String> = services
         .iter()
         .filter_map(|service| service.compose_profile.as_ref())
         .flatten()
         .map(ToString::to_string)
         .collect();
 
-    config.compose_profiles = match config.compose_profiles.take() {
-        Some(mut existing_profiles) => {
-            existing_profiles.extend(new_profiles);
-            existing_profiles.sort();
-            existing_profiles.dedup();
-            Some(existing_profiles)
-        }
-        None => Some(new_profiles),
-    };
+    let mut profiles: Vec<String> = config.compose_profiles.take().unwrap_or_default().clone();
+    profiles.extend(selected_profiles);
+    profiles.sort();
+    profiles.dedup();
+
+    config.compose_profiles = Some(profiles);
 
     config.setup_bbppairings = Some(
         services
