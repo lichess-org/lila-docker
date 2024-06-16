@@ -23,6 +23,8 @@ const BANNER: &str = r"
                                                    |___/
 ";
 
+const DEFAULT_PASSWORD: &str = "password";
+
 #[derive(Serialize, Deserialize, Debug, Default)]
 struct Config {
     compose_profiles: Option<Vec<String>>,
@@ -219,8 +221,8 @@ fn pwd_input(user_type: &str) -> std::io::Result<String> {
     input(format!(
         "Choose a password for {user_type} users (blank for 'password')"
     ))
-    .placeholder("password")
-    .default_input("password")
+    .placeholder(DEFAULT_PASSWORD)
+    .default_input(DEFAULT_PASSWORD)
     .required(false)
     .interact()
 }
@@ -248,7 +250,7 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
     let (su_password, password) = if setup_database {
         (pwd_input("admin")?, pwd_input("regular")?)
     } else {
-        (String::new(), String::new())
+        (DEFAULT_PASSWORD.to_string(), DEFAULT_PASSWORD.to_string())
     };
 
     config.setup_api_tokens = Some(

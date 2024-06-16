@@ -100,6 +100,7 @@ setup_bbppairings() {
 
 reset_database() {
     load_config_to_env
+    SETUP_DATABASE=true
     setup_database
 }
 
