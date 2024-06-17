@@ -250,9 +250,10 @@ services:
       - ELASTIC4S_LOG_LEVEL=DEBUG
       - HTTP_API_LOGGER=true
       - HTTP_ENABLE_DOCS=true
-      - MONGO_DATABASE=lila
+      - MONGO_DATABASE=lichess
       - MONGO_DRIVER_LOG_LEVEL=INFO
-      - MONGO_URI=mongodb://mongodb
+      - MONGO_URI=mongodb://mongodb_secondary
+      - INGESTOR_FORUM_TIME_WINDOWS=1
     ports:
       - 9673:9673
     networks:
