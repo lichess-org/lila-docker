@@ -245,6 +245,24 @@ services:
     entrypoint: sbt app/run
     restart: unless-stopped
     environment:
+      - ELASTIC_URI=http://elasticsearch:9200
+      - HTTP_API_LOGGER=true
+      - HTTP_ENABLE_DOCS=true
+    ports:
+      - 9673:9673
+    networks:
+      - lila-network
+    volumes:
+      - ./repos/lila-search:/lila-search
+    profiles:
+      - search
+
+  lila_search_ingestor:
+    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.0_3.4.2
+    working_dir: /lila-search
+    entrypoint: sbt ingestor/run
+    restart: unless-stopped
+    environment:
       - APP_LOG_LEVEL=DEBUG
       - ELASTIC_URI=http://elasticsearch:9200
       - ELASTIC4S_LOG_LEVEL=DEBUG
@@ -254,8 +272,6 @@ services:
       - MONGO_DRIVER_LOG_LEVEL=INFO
       - MONGO_URI=mongodb://mongodb_secondary
       - INGESTOR_FORUM_TIME_WINDOWS=1
-    ports:
-      - 9673:9673
     networks:
       - lila-network
     volumes:
