@@ -2,11 +2,26 @@ services:
   mongodb:
     image: mongo:5.0.26-focal
     restart: unless-stopped
+    command: mongod --bind_ip_all --replSet rs0
+    healthcheck:
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'mongodb:27017',priority:1},{_id:1,host:'mongodb_secondary:27017',priority:0.5}]}) }" | mongosh --quiet
+      interval: 5s
+      timeout: 30s
+      start_period: 0s
+      start_interval: 1s
+      retries: 30
     networks:
       - lila-network
     volumes:
       - ./repos/lila:/lila
       - ./scripts:/scripts
+
+  mongodb_secondary:
+    image: mongo:5.0.26-focal
+    restart: unless-stopped
+    command: mongod --bind_ip_all --replSet rs0
+    networks:
+      - lila-network
 
   redis:
     image: redis:7.2.4-alpine3.19
@@ -235,6 +250,28 @@ services:
       - HTTP_ENABLE_DOCS=true
     ports:
       - 9673:9673
+    networks:
+      - lila-network
+    volumes:
+      - ./repos/lila-search:/lila-search
+    profiles:
+      - search
+
+  lila_search_ingestor:
+    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.0_3.4.2
+    working_dir: /lila-search
+    entrypoint: sbt ingestor/run
+    restart: unless-stopped
+    environment:
+      - APP_LOG_LEVEL=DEBUG
+      - ELASTIC_URI=http://elasticsearch:9200
+      - ELASTIC4S_LOG_LEVEL=DEBUG
+      - HTTP_API_LOGGER=true
+      - HTTP_ENABLE_DOCS=true
+      - MONGO_DATABASE=lichess
+      - MONGO_DRIVER_LOG_LEVEL=INFO
+      - MONGO_URI=mongodb://mongodb_secondary
+      - INGESTOR_FORUM_TIME_WINDOWS=1
     networks:
       - lila-network
     volumes:
