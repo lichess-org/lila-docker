@@ -282,8 +282,10 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
         .map(ToString::to_string)
         .collect();
 
-    let mut profiles: Vec<String> = config.compose_profiles.take().unwrap_or_default().clone();
-    profiles.extend(selected_profiles);
+    let mut profiles: Vec<String> = selected_profiles;
+    if !first_setup {
+        profiles.extend(config.compose_profiles.unwrap_or_default());
+    }
     profiles.sort();
     profiles.dedup();
 
