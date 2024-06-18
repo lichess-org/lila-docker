@@ -40,7 +40,13 @@ services:
       - ./conf/lila.conf:/lila/conf/application.conf
 
   lila_ws:
-    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.0_3.4.2
+    build:
+      context: docker
+      args:
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
+      dockerfile: sbt.Dockerfile
+    user: ${USER_ID}:${GROUP_ID}
     working_dir: /lila-ws
     entrypoint: sbt run -Dconfig.file=/lila-ws.conf
     restart: unless-stopped
@@ -87,6 +93,7 @@ services:
     working_dir: /api/doc
     entrypoint: ["/bin/sh", "-c", "npm install && npm run serve -- --host=0.0.0.0"]
     restart: unless-stopped
+    user: ${USER_ID}:${GROUP_ID}
     ports:
       - 8089:8089
     volumes:
@@ -100,6 +107,7 @@ services:
       dockerfile: ui.Dockerfile
     entrypoint: ["/bin/sh", "-c", "pnpm install && pnpm run compile && pnpx http-server -p 8080"]
     restart: unless-stopped
+    user: ${USER_ID}:${GROUP_ID}
     ports:
       - 8090:8080
     volumes:
@@ -114,6 +122,7 @@ services:
       dockerfile: ui.Dockerfile
     entrypoint: ["/bin/sh", "-c", "pnpm install && pnpm run demo"]
     restart: unless-stopped
+    user: ${USER_ID}:${GROUP_ID}
     ports:
       - 8091:8080
     volumes:
@@ -127,6 +136,7 @@ services:
     working_dir: /lila-engine
     entrypoint: cargo run -- --bind 0.0.0.0:9666 --mongodb mongodb://mongodb
     restart: unless-stopped
+    user: ${USER_ID}:${GROUP_ID}
     environment:
       - LILA_ENGINE_LOG=lila_engine=debug,tower_http=debug
     networks:
@@ -139,7 +149,13 @@ services:
       - external-engine
 
   lila_fishnet:
-    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.0_3.4.2
+    build:
+      context: docker
+      args:
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
+      dockerfile: sbt.Dockerfile
+    user: ${USER_ID}:${GROUP_ID}
     working_dir: /lila-fishnet
     entrypoint: sbt app/run
     environment:
@@ -232,10 +248,17 @@ services:
       - search
 
   lila_search:
-    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.0_3.4.2
+    build:
+      context: docker
+      args:
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
+      dockerfile: sbt.Dockerfile
+    user: ${USER_ID}:${GROUP_ID}
     working_dir: /lila-search
     entrypoint: sbt app/run
     restart: unless-stopped
+    #
     environment:
       - ELASTIC_URI=http://elasticsearch:9200
       - HTTP_API_LOGGER=true
@@ -254,6 +277,7 @@ services:
     working_dir: /lila-gif
     entrypoint: cargo run -- --bind 0.0.0.0:6175
     restart: unless-stopped
+    user: ${USER_ID}:${GROUP_ID}
     ports:
       - 6175:6175
     networks:
