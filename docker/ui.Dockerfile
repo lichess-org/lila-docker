@@ -11,4 +11,12 @@ RUN corepack enable
 
 RUN pnpm config set store-dir /.pnpm-store
 
+ARG USER_ID
+ARG GROUP_ID
+
+RUN if [ "$USER_ID" != "1000" ] && [ "$USER_ID" != "0" ]; then \
+        adduser -D -u $USER_ID -G $(id -gn node) -h $(eval echo ~node) newuser; \
+        chown -R $USER_ID:$(id -gn node) $(eval echo ~node); \
+    fi
+
 WORKDIR /app

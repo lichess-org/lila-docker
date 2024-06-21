@@ -118,6 +118,9 @@ services:
   chessground:
     build:
       context: docker
+      args:
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
       dockerfile: ui.Dockerfile
     entrypoint: ["/bin/sh", "-c", "pnpm install && pnpm run compile && pnpx http-server -p 8080"]
     restart: unless-stopped
@@ -133,6 +136,9 @@ services:
   pgn_viewer:
     build:
       context: docker
+      args:
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
       dockerfile: ui.Dockerfile
     entrypoint: ["/bin/sh", "-c", "pnpm install && pnpm run demo"]
     restart: unless-stopped
@@ -221,6 +227,9 @@ services:
   ui:
     build:
       context: docker
+      args:
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
       dockerfile: ui.Dockerfile
     restart: unless-stopped
     user: ${USER_ID}:${GROUP_ID}
