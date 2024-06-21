@@ -1,5 +1,7 @@
 FROM node:22.2.0-bookworm-slim
 
+USER root
+
 RUN apt update && apt install -y git && apt clean
 
 RUN git config --global --add safe.directory /chessground
@@ -11,6 +13,11 @@ RUN corepack enable
 
 RUN pnpm config set store-dir /.pnpm-store
 
+# needed for ui, chessground images
+RUN mkdir -p /.cache && chmod -R 777 /.cache
+# needed for api_docs
+RUN mkdir -p /.npm && chmod -R 777 /.npm
+
 ARG USER_ID
 ARG GROUP_ID
 
@@ -20,3 +27,5 @@ RUN if [ "$USER_ID" != "1000" ] && [ "$USER_ID" != "0" ]; then \
     fi
 
 WORKDIR /app
+
+# lila-search chessground api_docs

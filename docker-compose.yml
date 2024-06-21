@@ -103,7 +103,12 @@ services:
       - mobile
 
   api_docs:
-    image: node:22.2.0-alpine3.20
+    build:
+      context: docker
+      args:
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
+      dockerfile: ui.Dockerfile
     working_dir: /api/doc
     entrypoint: ["/bin/sh", "-c", "npm install && npm run serve -- --host=0.0.0.0"]
     restart: unless-stopped
