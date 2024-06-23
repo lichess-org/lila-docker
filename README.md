@@ -265,7 +265,8 @@ curl --get http://localhost:8086/query \
 1. On your Android phone:
     1. Connect your phone to the same wifi network as your host machine
     2. Enable Developer Mode
-    3. In Developer Options, enable Wireless Debugging and tap into its menu
+    3. In Developer Options, toggle Wireless Debugging to ON
+    4. Tap "Wireless Debugging" to enter its menu
 2. On your host machine:
 
     1. Have the lila-docker services running, with the `Mobile` optional service started
@@ -283,25 +284,30 @@ curl --get http://localhost:8086/query \
         ./lila-docker mobile
         ```
 
-    4. Get a shell on the container:
+    4. Get a shell on the Mobile container:
 
         ```bash
         docker compose exec -it mobile bash
-
-        # verify your phone is listed
-        adb devices
         ```
 
-    5. Install the app dependencies:
-        ```bash
-        flutter pub get
-        dart run build_runner build
-        ```
-    6. Run the app:
-        ```bash
-        flutter run -v \
-            --dart-define LICHESS_HOST=$LILA_URL \
-            --dart-define LICHESS_WS_HOST=$LILA_URL
-        ```
-        - No substitutions necessary. The `$LILA_URL` environment variable will already be set on the container.
-        - First time you run it, it might take a while
+        1. Verify your phone is listed
+
+            ```bash
+            adb devices
+            ```
+
+        2. Install the app dependencies:
+
+            ```bash
+            flutter pub get
+            dart run build_runner build
+            ```
+
+        3. Run the app:
+            ```bash
+            flutter run -v \
+                --dart-define LICHESS_HOST=$LILA_URL \
+                --dart-define LICHESS_WS_HOST=$LILA_URL
+            ```
+            - No substitutions necessary. The `$LILA_URL` environment variable will already be set on the container.
+            - The first time you run it, it might take a while
