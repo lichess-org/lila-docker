@@ -27,5 +27,3 @@ RUN if [ "$USER_ID" != "1000" ] && [ "$USER_ID" != "0" ]; then \
     fi
 
 WORKDIR /app
-
-# lila-search chessground api_docs
