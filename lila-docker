@@ -1,6 +1,8 @@
 #!/bin/bash -e
 
 run_setup() {
+    write_user_id_to_env
+
     rust_cmd setup
 
     docker compose build
@@ -49,6 +51,8 @@ all_profiles() {
 }
 
 build_all_profiles() {
+    write_user_id_to_env
+
     COMPOSE_PROFILES=$(all_profiles) docker compose pull
     COMPOSE_PROFILES=$(all_profiles) docker compose build
 }
@@ -142,6 +146,18 @@ rust_cmd() {
     fi
 
     load_config_to_env
+}
+
+write_user_id_to_env() {
+    if docker info 2>/dev/null | grep -q "Operating System: Docker Desktop"; then
+        echo "Running on Docker Desktop"
+        echo "USER_ID=0" > .env
+        echo "GROUP_ID=0" >> .env
+    else
+        echo "Running on Docker Engine"
+        echo "USER_ID=$(id -u)" > .env
+        echo "GROUP_ID=$(id -g)" >> .env
+    fi
 }
 
 load_config_to_env() {
