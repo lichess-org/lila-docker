@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo:5.0.26-focal
+    image: mongo:5.0.27-focal
     restart: unless-stopped
     command: mongod --bind_ip_all --replSet rs0
     healthcheck:
@@ -16,14 +16,14 @@ services:
       - ./scripts:/scripts
 
   mongodb_secondary:
-    image: mongo:5.0.26-focal
+    image: mongo:5.0.27-focal
     restart: unless-stopped
     command: mongod --bind_ip_all --replSet rs0
     networks:
       - lila-network
 
   redis:
-    image: redis:7.2.4-alpine3.19
+    image: redis:7.2.5-alpine3.20
     restart: unless-stopped
     networks:
       - lila-network
@@ -157,7 +157,7 @@ services:
       - pgn-viewer
 
   lila_engine:
-    image: rust:1.78.0-slim-bookworm
+    image: rust:1.79.0-slim-bookworm
     working_dir: /lila-engine
     entrypoint: cargo run -- --bind 0.0.0.0:9666 --mongodb mongodb://mongodb
     restart: unless-stopped
@@ -322,7 +322,7 @@ services:
       - search
 
   lila_gif:
-    image: rust:1.78.0-slim-bookworm
+    image: rust:1.79.0-slim-bookworm
     working_dir: /lila-gif
     entrypoint: cargo run -- --bind 0.0.0.0:6175
     restart: unless-stopped
@@ -351,7 +351,7 @@ services:
       - thumbnails
 
   mailpit:
-    image: axllent/mailpit:v1.18.5
+    image: axllent/mailpit:v1.18.7
     restart: unless-stopped
     ports:
       - 8025:8025
