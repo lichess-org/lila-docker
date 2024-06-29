@@ -72,6 +72,13 @@ setup_database() {
         sleep 1
     done
 
+    if [[ $COMPOSE_PROFILES == *"search"* ]]; then
+        while ! docker compose exec elasticsearch curl -s -X GET "http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=10s" > /dev/null 2>&1; do
+            echo "Waiting for elasticsearch to be ready..."
+            sleep 2
+        done
+    fi
+
     [[ $SETUP_API_TOKENS == "true" ]] && params+=(--tokens)
 
     docker compose run --rm python python /lila-db-seed/spamdb/spamdb.py \
