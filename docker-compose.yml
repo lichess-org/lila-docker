@@ -300,7 +300,13 @@ services:
       - search
 
   lila_search_ingestor:
-    image: sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.0_3.4.2
+    build:
+      context: docker
+      args:
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
+      dockerfile: sbt.Dockerfile
+    user: ${USER_ID}:${GROUP_ID}
     working_dir: /lila-search
     entrypoint: sbt 'ingestor/runMain lila.search.ingestor.App'
     restart: unless-stopped
