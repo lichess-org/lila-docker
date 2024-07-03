@@ -1,6 +1,12 @@
 tasks:
+  - init: |
+      if [ "$GITPOD_HEADLESS" == "true" ]; then
+        ./lila-docker fast-setup
+      else
+        "You can setup prebuilds and get a faster dev environment by following the instructions at https://github.com/lichess-org/lila-docker"
+      fi
   - command: |
-      ./lila-docker start
+      ./lila-docker setup
 
 ports:
   - port: 8080

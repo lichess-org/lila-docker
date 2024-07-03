@@ -206,8 +206,9 @@ fn main() -> std::io::Result<()> {
     let config = Config::load();
 
     match args[1].as_str() {
-        "setup" => setup(config, true),
-        "add_services" => setup(config, false),
+        "setup" => setup(config, true, false),
+        "fast_setup" => setup(config, true, true),
+        "add_services" => setup(config, false, false),
         "hostname" => hostname(config),
         "mobile" => mobile_setup(config),
         "welcome" => welcome(config),
@@ -228,7 +229,7 @@ fn pwd_input(user_type: &str) -> std::io::Result<String> {
 }
 
 #[allow(clippy::too_many_lines)]
-fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
+fn setup(mut config: Config, first_setup: bool, opinionated_setup: bool) -> std::io::Result<()> {
     if first_setup {
         intro(BANNER)?;
     } else {
@@ -237,43 +238,66 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
             "NOTE: This will not remove any existing services that may be running.\nOnly the newly selected ones will be added."
         )?;
     }
-    let services = prompt_for_optional_services()?;
 
-    let setup_database = confirm(if first_setup {
-        "Do you want to seed the database with test users, games, etc? (Recommended)"
+    let mut services: Vec<OptionalService<'static>> = vec![];
+    let mut setup_database = opinionated_setup;
+
+    if opinionated_setup {
+        config.setup_database = Some(true);
+        config.su_password = Some(DEFAULT_PASSWORD.to_string());
+        config.password = Some(DEFAULT_PASSWORD.to_string());
+        config.setup_api_tokens = Some(true);
     } else {
-        "Do you want to re-seed the database with test users, games, etc?"
-    })
-    .initial_value(first_setup)
-    .interact()?;
+        services = prompt_for_optional_services()?;
 
-    let (su_password, password) = if setup_database {
-        (pwd_input("admin")?, pwd_input("regular")?)
-    } else {
-        (DEFAULT_PASSWORD.to_string(), DEFAULT_PASSWORD.to_string())
-    };
+        setup_database = confirm(if first_setup {
+            "Do you want to seed the database with test users, games, etc? (Recommended)"
+        } else {
+            "Do you want to re-seed the database with test users, games, etc?"
+        })
+        .initial_value(first_setup)
+        .interact()?;
 
-    config.setup_api_tokens = Some(
-        setup_database
-            && if password != "password" || su_password != "password" {
-                confirm("Do you want to setup default API tokens for the admin and regular users? Will be created with `lip_{username}` format")
+        let (su_password, password) = if setup_database {
+            (pwd_input("admin")?, pwd_input("regular")?)
+        } else {
+            (DEFAULT_PASSWORD.to_string(), DEFAULT_PASSWORD.to_string())
+        };
+
+        config.setup_api_tokens = Some(
+            setup_database
+                && if password != "password" || su_password != "password" {
+                    confirm("Do you want to setup default API tokens for the admin and regular users? Will be created with `lip_{username}` format")
+                .interact()?
+                } else {
+                    true
+                },
+        );
+        config.su_password = Some(su_password);
+        config.password = Some(password);
+
+        if Gitpod::is_host()
+        && confirm("By default, only this browser session can access your Gitpod development site.\nWould you like it to be accessible to other clients?")
+        .initial_value(false)
         .interact()?
-            } else {
-                true
-            },
-    );
+        {
+            gitpod_public()?;
+        }
+
+        config.setup_bbppairings = Some(
+            services
+                .iter()
+                .any(|service| service.compose_profile == Some(vec!["swiss-pairings"])),
+        );
+
+        config.enable_monitoring = Some(
+            services
+                .iter()
+                .any(|service| service.compose_profile == Some(vec!["monitoring"])),
+        );
+    }
 
     config.setup_database = Some(setup_database);
-    config.su_password = Some(su_password);
-    config.password = Some(password);
-
-    if Gitpod::is_host()
-    && confirm("By default, only this browser session can access your Gitpod development site.\nWould you like it to be accessible to other clients?")
-    .initial_value(false)
-    .interact()?
-    {
-        gitpod_public()?;
-    }
 
     let selected_profiles: Vec<String> = services
         .iter()
@@ -290,18 +314,6 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
     profiles.dedup();
 
     config.compose_profiles = Some(profiles);
-
-    config.setup_bbppairings = Some(
-        services
-            .iter()
-            .any(|service| service.compose_profile == Some(vec!["swiss-pairings"])),
-    );
-
-    config.enable_monitoring = Some(
-        services
-            .iter()
-            .any(|service| service.compose_profile == Some(vec!["monitoring"])),
-    );
 
     if Gitpod::is_host() {
         let gitpod = Gitpod::load();

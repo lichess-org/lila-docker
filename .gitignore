@@ -10,3 +10,4 @@ settings.env
 settings.toml
 
 .metals
+ran_as_gitpod_prebuild
