@@ -17,7 +17,6 @@ run_setup() {
 }
 
 add_services() {
-    # COMPOSE_PROFILES=$(all_profiles) docker compose start
     rust_cmd add_services
 
     docker compose build

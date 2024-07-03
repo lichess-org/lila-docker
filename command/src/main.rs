@@ -243,7 +243,6 @@ fn setup(mut config: Config, first_setup: bool, opinionated_setup: bool) -> std:
     let mut setup_database = opinionated_setup;
 
     if opinionated_setup {
-        config.setup_database = Some(true);
         config.su_password = Some(DEFAULT_PASSWORD.to_string());
         config.password = Some(DEFAULT_PASSWORD.to_string());
         config.setup_api_tokens = Some(true);
