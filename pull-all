@@ -36,6 +36,9 @@ for dir in ./repos/*; do
             cd "$initial_dir"
             continue
         fi
+
+        git fetch upstream "$main_or_master" 
+
         # if repo is not on main or master branch, don't do anything
         if [[ $(git branch --show-current) != "$main_or_master" ]]; then
             echo "Repo $dir is not on $main_or_master branch."
