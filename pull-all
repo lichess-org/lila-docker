@@ -13,15 +13,19 @@ for dir in ./repos/*; do
     # echo "Checking $dir"
     if [[ -d "$dir" ]]; then
         cd "$dir"
+
+        # Format the directory name
+        dir=$(printf "%-20s" "$dir")
+
         # check if the directory is a git repo
         if [[ ! -d ".git" ]]; then
-            echo "Directory $dir is not a git repo."
+            # echo "$dir : not a git repo."
             cd "$initial_dir"
             continue
         fi
         # check if the git repo is dirty
         if [[ $(git diff --stat) != '' ]]; then
-            echo "Repo $dir is dirty."
+            echo "$dir : repo has uncommitted changes."
             cd "$initial_dir"
             continue
         fi
@@ -32,30 +36,31 @@ for dir in ./repos/*; do
         elif [[ $(git branch --list master) ]]; then
             main_or_master="master"
         else
-            echo "Repo $dir does not have a main or master branch."
+            echo "$dir : doesn't have a main or master branch."
             cd "$initial_dir"
             continue
         fi
 
-        git fetch upstream "$main_or_master" 
+        git fetch upstream "$main_or_master" 2>/dev/null
 
         # if repo is not on main or master branch, don't do anything
         if [[ $(git branch --show-current) != "$main_or_master" ]]; then
-            echo "Repo $dir is not on $main_or_master branch."
+            echo "$dir : not on $main_or_master branch."
             cd "$initial_dir"
             continue
         fi
         # check if repo is up to date
         if [[ $(git rev-list HEAD...upstream/$main_or_master --count) -eq 0 ]]; then
-            echo "Repo $dir is up to date."
+            echo "$dir : up to date."
             cd "$initial_dir"
             continue
         fi
 
-        echo "The repo $dir is behind the remote. Pulling changes."
+        echo "$dir : pulling changes"
         if [[ $pull_flag == true ]]; then
-            git pull
+            git pull 2>/dev/null
         fi
+        
         cd "$initial_dir"
         pwd
     fi
