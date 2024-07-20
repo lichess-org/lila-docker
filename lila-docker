@@ -308,7 +308,7 @@ case "$@" in
         fast_setup
         ;;
     "setup")
-        # This is a special case for Gitpod
+        # This is a special case for Gitpod, used to run the setup even if the docker containers are already present
         if [ -f ran_as_gitpod_prebuild ]; then
             rm ran_as_gitpod_prebuild
             ./pull-all --pull
