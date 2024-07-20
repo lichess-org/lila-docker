@@ -260,7 +260,7 @@ fn setup(mut config: Config, first_setup: bool, opinionated_setup: bool) -> std:
         services = prompt_for_services()?;
 
         let options = prompt_for_options(first_setup)?;
-        
+
         setup_database = options.contains(&Setting::SetupDatabase);
 
         let (su_password, password) = if options.contains(&Setting::SetupDatabase) {

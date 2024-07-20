@@ -22,7 +22,7 @@ To enable Gitpod prebuilds for lila-docker, follow these steps:
 5. Once the prebuild is complete, you can open the workspace and start using it immediately.
 
 That's it! You have now enabled Gitpod prebuilds for lila-docker and can enjoy a faster and more efficient development process.
-To start a new workspace with prebuilds, go to https://gitpod.io/workspaces and open the workspace for your fork of the lila-docker repository or you can use https://gitpod.io/new/#<link-to-your-fork>. Eg: https://gitpod.io/new/#https://github.com/your-username/lila-docker/tree/main
+To start a new workspace with prebuilds, go to https://gitpod.io/workspaces and open the workspace for your fork of the lila-docker repository or you can use `https://gitpod.io/new/#<link-to-your-fork>`. Eg: https://gitpod.io/new/#https://github.com/your-username/lila-docker/tree/main
 
 ### Tips for using Gitpod prebuilds with lila-docker
 Here are some tips for using Gitpod prebuilds with lila-docker:
