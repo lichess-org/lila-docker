@@ -31,6 +31,7 @@ struct Config {
     setup_database: Option<bool>,
     setup_bbppairings: Option<bool>,
     enable_monitoring: Option<bool>,
+    enable_rate_limiting: Option<bool>,
     su_password: Option<String>,
     password: Option<String>,
     setup_api_tokens: Option<bool>,
@@ -80,6 +81,7 @@ impl Config {
             setup_database,
             setup_bbppairings,
             enable_monitoring,
+            enable_rate_limiting,
             su_password,
             password,
             setup_api_tokens,
@@ -100,6 +102,7 @@ impl Config {
             to_env!(setup_database),
             to_env!(setup_bbppairings),
             to_env!(enable_monitoring),
+            to_env!(enable_rate_limiting),
             to_env!(su_password),
             to_env!(password),
             to_env!(setup_api_tokens),
@@ -199,6 +202,12 @@ struct OptionalService<'a> {
     repositories: Option<Vec<Repository>>,
 }
 
+#[derive(Debug, Clone, Eq, PartialEq)]
+enum Setting {
+    SetupDatabase,
+    EnableRateLimiting,
+}
+
 fn main() -> std::io::Result<()> {
     let args: Vec<String> = std::env::args().collect();
     assert!(args.len() > 1, "Missing command");
@@ -237,24 +246,18 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
             "NOTE: This will not remove any existing services that may be running.\nOnly the newly selected ones will be added."
         )?;
     }
-    let services = prompt_for_optional_services()?;
+    let services = prompt_for_services()?;
 
-    let setup_database = confirm(if first_setup {
-        "Do you want to seed the database with test users, games, etc? (Recommended)"
-    } else {
-        "Do you want to re-seed the database with test users, games, etc?"
-    })
-    .initial_value(first_setup)
-    .interact()?;
+    let options = prompt_for_options(first_setup)?;
 
-    let (su_password, password) = if setup_database {
+    let (su_password, password) = if options.contains(&Setting::SetupDatabase) {
         (pwd_input("admin")?, pwd_input("regular")?)
     } else {
         (DEFAULT_PASSWORD.to_string(), DEFAULT_PASSWORD.to_string())
     };
 
     config.setup_api_tokens = Some(
-        setup_database
+        options.contains(&Setting::SetupDatabase)
             && if password != "password" || su_password != "password" {
                 confirm("Do you want to setup default API tokens for the admin and regular users? Will be created with `lip_{username}` format")
         .interact()?
@@ -263,7 +266,8 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
             },
     );
 
-    config.setup_database = Some(setup_database);
+    config.setup_database = Some(options.contains(&Setting::SetupDatabase));
+    config.enable_rate_limiting = Some(options.contains(&Setting::EnableRateLimiting));
     config.su_password = Some(su_password);
     config.password = Some(password);
 
@@ -318,7 +322,7 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
         Repository::new("lichess-org", "lila-ws"),
     ];
 
-    if setup_database {
+    if options.contains(&Setting::SetupDatabase) {
         repos_to_clone.push(Repository::new("lichess-org", "lila-db-seed"));
     }
 
@@ -439,7 +443,7 @@ fn gitpod_checkout_pr() -> std::io::Result<()> {
 }
 
 #[allow(clippy::too_many_lines)]
-fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error> {
+fn prompt_for_services() -> Result<Vec<OptionalService<'static>>, Error> {
     multiselect(
         "Select which optional services to include:\n    (Use arrows, <space> to toggle, <enter> to continue)\n",
     )
@@ -589,6 +593,31 @@ fn prompt_for_optional_services() -> Result<Vec<OptionalService<'static>>, Error
         "bbpPairings tool",
     )
     .interact()
+}
+
+fn prompt_for_options(first_setup: bool) -> Result<Vec<Setting>, Error> {
+    multiselect("Select options:\n")
+        .required(false)
+        .item(
+            Setting::SetupDatabase,
+            if first_setup {
+                "Seed the database with test users, games, etc. (Recommended)"
+            } else {
+                "Re-seed the database with test users, games, etc."
+            },
+            "",
+        )
+        .item(
+            Setting::EnableRateLimiting,
+            "Enable rate limiting",
+            "To be prod-like. Can be disabled for development/testing purposes",
+        )
+        .initial_values(if first_setup {
+            vec![Setting::SetupDatabase, Setting::EnableRateLimiting]
+        } else {
+            vec![Setting::EnableRateLimiting]
+        })
+        .interact()
 }
 
 fn hostname(mut config: Config) -> std::io::Result<()> {
@@ -771,6 +800,7 @@ mod tests {
             setup_database: Some(true),
             setup_bbppairings: Some(false),
             enable_monitoring: Some(false),
+            enable_rate_limiting: Some(true),
             su_password: Some("foo".to_string()),
             password: Some("bar".to_string()),
             setup_api_tokens: Some(false),
@@ -790,6 +820,7 @@ mod tests {
                 "SETUP_DATABASE=true",
                 "SETUP_BBPPAIRINGS=false",
                 "ENABLE_MONITORING=false",
+                "ENABLE_RATE_LIMITING=true",
                 "SU_PASSWORD=foo",
                 "PASSWORD=bar",
                 "SETUP_API_TOKENS=false",
@@ -811,6 +842,7 @@ mod tests {
             setup_database: None,
             setup_bbppairings: None,
             enable_monitoring: None,
+            enable_rate_limiting: None,
             su_password: None,
             password: None,
             setup_api_tokens: None,

@@ -45,6 +45,7 @@ services:
       - LILA_DOMAIN=${LILA_DOMAIN:-localhost:8080}
       - LILA_URL=${LILA_URL:-http://localhost:8080}
       - ENABLE_MONITORING=${ENABLE_MONITORING:-false}
+      - ENABLE_RATE_LIMITING=${ENABLE_RATE_LIMITING:-true}
     volumes:
       - ./repos/lila:/lila
       - ./repos/chessground:/chessground
