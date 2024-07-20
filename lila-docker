@@ -1,4 +1,6 @@
-#!/bin/bash -e
+#!/usr/bin/env bash 
+
+set -e
 
 run_setup() {
     write_user_id_to_env
