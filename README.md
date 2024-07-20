@@ -17,6 +17,8 @@ Click here to create a workspace:
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/new/#https://github.com/lichess-org/lila-docker)
 
+Also, see [gitpod-prebuilds.md](gitpod-prebuilds.md) for more information on how to use prebuilds to speed up your development.
+
 ## Instructions
 
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and have it running
