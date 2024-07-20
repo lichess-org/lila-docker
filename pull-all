@@ -56,12 +56,13 @@ for dir in ./repos/*; do
             continue
         fi
 
-        echo "$dir : pulling changes"
         if [[ $pull_flag == true ]]; then
+            echo "$dir : pulling changes."
             git pull 2>/dev/null
+        else 
+            echo "$dir : is behind by $(git rev-list HEAD...upstream/$main_or_master --count) commits."
         fi
         
         cd "$initial_dir"
-        pwd
     fi
 done
