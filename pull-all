@@ -1,4 +1,6 @@
-#!/bin/bash -e
+#!/usr/bin/env bash 
+
+set -e
 
 cd "$(dirname "$0")"
 initial_dir=$(pwd)
@@ -41,7 +43,19 @@ for dir in ./repos/*; do
             continue
         fi
 
-        git fetch upstream "$main_or_master" 2>/dev/null
+        # check if repo has an upstream or origin remote
+        upstream_or_origin=""
+        if [[ $(git remote -v | grep upstream) ]]; then
+            upstream_or_origin="upstream"
+        elif [[ $(git remote -v | grep origin) ]]; then
+            upstream_or_origin="origin"
+        else
+            echo "$dir : doesn't have an upstream or origin remote."
+            cd "$initial_dir"
+            continue
+        fi
+
+        git fetch "$upstream_or_origin" "$main_or_master" 2>/dev/null
 
         # if repo is not on main or master branch, don't do anything
         if [[ $(git branch --show-current) != "$main_or_master" ]]; then

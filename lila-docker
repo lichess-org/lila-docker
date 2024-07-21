@@ -56,11 +56,11 @@ fast_setup() {
         for i in {1..100}; do # 100 * 5 = 500 seconds
             sleep 5
             status_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/)
-            echo "Status code: $status_code"
-            echo "Waited for $((i * 5)) seconds"
             if [ "$status_code" -ne 502 ]; then
+                echo "lila is ready after $((i * 5)) seconds"
                 break
             fi
+            echo "Checking if lila is ready... not yet (Status code: $status_code after $((i * 5)) seconds) "
         done
     fi
 }
