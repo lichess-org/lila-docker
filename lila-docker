@@ -53,7 +53,7 @@ fast_setup() {
     if is_gitpod_prebuild; then
         touch ran_as_gitpod_prebuild
         # wait for the services to be ready sleep for 5 seconds multiple times and check 8080 port if 502 status code is returned
-        for i in {1..100}; do # 100 * 5 = 500 seconds
+        for i in {1..150}; do # 150 * 5 = 750 seconds
             sleep 5
             status_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/)
             if [ "$status_code" -ne 502 ]; then
