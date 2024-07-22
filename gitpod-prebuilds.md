@@ -27,4 +27,4 @@ To start a new workspace with prebuilds, go to https://gitpod.io/workspaces and 
 ### Tips for using Gitpod prebuilds with lila-docker
 Here are some tips for using Gitpod prebuilds with lila-docker:
 - Try to keep your prebuilds up to date by running them regularly by following step 4 and don't forget to update your fork of the lila-docker repository.
-- Don't use prebuilds if they are 4-5 days old, we recommend to run a new prebuild or to start a new workspace without prebuilds from the lichess/lila-docker repository instead of your fork.
+- Don't use prebuilds if they are 4-5 days old, we recommend to run a new prebuild or to start a new workspace without prebuilds from the `github.com/lichess-org/lila-docker` repository instead of your fork.
