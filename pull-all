@@ -73,7 +73,7 @@ for dir in ./repos/*; do
 
         if [[ $pull_flag == true ]]; then
             echo -n "pulling changes..."
-            git pull 2>/dev/null && echo "✅ done" || echo "❌ failed"
+            git pull &>/dev/null && echo "✅ done" || echo "❌ failed"
         else 
             echo "🔸 behind by $(git rev-list HEAD...$upstream_or_origin/$main_or_master --count) commits."
         fi
