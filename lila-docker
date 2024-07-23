@@ -54,13 +54,15 @@ fast_setup() {
         touch ran_as_gitpod_prebuild
         # wait for the services to be ready sleep for 5 seconds multiple times and check 8080 port if 502 status code is returned
         for i in {1..150}; do # 150 * 5 = 750 seconds
+            echo -n "Checking if lila is ready... "
             sleep 5
             status_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/)
+            echo -n "status code: $status_code - "
             if [ "$status_code" -ne 502 ]; then
-                echo "lila is ready after $((i * 5)) seconds"
+                echo "OK"
                 break
             fi
-            echo "Checking if lila is ready... not yet (Status code: $status_code after $((i * 5)) seconds) "
+            echo "not yet"
         done
     fi
 }

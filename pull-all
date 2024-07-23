@@ -18,16 +18,17 @@ for dir in ./repos/*; do
 
         # Format the directory name
         dir=$(printf "%-20s" "$dir")
+        echo -n "$dir: "
 
         # check if the directory is a git repo
         if [[ ! -d ".git" ]]; then
-            # echo "$dir : not a git repo."
+            echo "🔸 not a git repo"
             cd "$initial_dir"
             continue
         fi
         # check if the git repo is dirty
         if [[ $(git diff --stat) != '' ]]; then
-            echo "$dir : repo has uncommitted changes."
+            echo "🔸 repo has uncommitted changes"
             cd "$initial_dir"
             continue
         fi
@@ -38,7 +39,7 @@ for dir in ./repos/*; do
         elif [[ $(git branch --list master) ]]; then
             main_or_master="master"
         else
-            echo "$dir : doesn't have a main or master branch."
+            echo "🔸 no main or master branch"
             cd "$initial_dir"
             continue
         fi
@@ -50,7 +51,7 @@ for dir in ./repos/*; do
         elif [[ $(git remote -v | grep origin) ]]; then
             upstream_or_origin="origin"
         else
-            echo "$dir : doesn't have an upstream or origin remote."
+            echo "🔸 no upstream or origin remote"
             cd "$initial_dir"
             continue
         fi
@@ -59,24 +60,24 @@ for dir in ./repos/*; do
 
         # if repo is not on main or master branch, don't do anything
         if [[ $(git branch --show-current) != "$main_or_master" ]]; then
-            echo "$dir : not on $main_or_master branch."
+            echo "🔸 not on $main_or_master branch."
             cd "$initial_dir"
             continue
         fi
         # check if repo is up to date
         if [[ $(git rev-list HEAD...upstream/$main_or_master --count) -eq 0 ]]; then
-            echo "$dir : up to date."
+            echo "✅ up to date"
             cd "$initial_dir"
             continue
         fi
 
         if [[ $pull_flag == true ]]; then
-            echo "$dir : pulling changes."
-            git pull 2>/dev/null
+            echo -n "pulling changes..."
+            git pull 2>/dev/null && echo "✅ done" || echo "❌ failed"
         else 
-            echo "$dir : is behind by $(git rev-list HEAD...upstream/$main_or_master --count) commits."
+            echo "🔸 behind by $(git rev-list HEAD...upstream/$main_or_master --count) commits."
         fi
-        
+
         cd "$initial_dir"
     fi
 done
