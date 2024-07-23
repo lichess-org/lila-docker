@@ -65,7 +65,7 @@ for dir in ./repos/*; do
             continue
         fi
         # check if repo is up to date
-        if [[ $(git rev-list HEAD...upstream/$main_or_master --count) -eq 0 ]]; then
+        if [[ $(git rev-list HEAD...$upstream_or_origin/$main_or_master --count) -eq 0 ]]; then
             echo "✅ up to date"
             cd "$initial_dir"
             continue
@@ -75,7 +75,7 @@ for dir in ./repos/*; do
             echo -n "pulling changes..."
             git pull 2>/dev/null && echo "✅ done" || echo "❌ failed"
         else 
-            echo "🔸 behind by $(git rev-list HEAD...upstream/$main_or_master --count) commits."
+            echo "🔸 behind by $(git rev-list HEAD...$upstream_or_origin/$main_or_master --count) commits."
         fi
 
         cd "$initial_dir"
