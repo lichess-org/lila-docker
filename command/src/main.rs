@@ -215,8 +215,7 @@ fn main() -> std::io::Result<()> {
     let config = Config::load();
 
     match args[1].as_str() {
-        "setup" => setup(config, true, false),
-        "fast_setup" => setup(config, true, true),
+        "setup" => setup(config, true, std::env::var("NONINTERACTIVE").is_ok()),
         "add_services" => setup(config, false, false),
         "hostname" => hostname(config),
         "mobile" => mobile_setup(config),
@@ -238,7 +237,7 @@ fn pwd_input(user_type: &str) -> std::io::Result<String> {
 }
 
 #[allow(clippy::too_many_lines)]
-fn setup(mut config: Config, first_setup: bool, opinionated_setup: bool) -> std::io::Result<()> {
+fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io::Result<()> {
     if first_setup {
         intro(BANNER)?;
     } else {
@@ -249,19 +248,17 @@ fn setup(mut config: Config, first_setup: bool, opinionated_setup: bool) -> std:
     }
 
     let mut services: Vec<OptionalService<'static>> = vec![];
-    let mut setup_database = opinionated_setup;
 
-    if opinionated_setup {
-        config.su_password = Some(DEFAULT_PASSWORD.to_string());
+    if noninteractive {
         config.password = Some(DEFAULT_PASSWORD.to_string());
+        config.su_password = Some(DEFAULT_PASSWORD.to_string());
         config.setup_api_tokens = Some(true);
         config.enable_rate_limiting = Some(true);
+        config.setup_database = Some(true);
     } else {
         services = prompt_for_services()?;
 
         let options = prompt_for_options(first_setup)?;
-
-        setup_database = options.contains(&Setting::SetupDatabase);
 
         let (su_password, password) = if options.contains(&Setting::SetupDatabase) {
             (pwd_input("admin")?, pwd_input("regular")?)
@@ -279,6 +276,7 @@ fn setup(mut config: Config, first_setup: bool, opinionated_setup: bool) -> std:
                 },
         );
 
+        config.setup_database = Some(options.contains(&Setting::SetupDatabase));
         config.enable_rate_limiting = Some(options.contains(&Setting::EnableRateLimiting));
         config.su_password = Some(su_password);
         config.password = Some(password);
@@ -303,8 +301,6 @@ fn setup(mut config: Config, first_setup: bool, opinionated_setup: bool) -> std:
                 .any(|service| service.compose_profile == Some(vec!["monitoring"])),
         );
     }
-
-    config.setup_database = Some(setup_database);
 
     let selected_profiles: Vec<String> = services
         .iter()
@@ -337,7 +333,7 @@ fn setup(mut config: Config, first_setup: bool, opinionated_setup: bool) -> std:
         Repository::new("lichess-org", "lila-ws"),
     ];
 
-    if setup_database {
+    if config.setup_database.unwrap_or_default() {
         repos_to_clone.push(Repository::new("lichess-org", "lila-db-seed"));
     }
 

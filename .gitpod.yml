@@ -1,7 +1,7 @@
 tasks:
   - init: |
       if [ "$GITPOD_HEADLESS" == "true" ]; then
-        ./lila-docker fast-setup
+        ./lila-docker setup
       else
         "You can setup prebuilds and get a faster dev environment by following the instructions at https://github.com/lichess-org/lila-docker/blob/main/gitpod-prebuilds.md"
       fi
