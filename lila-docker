@@ -5,6 +5,11 @@ set -e
 run_setup() {
     write_user_id_to_env
 
+    if  is_gitpod_prebuild; then
+        echo "✓ Running in Gitpod prebuilds"
+        export NON_INTERACTIVE=true
+    fi
+
     rust_cmd setup
 
     docker compose build
@@ -16,40 +21,7 @@ run_setup() {
     setup_bbppairings
     setup_database
     rust_cmd welcome
-}
 
-add_services() {
-    rust_cmd add_services
-
-    docker compose build
-    docker compose up -d
-    setup_bbppairings
-    setup_database
-}
-
-fast_setup() {
-    write_user_id_to_env
-    if [ ! -z "$(docker compose ps -a --services | xargs)" ]; then
-        if [ ! -z "$(docker compose ps -a --services --status=exited | xargs)" ]; then
-            COMPOSE_PROFILES=$(all_profiles) docker compose start
-        else
-            echo "There are no stopped services to resume"
-        fi
-        return
-    fi
-
-    if  is_gitpod_prebuild; then
-        echo "Running in Gitpod prebuilds"
-    fi
-    rust_cmd fast_setup
-
-    docker compose build
-    docker compose --profile utils build
-    docker compose up -d
-    run_ui_build --update
-
-    SETUP_DATABASE=true
-    setup_database
     if is_gitpod_prebuild; then
         touch ran_as_gitpod_prebuild
         # wait for the services to be ready sleep for 5 seconds multiple times and check 8080 port if 502 status code is returned
@@ -65,6 +37,15 @@ fast_setup() {
             echo "not yet"
         done
     fi
+}
+
+add_services() {
+    rust_cmd add_services
+
+    docker compose build
+    docker compose up -d
+    setup_bbppairings
+    setup_database
 }
 
 run_start() {
@@ -212,11 +193,11 @@ is_gitpod_prebuild() {
 
 write_user_id_to_env() {
     if docker info 2>/dev/null | grep -q "Operating System: Docker Desktop"; then
-        echo "Running on Docker Desktop"
+        echo "✓ Running on Docker Desktop"
         echo "USER_ID=0" > .env
         echo "GROUP_ID=0" >> .env
     else
-        echo "Running on Docker Engine"
+        echo "✓ Running on Docker Engine"
         echo "USER_ID=$(id -u)" > .env
         echo "GROUP_ID=$(id -g)" >> .env
     fi
@@ -247,7 +228,6 @@ show_help() {
     echo "  add-services  Add new services to the existing setup"
     echo "  status        Show the status of all git repositories in ./repos"
     echo "  pull          Pull the latest changes from all git repositories in ./repos"
-    echo "  fast-setup    Setup opinionated services without any prompts"
 }
 
 cd "$(dirname "$0")"
@@ -307,9 +287,6 @@ case "$@" in
         ;;
     "pull")
         ./pull-all --pull
-        ;;
-    "fast-setup")
-        fast_setup
         ;;
     "setup")
         # This is a special case for Gitpod, used to run the setup even if the docker containers are already present
