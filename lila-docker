@@ -5,6 +5,11 @@ set -e
 run_setup() {
     write_user_id_to_env
 
+    if  is_gitpod_prebuild; then
+        echo "✓ Running in Gitpod prebuilds"
+        export NONINTERACTIVE=true
+    fi
+
     rust_cmd setup
 
     docker compose build
@@ -16,6 +21,22 @@ run_setup() {
     setup_bbppairings
     setup_database
     rust_cmd welcome
+
+    if is_gitpod_prebuild; then
+        touch ran_as_gitpod_prebuild
+        # wait for the services to be ready sleep for 5 seconds multiple times and check 8080 port if 502 status code is returned
+        for i in {1..150}; do # 150 * 5 = 750 seconds
+            echo -n "Checking if lila is ready... "
+            sleep 5
+            status_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/)
+            echo -n "status code: $status_code - "
+            if [ "$status_code" -ne 502 ]; then
+                echo "OK"
+                break
+            fi
+            echo "not yet"
+        done
+    fi
 }
 
 add_services() {
@@ -162,13 +183,21 @@ rust_cmd() {
     load_config_to_env
 }
 
+is_gitpod() {
+    [ -n "$GITPOD_WORKSPACE_URL" ]
+}
+
+is_gitpod_prebuild() {
+    [ "$GITPOD_HEADLESS" == "true" ]
+}
+
 write_user_id_to_env() {
     if docker info 2>/dev/null | grep -q "Operating System: Docker Desktop"; then
-        echo "Running on Docker Desktop"
+        echo "✓ Running on Docker Desktop"
         echo "USER_ID=0" > .env
         echo "GROUP_ID=0" >> .env
     else
-        echo "Running on Docker Engine"
+        echo "✓ Running on Docker Engine"
         echo "USER_ID=$(id -u)" > .env
         echo "GROUP_ID=$(id -g)" >> .env
     fi
@@ -197,6 +226,8 @@ show_help() {
     echo "  gitpod public Make http port 8080 public on the Gitpod instance"
     echo "  ui            Compile the frontend code. Runs in watch mode to automatically recompile on changes"
     echo "  add-services  Add new services to the existing setup"
+    echo "  status        Show the status of all git repositories in ./repos"
+    echo "  pull          Pull the latest changes from all git repositories in ./repos"
 }
 
 cd "$(dirname "$0")"
@@ -250,6 +281,20 @@ case "$@" in
         ;;
     "add-services")
         add_services
+        ;;
+    "status")
+        ./pull-all
+        ;;
+    "pull")
+        ./pull-all --pull
+        ;;
+    "setup")
+        # This is a special case for Gitpod, used to run the setup even if the docker containers are already present
+        if [ -f ran_as_gitpod_prebuild ]; then
+            rm ran_as_gitpod_prebuild
+            ./pull-all --pull
+        fi
+        run_setup
         ;;
     *)
         show_help

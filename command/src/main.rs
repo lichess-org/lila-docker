@@ -215,8 +215,8 @@ fn main() -> std::io::Result<()> {
     let config = Config::load();
 
     match args[1].as_str() {
-        "setup" => setup(config, true),
-        "add_services" => setup(config, false),
+        "setup" => setup(config, true, std::env::var("NONINTERACTIVE").is_ok()),
+        "add_services" => setup(config, false, false),
         "hostname" => hostname(config),
         "mobile" => mobile_setup(config),
         "welcome" => welcome(config),
@@ -237,7 +237,7 @@ fn pwd_input(user_type: &str) -> std::io::Result<String> {
 }
 
 #[allow(clippy::too_many_lines)]
-fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
+fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io::Result<()> {
     if first_setup {
         intro(BANNER)?;
     } else {
@@ -246,37 +246,60 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
             "NOTE: This will not remove any existing services that may be running.\nOnly the newly selected ones will be added."
         )?;
     }
-    let services = prompt_for_services()?;
 
-    let options = prompt_for_options(first_setup)?;
+    let mut services: Vec<OptionalService<'static>> = vec![];
 
-    let (su_password, password) = if options.contains(&Setting::SetupDatabase) {
-        (pwd_input("admin")?, pwd_input("regular")?)
+    if noninteractive {
+        config.password = Some(DEFAULT_PASSWORD.to_string());
+        config.su_password = Some(DEFAULT_PASSWORD.to_string());
+        config.setup_api_tokens = Some(true);
+        config.enable_rate_limiting = Some(true);
+        config.setup_database = Some(true);
     } else {
-        (DEFAULT_PASSWORD.to_string(), DEFAULT_PASSWORD.to_string())
-    };
+        services = prompt_for_services()?;
 
-    config.setup_api_tokens = Some(
-        options.contains(&Setting::SetupDatabase)
-            && if password != "password" || su_password != "password" {
-                confirm("Do you want to setup default API tokens for the admin and regular users? Will be created with `lip_{username}` format")
+        let options = prompt_for_options(first_setup)?;
+
+        let (su_password, password) = if options.contains(&Setting::SetupDatabase) {
+            (pwd_input("admin")?, pwd_input("regular")?)
+        } else {
+            (DEFAULT_PASSWORD.to_string(), DEFAULT_PASSWORD.to_string())
+        };
+
+        config.setup_api_tokens = Some(
+            options.contains(&Setting::SetupDatabase)
+                && if password != "password" || su_password != "password" {
+                    confirm("Do you want to setup default API tokens for the admin and regular users? Will be created with `lip_{username}` format")
+            .interact()?
+                } else {
+                    true
+                },
+        );
+
+        config.setup_database = Some(options.contains(&Setting::SetupDatabase));
+        config.enable_rate_limiting = Some(options.contains(&Setting::EnableRateLimiting));
+        config.su_password = Some(su_password);
+        config.password = Some(password);
+
+        if Gitpod::is_host()
+        && confirm("By default, only this browser session can access your Gitpod development site.\nWould you like it to be accessible to other clients?")
+        .initial_value(false)
         .interact()?
-            } else {
-                true
-            },
-    );
+        {
+            gitpod_public()?;
+        }
 
-    config.setup_database = Some(options.contains(&Setting::SetupDatabase));
-    config.enable_rate_limiting = Some(options.contains(&Setting::EnableRateLimiting));
-    config.su_password = Some(su_password);
-    config.password = Some(password);
+        config.setup_bbppairings = Some(
+            services
+                .iter()
+                .any(|service| service.compose_profile == Some(vec!["swiss-pairings"])),
+        );
 
-    if Gitpod::is_host()
-    && confirm("By default, only this browser session can access your Gitpod development site.\nWould you like it to be accessible to other clients?")
-    .initial_value(false)
-    .interact()?
-    {
-        gitpod_public()?;
+        config.enable_monitoring = Some(
+            services
+                .iter()
+                .any(|service| service.compose_profile == Some(vec!["monitoring"])),
+        );
     }
 
     let selected_profiles: Vec<String> = services
@@ -295,18 +318,6 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
 
     config.compose_profiles = Some(profiles);
 
-    config.setup_bbppairings = Some(
-        services
-            .iter()
-            .any(|service| service.compose_profile == Some(vec!["swiss-pairings"])),
-    );
-
-    config.enable_monitoring = Some(
-        services
-            .iter()
-            .any(|service| service.compose_profile == Some(vec!["monitoring"])),
-    );
-
     if Gitpod::is_host() {
         let gitpod = Gitpod::load();
         config.lila_domain = Some(gitpod.domain);
@@ -322,7 +333,7 @@ fn setup(mut config: Config, first_setup: bool) -> std::io::Result<()> {
         Repository::new("lichess-org", "lila-ws"),
     ];
 
-    if options.contains(&Setting::SetupDatabase) {
+    if config.setup_database.unwrap_or_default() {
         repos_to_clone.push(Repository::new("lichess-org", "lila-db-seed"));
     }
 
