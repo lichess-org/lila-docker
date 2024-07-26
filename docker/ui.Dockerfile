@@ -1,4 +1,4 @@
-FROM node:22.3.0-bookworm-slim
+FROM node:22.5.1-bookworm-slim
 
 USER root
 

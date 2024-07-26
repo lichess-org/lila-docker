@@ -1,6 +1,6 @@
-FROM eclipse-temurin:22.0.1_8-jdk-alpine
+FROM eclipse-temurin:22.0.2_9-jdk-alpine
 
-COPY --from=python:3.12.3-alpine3.19 / /
+COPY --from=python:3.12.4-alpine3.20 / /
 
 RUN pip install --upgrade pip
 RUN pip install berserk pymongo requests termcolor

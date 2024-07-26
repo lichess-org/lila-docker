@@ -31,14 +31,14 @@ RUN mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /seeded \
         --tokens
 
 ##################################################################################
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.0_3.4.2 AS lilawsbuilder
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.1_3.4.2 AS lilawsbuilder
 
 COPY repos/lila-ws /lila-ws
 WORKDIR /lila-ws
 RUN sbt stage
 
 ##################################################################################
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.0_3.4.2 AS lilabuilder
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.1_3.4.2 AS lilabuilder
 
 COPY --from=node /lila /lila
 WORKDIR /lila
