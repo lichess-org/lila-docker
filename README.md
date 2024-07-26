@@ -214,13 +214,10 @@ docker compose run --rm -w /dartchess mobile bash -c "dart pub get && dart test 
 
 By default, your local lila instance will use the version of chessground that is published to npm. If you want to make changes to that library and see them reflected in your local lila instance, you can do the following:
 
-1. Update the `package.json` in the `lila` repo:
+1. Have lila use the local version of chessground:
 
-    ```diff
-    "dependencies": {
-    -  "chessground": "^8.3.11",
-    +  "chessground": "link:/chessground",
-    }
+    ```bash
+    docker compose run --rm -w /lila ui bash -c "pnpm link /chessground"
     ```
 
 2. Start the chessground compiler in watch mode:
