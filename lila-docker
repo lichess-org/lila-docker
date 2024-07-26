@@ -7,7 +7,7 @@ run_setup() {
 
     if  is_gitpod_prebuild; then
         echo "✓ Running in Gitpod prebuilds"
-        export NON_INTERACTIVE=true
+        export NONINTERACTIVE=true
     fi
 
     rust_cmd setup

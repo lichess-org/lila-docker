@@ -215,7 +215,7 @@ fn main() -> std::io::Result<()> {
     let config = Config::load();
 
     match args[1].as_str() {
-        "setup" => setup(config, true, std::env::var("NON_INTERACTIVE").is_ok()),
+        "setup" => setup(config, true, std::env::var("NONINTERACTIVE").is_ok()),
         "add_services" => setup(config, false, false),
         "hostname" => hostname(config),
         "mobile" => mobile_setup(config),
