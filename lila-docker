@@ -168,8 +168,12 @@ run_mobile() {
 rust_cmd() {
     if command -v rustup &> /dev/null; then
         # if the host has Rust installed, use it directly
+
+        # if `CARGO_TARGET_DIR` is set, use `CARGO_TARGET_DIR/release/command`, else use `command/target/release/command`
+        COMMAND_EXE="${CARGO_TARGET_DIR:-command/target}/release/command"
+
         cargo build --release --manifest-path command/Cargo.toml
-        ./command/target/release/command "$@"
+        eval "$COMMAND_EXE $@"
     elif [ "$(uname)" = "Darwin" ]; then
         docker run --rm -v "$PWD/command:/command" -w /command messense/cargo-zigbuild:0.19.1 \
             cargo zigbuild --release --target universal2-apple-darwin
