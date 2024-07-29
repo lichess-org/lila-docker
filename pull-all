@@ -67,7 +67,7 @@ for dir in ./repos/*; do
         fi
         # check if repo is up to date
         if [[ $(git rev-list HEAD...$upstream_or_origin/$main_or_master --count) -eq 0 ]]; then
-            echo "🟢 up to date"
+            echo "🟢"
             cd "$initial_dir"
             continue
         fi
