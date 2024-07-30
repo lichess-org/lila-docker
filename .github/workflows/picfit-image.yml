@@ -7,6 +7,9 @@ on:
       - '.github/workflows/picfit-image.yml'
       - 'docker/picfit-image.Dockerfile'
 
+env:
+  PICFIT_VERSION: 0.14.0
+
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -23,6 +26,7 @@ jobs:
         with:
           repository: 'thoas/picfit'
           path: 'picfit'
+          ref: ${{ env.PICFIT_VERSION }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -42,7 +46,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}/picfit
-          tags: v1
+          tags: ${{ env.PICFIT_VERSION }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
