@@ -1,4 +1,4 @@
-#!/usr/bin/env bash 
+#!/usr/bin/env bash
 
 set -e
 
@@ -11,26 +11,26 @@ if [[ $1 == "--pull" ]]; then
     pull_flag=true
 fi
 
-for dir in ./repos/*; do
-    # echo "Checking $dir"
-    if [[ -d "$dir" ]]; then
-        cd "$dir"
+handle_dir() {
+    if [[ -d "$1" ]]; then
+
+        cd "$1"
 
         # Format the directory name
-        dir=$(printf "%-20s" "$dir")
+        dir=$(printf "%-14s" "$(basename $1)")
         echo -n "$dir: "
 
         # check if the directory is a git repo
         if [[ ! -d ".git" ]]; then
             echo "🟡 not a git repo"
             cd "$initial_dir"
-            continue
+            return
         fi
         # check if the git repo is dirty
         if [[ $(git diff --stat) != '' ]]; then
             echo "🟡 repo has uncommitted changes"
             cd "$initial_dir"
-            continue
+            return
         fi
         # check if repo has a main branch or master branch
         main_or_master=""
@@ -41,7 +41,7 @@ for dir in ./repos/*; do
         else
             echo "🟡 no main or master branch"
             cd "$initial_dir"
-            continue
+            return
         fi
 
         # check if repo has an upstream or origin remote
@@ -53,7 +53,7 @@ for dir in ./repos/*; do
         else
             echo "🟡 no upstream or origin remote"
             cd "$initial_dir"
-            continue
+            return
         fi
 
         git fetch "$upstream_or_origin" "$main_or_master" 2>/dev/null
@@ -63,13 +63,13 @@ for dir in ./repos/*; do
         if [[ $current_branch != "$main_or_master" ]]; then
             echo "🟣 not on $main_or_master branch ($current_branch)"
             cd "$initial_dir"
-            continue
+            return
         fi
         # check if repo is up to date
         if [[ $(git rev-list HEAD...$upstream_or_origin/$main_or_master --count) -eq 0 ]]; then
             echo "🟢"
             cd "$initial_dir"
-            continue
+            return
         fi
 
         if [[ $pull_flag == true ]]; then
@@ -81,4 +81,12 @@ for dir in ./repos/*; do
 
         cd "$initial_dir"
     fi
+}
+
+# check lila-docker itself
+handle_dir $(dirname "$(readlink -f "$BASH_SOURCE")")
+
+# check the cloned repos
+for dir in ./repos/*; do
+    handle_dir "$dir"
 done

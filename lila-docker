@@ -287,6 +287,9 @@ case "$@" in
         add_services
         ;;
     "status")
+        docker info --format '{{ .OperatingSystem }}, {{ .ClientInfo.Version }}, {{ .ClientInfo.Os }} {{ .ClientInfo.Arch }}'
+        docker compose ps
+        echo "----------------------------"
         ./pull-all
         ;;
     "pull")
