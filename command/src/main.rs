@@ -565,7 +565,7 @@ fn prompt_for_services() -> Result<Vec<OptionalService<'static>>, Error> {
     )
     .item(
         OptionalService {
-            compose_profile: vec!["mobile"].into(),
+            compose_profile: None,
             repositories: vec![Repository::new("lichess-org", "mobile")].into(),
         },
         "Mobile app",

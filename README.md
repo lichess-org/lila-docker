@@ -261,6 +261,9 @@ curl --get http://localhost:8086/query \
 
 ### Mobile
 
+> [!IMPORTANT]
+> Requires Flutter and `adb` to be installed locally. Verify Flutter is configured correctly with `flutter doctor`.
+
 1. On your Android phone:
     1. Connect your phone to the same wifi network as your host machine
     2. Enable Developer Mode
@@ -283,30 +286,22 @@ curl --get http://localhost:8086/query \
         ./lila-docker mobile
         ```
 
-    4. Get a shell on the Mobile container:
+     4. Verify your phone is listed
 
-        ```bash
-        docker compose exec -it mobile bash
-        ```
+         ```bash
+         adb devices
+         ```
 
-        1. Verify your phone is listed
+     5. Install the app dependencies and run the app:
 
-            ```bash
-            adb devices
-            ```
+         ```bash
+         cd repos/mobile
 
-        2. Install the app dependencies:
+         flutter channel beta
+         flutter upgrade
 
-            ```bash
-            flutter pub get
-            dart run build_runner build
-            ```
+         flutter pub get
+         dart run build_runner build
 
-        3. Run the app:
-            ```bash
-            flutter run -v \
-                --dart-define LICHESS_HOST=$LILA_URL \
-                --dart-define LICHESS_WS_HOST=$LILA_URL
-            ```
-            - No substitutions necessary. The `$LILA_URL` environment variable will already be set on the container.
-            - The first time you run it, it might take a while
+         flutter run
+         ```
