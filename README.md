@@ -4,6 +4,8 @@ Lichess development environment using Docker Compose, for developing on Mac, Lin
 
 The only requirements for running on your local machine are `git` and Docker Desktop. All the other dependencies (Scala, MongoDB, Node.js, etc) are installed and run in Docker containers.
 
+![image](https://github.com/user-attachments/assets/0192574a-4cb7-42da-a19e-e75af24b0565)
+
 ## Running in Gitpod
 
 As an alternative to running it on your local machine, you can use Gitpod (a free, online, VS Code-like IDE) for contributing. With a single click, it will launch a workspace and automatically:
