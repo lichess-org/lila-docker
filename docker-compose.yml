@@ -90,19 +90,6 @@ services:
       - lila
       - lila_ws
 
-  mobile:
-    build:
-      context: docker
-      dockerfile: mobile.Dockerfile
-    environment:
-      - LILA_URL=${LILA_URL:-http://localhost:8080}
-    tty: true
-    volumes:
-      - ./repos/dartchess:/dartchess
-      - ./repos/mobile:/app
-    profiles:
-      - mobile
-
   api_docs:
     build:
       context: docker

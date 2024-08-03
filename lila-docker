@@ -162,8 +162,11 @@ run_hostname() {
 
 run_mobile() {
     rust_cmd mobile
-    docker compose exec mobile adb pair $PHONE_IP:$PAIRING_PORT $PAIRING_CODE
-    docker compose exec mobile adb connect $PHONE_IP:$CONNECTION_PORT
+    adb pair $PHONE_IP:$PAIRING_PORT $PAIRING_CODE
+    adb connect $PHONE_IP:$CONNECTION_PORT
+    adb reverse tcp:9663 tcp:8080
+    adb reverse tcp:9664 tcp:8080
+    echo "Run "flutter run" in ./repos/mobile to start the app"
 }
 
 rust_cmd() {
