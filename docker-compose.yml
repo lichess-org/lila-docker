@@ -311,9 +311,13 @@ services:
       - HTTP_API_LOGGER=true
       - HTTP_ENABLE_DOCS=true
       - MONGO_DATABASE=lichess
-      - MONGO_DRIVER_LOG_LEVEL=INFO
+      - MONGO_STUDY_DATABASE=lichess
+      - MONGO_DRIVER_LOG_LEVEL=DEBUG
       - MONGO_URI=mongodb://mongodb_secondary
+      - MONGO_STUDY_URI=mongodb://mongodb_secondary
       - INGESTOR_FORUM_TIME_WINDOWS=1
+      - INGESTOR_STUDY_INTERVAL=10
+      - INGESTOR_STUDY_START_AT=1344789787
     networks:
       - lila-network
     volumes:
