@@ -308,8 +308,6 @@ services:
       - APP_LOG_LEVEL=DEBUG
       - ELASTIC_URI=http://elasticsearch:9200
       - ELASTIC4S_LOG_LEVEL=DEBUG
-      - HTTP_API_LOGGER=true
-      - HTTP_ENABLE_DOCS=true
       - MONGO_DATABASE=lichess
       - MONGO_STUDY_DATABASE=lichess
       - MONGO_DRIVER_LOG_LEVEL=DEBUG
