@@ -488,8 +488,16 @@ fn prompt_for_services() -> Result<Vec<OptionalService<'static>>, Error> {
             compose_profile: vec!["stockfish-analysis"].into(),
             repositories: None,
         },
-        "Stockfish Analysis",
+        "Stockfish Game Analysis",
         "for requesting computer analysis of games",
+    )
+    .item(
+        OptionalService {
+            compose_profile: None,
+            repositories: vec![Repository::new("lichess-org", "lifat")].into(),
+        },
+        "Stockfish Analysis Board",
+        "for toggling engine when analyzing positions",
     )
     .item(
         OptionalService {
@@ -505,7 +513,7 @@ fn prompt_for_services() -> Result<Vec<OptionalService<'static>>, Error> {
             repositories: vec![Repository::new("lichess-org", "lifat")].into(),
         },
         "Larger static assets",
-        "Analysis board engines, background images, voice move models, etc",
+        "Background images, voice move models, etc",
     )
     .item(
         OptionalService {
