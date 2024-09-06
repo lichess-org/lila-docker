@@ -216,21 +216,28 @@ docker compose run --rm -w /dartchess mobile bash -c "dart pub get && dart analy
 docker compose run --rm -w /dartchess mobile bash -c "dart pub get && dart test -x full_perft"
 ```
 
-### Developing Chessground locally
+### Developing Chessground or PGN-Viewer locally
 
-By default, your local lila instance will use the version of chessground that is published to npm. If you want to make changes to that library and see them reflected in your local lila instance, you can do the following:
+By default, your local lila instance will use the version of chessground + pgn-viewer that are published to npm. If you want to make changes to either library and see them reflected in your local lila instance, you can do the following:
 
-1. Have lila use the local version of chessground:
+1. Have lila use the local version(s):
 
     ```bash
     docker compose run --rm -w /lila ui bash -c "pnpm link /chessground"
+
+    docker compose run --rm -w /lila ui bash -c "pnpm link /pgn-viewer"
     ```
 
-2. Start the chessground compiler in watch mode:
+2. Start the compilers in watch mode:
 
     ```bash
     docker compose run --rm -w /chessground ui bash -c "pnpm install && pnpm run compile --watch"
+
+    docker compose run --rm -w /pgn-viewer ui bash -c "pnpm install && pnpm run sass-dev && pnpm run bundle-prod --watch"
     ```
+
+    See the updated chessground demo: http://localhost:8090/demo.html
+    See the updated pgn-viewer demo: http://localhost:8091/
 
 3. Start the lila ui build in watch mode:
 
@@ -238,17 +245,7 @@ By default, your local lila instance will use the version of chessground that is
     ./lila-docker ui
     ```
 
-Then you can see the updated chessground demo at http://localhost:8090/demo.html and when you refresh lila, it will use the local copy of chessground.
-
-### Developing PGN Viewer locally
-
-To re-compile the PGN Viewer after making changes:
-
-```bash
-docker compose run --rm -w /pgn-viewer ui bash -c "pnpm run sass-dev && pnpm run bundle-dev"
-```
-
-See the changes on the PGN Viewer demo page: http://localhost:8091/
+   and when you refresh lila, it will use the local copy of chessground and/or pgn-viewer.
 
 ### InfluxDB Monitoring
 
