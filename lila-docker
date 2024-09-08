@@ -91,7 +91,7 @@ setup_database() {
         return
     fi
 
-    while ! docker compose exec mongodb mongo --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
+    while ! docker compose exec mongodb mongosh --eval "db.runCommand({ping: 1})" > /dev/null 2>&1; do
         echo "Waiting for mongodb to be ready..."
         sleep 1
     done
@@ -116,11 +116,11 @@ setup_database() {
         "${params[@]}"
 
     echo -n "Creating database indexes..."
-    docker compose exec mongodb mongo --quiet lichess /lila/bin/mongodb/indexes.js
+    docker compose exec mongodb mongosh --quiet lichess /lila/bin/mongodb/indexes.js
     echo " done"
 
     echo -n "Creating user trophies..."
-    docker compose exec mongodb mongo --quiet lichess /lila/bin/mongodb/create-trophy-kinds.js
+    docker compose exec mongodb mongosh --quiet lichess /lila/bin/mongodb/create-trophy-kinds.js
     echo " done"
 
     docker compose run --rm python python /scripts/users.py

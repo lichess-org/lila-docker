@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo:5.0.28-focal
+    image: mongo:7.0.14-jammy
     restart: unless-stopped
     command: mongod --bind_ip_all --replSet rs0
     healthcheck:
@@ -16,7 +16,7 @@ services:
       - ./scripts:/scripts
 
   mongodb_secondary:
-    image: mongo:5.0.28-focal
+    image: mongo:7.0.14-jammy
     restart: unless-stopped
     command: mongod --bind_ip_all --replSet rs0
     networks:
@@ -362,7 +362,7 @@ services:
     profiles:
       - email
 
-  mongo_express:
+  mongo_express_primary:
     image: mongo-express:1.0.2-20-alpine3.19
     restart: unless-stopped
     ports:
