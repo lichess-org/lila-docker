@@ -124,7 +124,7 @@ docker compose exec lila ./lila playRoutes
 After modifying a `translation/source/*.xml` file, run:
 
 ```bash
-docker compose run --rm ui /lila/bin/trans-dump
+docker compose run --rm -w /lila ui pnpm run trans-dump
 ```
 
 ### Code formatting:
