@@ -347,7 +347,7 @@ fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io
 
     for repo in repos_to_clone {
         let progress = spinner();
-        progress.start(&format!("Cloning {}...", repo.full_name()));
+        progress.start(format!("Cloning {}...", repo.full_name()));
 
         if repo.clone_path().read_dir()?.next().is_some() {
             progress.stop(format!("✓ Already cloned {}", repo.full_name()));
