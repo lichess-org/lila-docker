@@ -121,7 +121,7 @@ setup_database() {
             sleep 2
         done
 
-        docker compose exec lila_search_ingestor sbt 'ingestor/runMain lila.search.ingestor.cli rebuild --drop'
+        docker compose exec lila_search_ingestor sbt 'ingestor/runMain lila.search.ingestor.cli index --all --since 0'
     fi
 
     docker compose run --rm python python /scripts/users.py
