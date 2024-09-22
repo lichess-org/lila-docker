@@ -37,7 +37,7 @@ services:
       dockerfile: sbt.Dockerfile
     user: ${USER_ID}:${GROUP_ID}
     working_dir: /lila
-    entrypoint: ./lila run
+    entrypoint: ./lila.sh run
     restart: unless-stopped
     networks:
       - lila-network

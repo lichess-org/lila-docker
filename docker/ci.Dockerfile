@@ -41,7 +41,7 @@ FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.2_3.5.1 AS lilabui
 
 COPY --from=node /lila /lila
 WORKDIR /lila
-RUN ./lila stage
+RUN ./lila.sh stage
 
 ##################################################################################
 FROM mongo:7-jammy
