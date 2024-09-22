@@ -11,7 +11,6 @@ RUN /lila/ui/build --clean-build --debug
 FROM mongo:7-jammy AS dbbuilder
 
 RUN apt update && apt install -y python3-pip python3-venv curl && apt clean
-RUN pip3 install pymongo requests
 
 ENV JAVA_HOME=/opt/java/openjdk
 COPY --from=eclipse-temurin:21-jdk $JAVA_HOME $JAVA_HOME
