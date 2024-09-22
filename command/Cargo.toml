@@ -9,7 +9,7 @@ strip = "none"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cliclack = "0.2.5"
+cliclack = "0.3.5"
 local-ip-address = "0.6.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
