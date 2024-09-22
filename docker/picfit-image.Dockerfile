@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.22.1-alpine3.19 AS build
+FROM golang:1.23.1-alpine3.20 AS build
 
 RUN apk --no-cache add make
 
