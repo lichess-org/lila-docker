@@ -9,7 +9,7 @@ WORKDIR /picfit
 RUN make -C /picfit build
 
 # Runtime stage
-FROM alpine:3.19
+FROM alpine:3.20
 
 COPY --from=build /picfit/bin/picfit /picfit
 

@@ -23,7 +23,7 @@ services:
       - lila-network
 
   redis:
-    image: redis:7.2.5-alpine3.20
+    image: redis:7.4.0-alpine3.20
     restart: unless-stopped
     networks:
       - lila-network
