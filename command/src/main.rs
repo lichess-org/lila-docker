@@ -30,6 +30,7 @@ struct Config {
     compose_profiles: Option<Vec<String>>,
     setup_database: Option<bool>,
     setup_bbppairings: Option<bool>,
+    mock_email: Option<bool>,
     enable_monitoring: Option<bool>,
     enable_rate_limiting: Option<bool>,
     su_password: Option<String>,
@@ -80,6 +81,7 @@ impl Config {
             compose_profiles,
             setup_database,
             setup_bbppairings,
+            mock_email,
             enable_monitoring,
             enable_rate_limiting,
             su_password,
@@ -101,6 +103,7 @@ impl Config {
             to_env!(compose_profiles, compose_profiles_string),
             to_env!(setup_database),
             to_env!(setup_bbppairings),
+            to_env!(mock_email),
             to_env!(enable_monitoring),
             to_env!(enable_rate_limiting),
             to_env!(su_password),
@@ -293,6 +296,12 @@ fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io
             services
                 .iter()
                 .any(|service| service.compose_profile == Some(vec!["swiss-pairings"])),
+        );
+
+        config.mock_email = Some(
+            !services
+                .iter()
+                .any(|service| service.compose_profile == Some(vec!["email"])),
         );
 
         config.enable_monitoring = Some(
@@ -818,6 +827,7 @@ mod tests {
             compose_profiles: Some(vec!["foo".to_string(), "bar".to_string()]),
             setup_database: Some(true),
             setup_bbppairings: Some(false),
+            mock_email: Some(false),
             enable_monitoring: Some(false),
             enable_rate_limiting: Some(true),
             su_password: Some("foo".to_string()),
@@ -838,6 +848,7 @@ mod tests {
                 "COMPOSE_PROFILES=foo,bar",
                 "SETUP_DATABASE=true",
                 "SETUP_BBPPAIRINGS=false",
+                "MOCK_EMAIL=false",
                 "ENABLE_MONITORING=false",
                 "ENABLE_RATE_LIMITING=true",
                 "SU_PASSWORD=foo",
@@ -860,6 +871,7 @@ mod tests {
             compose_profiles: None,
             setup_database: None,
             setup_bbppairings: None,
+            mock_email: None,
             enable_monitoring: None,
             enable_rate_limiting: None,
             su_password: None,
