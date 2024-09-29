@@ -464,6 +464,14 @@ fn gitpod_checkout_pr() -> std::io::Result<()> {
 
 #[allow(clippy::too_many_lines)]
 fn prompt_for_services() -> Result<Vec<OptionalService<'static>>, Error> {
+    info(
+        [
+            "Your Lichess development site will include a basic instance of Lichess.",
+            "You will be able to use the site, play games, and test most of the main functionality.",
+            "If you want additional features, you can select them here.",
+        ]
+        .join("\n"),
+    )?;
     multiselect(
         "Select which optional services to include:\n    (Use arrows, <space> to toggle, <enter> to continue)\n",
     )
@@ -506,7 +514,7 @@ fn prompt_for_services() -> Result<Vec<OptionalService<'static>>, Error> {
             repositories: vec![Repository::new("lichess-org", "lifat")].into(),
         },
         "Stockfish Analysis Board",
-        "for toggling engine when analyzing positions",
+        "for toggling engine when analyzing positions of games or puzzles",
     )
     .item(
         OptionalService {
