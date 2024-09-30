@@ -281,7 +281,7 @@ case "$@" in
         docker compose restart lila
         ;;
     ui)
-        run_ui_build --rebuild
+        run_ui_build --watch
         ;;
     "gitpod public")
         rust_cmd gitpod_public
