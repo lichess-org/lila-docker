@@ -22,6 +22,16 @@ services:
     networks:
       - lila-network
 
+  mongodb_insights:
+    image: mongo:4.4.29-focal
+    networks:
+      - lila-network
+
+  mongodb_puzzles:
+    image: mongo:5.0.29-focal
+    networks:
+      - lila-network
+
   redis:
     image: redis:7.4.0-alpine3.20
     restart: unless-stopped
