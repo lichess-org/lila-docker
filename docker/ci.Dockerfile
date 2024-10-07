@@ -63,6 +63,7 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 ENV LANG=C.utf8
 
 WORKDIR /lila
+SHELL ["/bin/bash", "-c"]
 CMD mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /seeded \
     && redis-server --daemonize yes \
     && wait-for localhost:27017 --timeout=15 \
