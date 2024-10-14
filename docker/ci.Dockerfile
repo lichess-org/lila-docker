@@ -4,13 +4,18 @@ FROM node:22-bookworm AS node
 COPY repos/lila /lila
 COPY conf/ci.conf /lila/conf/application.conf
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-RUN corepack enable
-RUN /lila/ui/build --clean-build --debug
+RUN corepack enable \
+    && /lila/ui/build --clean-build --debug
 
 ##################################################################################
 FROM mongo:7-jammy AS dbbuilder
 
-RUN apt update && apt install -y python3-pip python3-venv curl && apt clean
+RUN apt update \
+    && apt install -y \
+        curl \
+        python3-pip \
+        python3-venv \
+    && apt clean
 
 ENV JAVA_HOME=/opt/java/openjdk
 COPY --from=eclipse-temurin:21-jdk $JAVA_HOME $JAVA_HOME
@@ -19,9 +24,9 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 COPY repos/lila-db-seed /lila-db-seed
 WORKDIR /lila-db-seed
 
-RUN mkdir /seeded
-RUN mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /seeded \
- && ./spamdb/spamdb.py \
+RUN mkdir /seeded \
+    && mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /seeded \
+    && ./spamdb/spamdb.py \
         --drop-db \
         --password=password \
         --su-password=password \
@@ -46,8 +51,13 @@ RUN ./lila.sh stage
 ##################################################################################
 FROM mongo:7-jammy
 
-RUN apt update && apt install -y curl redis python3-pip && apt clean
-RUN pip3 install berserk pytest
+RUN apt update \
+    && apt install -y \
+        curl \
+        python3-pip \
+        redis \
+    && apt clean \
+    && pip3 install berserk pytest
 
 COPY --from=dbbuilder /seeded /seeded
 COPY --from=lilawsbuilder /lila-ws/target /lila-ws/target
