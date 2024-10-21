@@ -116,7 +116,7 @@ To watch for Typescript/SCSS changes and automatically recompile:
 If you edit the `conf/routes` file, you'll need to update the route cache.
 
 ```bash
-docker compose exec lila ./lila playRoutes
+docker compose exec lila ./lila.sh playRoutes
 ```
 
 ### To add translation keys:
