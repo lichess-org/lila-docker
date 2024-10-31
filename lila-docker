@@ -16,7 +16,7 @@ run_setup() {
     docker compose --profile utils build
     docker compose up -d
 
-    run_ui_build --update
+    run_ui_build
 
     setup_bbppairings
     setup_database
@@ -82,7 +82,7 @@ build_all_profiles() {
 }
 
 run_ui_build() {
-    ARGS=(--update --clean-build --debug $@)
+    ARGS=(--update --clean --debug $@)
     echo "Running ./ui/build with args: ${ARGS[@]}"
     docker compose run --rm ui /lila/ui/build "${ARGS[@]}"
 }

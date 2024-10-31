@@ -5,7 +5,7 @@ COPY repos/lila /lila
 COPY conf/ci.conf /lila/conf/application.conf
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable \
-    && /lila/ui/build --clean-build --debug
+    && /lila/ui/build --clean --debug
 
 ##################################################################################
 FROM mongo:7-jammy AS dbbuilder
