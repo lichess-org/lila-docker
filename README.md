@@ -146,8 +146,8 @@ Then in `docker-compose.yml`add `- ./database:/data/db` to mongodb volumes
 To install the development version of [Berserk](https://github.com/lichess-org/berserk) and run a sample script against your local development site:
 
 ```bash
-docker compose run --rm -w /berserk python \
-    bash -c "pip install -e . && python /scripts/berserk-example.py"
+docker compose run --rm -w /berserk python sh -c "pip install -e . && python /scripts/berserk-example.py"
+docker compose run --rm -w /berserk python sh -c "pip install -e . && python /scripts/berserk-connect-bots.py"
 ```
 
 ### Scala Metals (IDE helper):
