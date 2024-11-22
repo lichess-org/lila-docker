@@ -1,9 +1,12 @@
 ##################################################################################
-FROM node:22-bookworm AS node
+FROM node:22.11.0-bookworm-slim AS node
 
 COPY repos/lila /lila
 COPY conf/ci.conf /lila/conf/application.conf
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN apt update \
+    && apt install -y git \
+    && apt clean
 RUN corepack enable \
     && /lila/ui/build --clean --debug
 
@@ -35,14 +38,11 @@ RUN mkdir /seeded \
         --tokens
 
 ##################################################################################
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.4_3.5.2 AS lilawsbuilder
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.4_3.5.2 AS lila-and-lilawsbuilder
 
 COPY repos/lila-ws /lila-ws
 WORKDIR /lila-ws
 RUN sbt stage
-
-##################################################################################
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.4_3.5.2 AS lilabuilder
 
 COPY --from=node /lila /lila
 WORKDIR /lila
@@ -60,10 +60,10 @@ RUN apt update \
     && pip3 install berserk pytest
 
 COPY --from=dbbuilder /seeded /seeded
-COPY --from=lilawsbuilder /lila-ws/target /lila-ws/target
-COPY --from=lilabuilder /lila/target /lila/target
-COPY --from=lilabuilder /lila/public /lila/public
-COPY --from=lilabuilder /lila/conf   /lila/conf
+COPY --from=lila-and-lilawsbuilder /lila-ws/target /lila-ws/target
+COPY --from=lila-and-lilawsbuilder /lila/target /lila/target
+COPY --from=lila-and-lilawsbuilder /lila/public /lila/public
+COPY --from=lila-and-lilawsbuilder /lila/conf   /lila/conf
 COPY --from=node /lila/public /lila/target/universal/stage/public
 COPY --from=thegeeklab/wait-for /usr/local/bin/wait-for /usr/local/bin/wait-for
 
