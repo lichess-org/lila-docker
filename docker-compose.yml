@@ -233,6 +233,8 @@ services:
       dockerfile: ui.Dockerfile
     restart: unless-stopped
     user: ${USER_ID}:${GROUP_ID}
+    environment:
+      - CI=1 # to disable pnpm install prompts
     networks:
       - lila-network
     volumes:
