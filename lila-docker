@@ -82,7 +82,7 @@ build_all_profiles() {
 }
 
 run_ui_build() {
-    ARGS=(--update --clean --debug $@)
+    ARGS=(--clean --debug $@)
     echo "Running ./ui/build with args: ${ARGS[@]}"
     docker compose run --rm ui /lila/ui/build "${ARGS[@]}"
 }
