@@ -140,7 +140,7 @@ setup_bbppairings() {
 
     ## verify it compiled
     docker compose run --rm --entrypoint="/opt/bbpPairings/bbpPairings.exe" lila \
-        && echo "✅ bbppairings compiled successfully"
+        && echo "✅ bbpPairings compiled successfully"
 }
 
 reset_database() {
