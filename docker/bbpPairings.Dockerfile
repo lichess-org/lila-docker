@@ -1,10 +1,5 @@
-FROM ubuntu:focal
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.4_3.5.2
 
-RUN apt-get update && \
-    apt-get install --yes \
-        g++ \
-        git \
-        make \
-    && apt-get clean
+RUN apk add build-base
 
 WORKDIR /mnt
