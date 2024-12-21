@@ -139,7 +139,8 @@ setup_bbppairings() {
     docker run --rm -v ./repos/bbpPairings:/mnt bbppairings make
 
     ## verify it compiled
-    ./repos/bbpPairings/bbpPairings.exe
+    docker compose run --rm --entrypoint="/opt/bbpPairings/bbpPairings.exe" lila \
+        && echo "✅ bbppairings compiled successfully"
 }
 
 reset_database() {
