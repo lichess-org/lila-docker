@@ -289,8 +289,6 @@ services:
       - HTTP_ENABLE_DOCS=true
       - OTEL_METRICS_EXPORTER=none
       - OTEL_TRACES_EXPORTER=none
-      - OTEL_EXPORTER_PROMETHEUS_HOST=0.0.0.0
-      - OTEL_EXPORTER_PROMETHEUS_PORT=9465
     ports:
       - 9673:9673
     networks:
@@ -325,8 +323,6 @@ services:
       - INGESTOR_STUDY_START_AT=1344789787
       - OTEL_METRICS_EXPORTER=none
       - OTEL_TRACES_EXPORTER=none
-      - OTEL_EXPORTER_PROMETHEUS_HOST=0.0.0.0
-      - OTEL_EXPORTER_PROMETHEUS_PORT=9465
     networks:
       - lila-network
     volumes:
