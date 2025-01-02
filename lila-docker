@@ -165,15 +165,6 @@ run_hostname() {
     fi
 }
 
-run_mobile() {
-    rust_cmd mobile
-    adb pair $PHONE_IP:$PAIRING_PORT $PAIRING_CODE
-    adb connect $PHONE_IP:$CONNECTION_PORT
-    adb reverse tcp:9663 tcp:8080
-    adb reverse tcp:9664 tcp:8080
-    echo "Run "flutter run" in ./repos/mobile to start the app"
-}
-
 rust_cmd() {
     if command -v rustup &> /dev/null; then
         # if the host has Rust installed, use it directly
@@ -231,8 +222,6 @@ show_help() {
     echo "  build         Pre-fetch and pre-build all the images necessary for the containers"
     echo "  format        Run the code formatter to match Lichess code style"
     echo "  hostname      Set the hostname to something different than the default localhost"
-    echo "  mobile        For mobile app development. Pair and connect to a mobile device"
-    echo "  flutter       Get the 'flutter run' command with the URL arguments pre-configured"
     echo "  db            Reset and re-seed the database with fresh fake data"
     echo "  lila clean    Run 'sbt clean' in the lila container. Useful if there are compilation errors"
     echo "  lila restart  Restart the lila container to apply changes to the codebase"
@@ -271,9 +260,6 @@ case "$@" in
     hostname)
         run_hostname
         ;;
-    mobile)
-        run_mobile
-        ;;
     db)
         reset_database
         ;;
@@ -288,9 +274,6 @@ case "$@" in
         ;;
     "gitpod public")
         rust_cmd gitpod_public
-        ;;
-    "flutter")
-        rust_cmd flutter
         ;;
     "add-services")
         add_services

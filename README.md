@@ -203,19 +203,6 @@ docker compose run --rm -w /scalachess --entrypoint="sbt testKit/test" lila
 docker compose run --rm -w /scalachess --entrypoint="sbt package" lila
 ```
 
-### Dartchess:
-
-```bash
-## run formatter
-docker compose run --rm -w /dartchess mobile dart format .
-
-## analyze
-docker compose run --rm -w /dartchess mobile bash -c "dart pub get && dart analyze"
-
-## run tests
-docker compose run --rm -w /dartchess mobile bash -c "dart pub get && dart test -x full_perft"
-```
-
 ### Developing Chessground or PGN-Viewer locally
 
 By default, your local lila instance will use the version of chessground + pgn-viewer that are published to npm. If you want to make changes to either library and see them reflected in your local lila instance, you can do the following:
@@ -259,50 +246,3 @@ curl --get http://localhost:8086/query \
     --data-urlencode "db=kamon"  \
     --data-urlencode "q=show measurements;"
 ```
-
-### Mobile
-
-> [!IMPORTANT]
-> Requires Flutter and `adb` to be installed locally. Verify Flutter is configured correctly with `flutter doctor`.
-
-1. On your Android phone:
-    1. Connect your phone to the same wifi network as your host machine
-    2. Enable Developer Mode
-    3. In Developer Options, toggle Wireless Debugging to ON
-    4. Tap "Wireless Debugging" to enter its menu
-2. On your host machine:
-
-    1. Have the lila-docker services running, with the `Mobile` optional service started
-    2. Configure lila to run with your host's IP address or hostname instead of localhost
-
-        ```bash
-        ./lila-docker hostname
-        ```
-
-        - Then verify that your phone can access the site at `http://[your-selection]:8080`
-
-    3. Connect to your phone
-
-        ```bash
-        ./lila-docker mobile
-        ```
-
-     4. Verify your phone is listed
-
-         ```bash
-         adb devices
-         ```
-
-     5. Install the app dependencies and run the app:
-
-         ```bash
-         cd repos/mobile
-
-         flutter channel beta
-         flutter upgrade
-
-         flutter pub get
-         dart run build_runner build
-
-         flutter run
-         ```
