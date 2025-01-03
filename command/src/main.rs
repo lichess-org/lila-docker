@@ -38,10 +38,6 @@ struct Config {
     setup_api_tokens: Option<bool>,
     lila_domain: Option<String>,
     lila_url: Option<String>,
-    phone_ip: Option<String>,
-    connection_port: Option<u16>,
-    pairing_code: Option<u32>,
-    pairing_port: Option<u16>,
 }
 
 macro_rules! to_env {
@@ -89,10 +85,6 @@ impl Config {
             setup_api_tokens,
             lila_domain,
             lila_url,
-            phone_ip,
-            connection_port,
-            pairing_code,
-            pairing_port,
         } = self;
         let compose_profiles_string = compose_profiles
             .clone()
@@ -111,10 +103,6 @@ impl Config {
             to_env!(setup_api_tokens),
             to_env!(lila_domain),
             to_env!(lila_url),
-            to_env!(phone_ip),
-            to_env!(connection_port),
-            to_env!(pairing_code),
-            to_env!(pairing_port),
         ]
         .iter()
         .filter(|line| !line.is_empty())
@@ -221,9 +209,7 @@ fn main() -> std::io::Result<()> {
         "setup" => setup(config, true, std::env::var("NONINTERACTIVE").is_ok()),
         "add_services" => setup(config, false, false),
         "hostname" => hostname(config),
-        "mobile" => mobile_setup(config),
         "welcome" => welcome(config),
-        "flutter" => flutter(config),
         "gitpod_public" => gitpod_public(),
         _ => panic!("Unknown command"),
     }
@@ -407,8 +393,6 @@ fn create_placeholder_dirs() {
         Repository::new("lichess-org", "chessground"),
         Repository::new("lichess-org", "pgn-viewer"),
         Repository::new("lichess-org", "scalachess"),
-        Repository::new("lichess-org", "mobile"),
-        Repository::new("lichess-org", "dartchess"),
         Repository::new("lichess-org", "berserk"),
         Repository::new("cyanfish", "bbpPairings"),
     ]
@@ -591,22 +575,6 @@ fn prompt_for_services() -> Result<Vec<OptionalService<'static>>, Error> {
     .item(
         OptionalService {
             compose_profile: None,
-            repositories: vec![Repository::new("lichess-org", "mobile")].into(),
-        },
-        "Mobile app",
-        "Flutter-based mobile app",
-    )
-    .item(
-        OptionalService {
-            compose_profile: None,
-            repositories: vec![Repository::new("lichess-org", "dartchess")].into(),
-        },
-        "Dartchess",
-        "standalone chess library for mobile platforms",
-    )
-    .item(
-        OptionalService {
-            compose_profile: None,
             repositories: vec![Repository::new("lichess-org", "berserk")].into(),
         },
         "Berserk",
@@ -693,45 +661,6 @@ fn hostname(mut config: Config) -> std::io::Result<()> {
     outro(format!("✔ Local Lichess URL set to http://{hostname}:8080"))
 }
 
-fn mobile_setup(mut config: Config) -> std::io::Result<()> {
-    intro("On your Android phone, open Developer Options > Wireless Debugging")?;
-
-    let phone_ip = match config.phone_ip {
-        Some(ip) => input("Your phone's private IP address").default_input(&ip),
-        None => input("Your phone's private IP address").placeholder("192.168.x.x or 10.x.x.x"),
-    }
-    .interact()?;
-
-    let connection_port: u16 = input("Connection port")
-        .validate(|input: &String| validate_string_length(input, 5))
-        .interact()?;
-
-    info("Tap `Pair device with pairing code`")?;
-
-    let pairing_code: u32 = input("Pairing code")
-        .validate(|input: &String| validate_string_length(input, 6))
-        .interact()?;
-    let pairing_port: u16 = input("Pairing port")
-        .validate(|input: &String| validate_string_length(input, 5))
-        .interact()?;
-
-    config.phone_ip = Some(phone_ip);
-    config.connection_port = Some(connection_port);
-    config.pairing_code = Some(pairing_code);
-    config.pairing_port = Some(pairing_port);
-    config.save()?;
-
-    outro("Pairing and connecting to phone...")
-}
-
-fn validate_string_length(input: &str, length: usize) -> Result<(), String> {
-    if input.len() == length {
-        Ok(())
-    } else {
-        Err(format!("Value should be {length} digits in length"))
-    }
-}
-
 fn welcome(config: Config) -> std::io::Result<()> {
     intro("Your Lichess development environment is starting!")?;
 
@@ -760,25 +689,6 @@ fn welcome(config: Config) -> std::io::Result<()> {
     )?;
 
     outro("🚀")
-}
-
-fn flutter(config: Config) -> std::io::Result<()> {
-    let url = if Gitpod::is_host() {
-        gitpod_public()?;
-        Gitpod::load().url
-    } else {
-        config.lila_url.expect("Missing lila_url")
-    };
-
-    if url.contains("localhost") {
-        error("To run the Flutter app against your development site, change the lila URL to a hostname that can be resolved from other network devices (instead of `localhost`).")?;
-        return note("To fix, run:", "./lila-docker hostname");
-    }
-
-    outro("On your local machine, start Flutter with this command:")?;
-    println!("\nflutter run -v \\\n  --dart-define LICHESS_HOST={url} \\\n  --dart-define LICHESS_WS_HOST={url}");
-
-    Ok(())
 }
 
 fn gitpod_public() -> std::io::Result<()> {
@@ -843,10 +753,6 @@ mod tests {
             setup_api_tokens: Some(false),
             lila_domain: Some("baz:8080".to_string()),
             lila_url: Some("http://baz:8080".to_string()),
-            phone_ip: Some("1.2.3.4".to_string()),
-            connection_port: Some(1234),
-            pairing_code: Some(901234),
-            pairing_port: Some(5678),
         }
         .to_env();
 
@@ -864,10 +770,6 @@ mod tests {
                 "SETUP_API_TOKENS=false",
                 "LILA_DOMAIN=baz:8080",
                 "LILA_URL=http://baz:8080",
-                "PHONE_IP=1.2.3.4",
-                "CONNECTION_PORT=1234",
-                "PAIRING_CODE=901234",
-                "PAIRING_PORT=5678"
             ]
             .join("\n")
         );
@@ -887,10 +789,6 @@ mod tests {
             setup_api_tokens: None,
             lila_domain: Some("baz:8080".to_string()),
             lila_url: Some("http://baz:8080".to_string()),
-            phone_ip: None,
-            connection_port: None,
-            pairing_code: None,
-            pairing_port: None,
         }
         .to_env();
 
