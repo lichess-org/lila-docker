@@ -395,8 +395,8 @@ fn create_placeholder_dirs() {
     // otherwise the directories will be created by Docker
     // when the volumes are mounted and they may be owned by root
     [
-        Repository::new("lichess-org", "lila"),
-        Repository::new("lichess-org", "lila-ws"),
+        Repository::new("adamw86", "lila"),
+        Repository::new("adamw86", "lila-ws"),
         Repository::new("lichess-org", "lila-db-seed"),
         Repository::new("lichess-org", "lifat"),
         Repository::new("lichess-org", "lila-fishnet"),
@@ -404,9 +404,9 @@ fn create_placeholder_dirs() {
         Repository::new("lichess-org", "lila-search"),
         Repository::new("lichess-org", "lila-gif"),
         Repository::new("lichess-org", "api"),
-        Repository::new("lichess-org", "chessground"),
+        Repository::new("adamw86", "chessground"),
         Repository::new("lichess-org", "pgn-viewer"),
-        Repository::new("lichess-org", "scalachess"),
+        Repository::new("adamw86", "scalachess"),
         Repository::new("lichess-org", "mobile"),
         Repository::new("lichess-org", "dartchess"),
         Repository::new("lichess-org", "berserk"),
