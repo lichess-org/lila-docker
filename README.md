@@ -119,12 +119,12 @@ If you edit the `conf/routes` file, you'll need to update the route cache.
 docker compose exec lila ./lila.sh playRoutes
 ```
 
-### To add translation keys:
+### To update translation keys:
 
 After modifying a `translation/source/*.xml` file, run:
 
 ```bash
-docker compose run --rm -w /lila ui pnpm run trans-dump
+docker compose run --rm -w /lila ui pnpm run i18n-file-gen
 ```
 
 ### Code formatting:
