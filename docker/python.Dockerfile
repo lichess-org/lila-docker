@@ -1,6 +1,6 @@
-FROM eclipse-temurin:22.0.2_9-jdk-alpine
+FROM eclipse-temurin:21.0.5_11-jdk-alpine
 
-COPY --from=python:3.13.0-alpine3.20 / /
+COPY --from=python:3.13.1-alpine3.21 / /
 
 RUN pip install --upgrade pip \
     && pip install \
