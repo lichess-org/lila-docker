@@ -35,14 +35,14 @@ RUN mkdir /seeded \
         --tokens
 
 ##################################################################################
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.4_3.5.2 AS lilawsbuilder
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.5_11_1.10.7_3.6.2 AS lilawsbuilder
 
 COPY repos/lila-ws /lila-ws
 WORKDIR /lila-ws
 RUN sbt stage
 
 ##################################################################################
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.2_13_1.10.4_3.5.2 AS lilabuilder
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.5_11_1.10.7_3.6.2 AS lilabuilder
 
 COPY --from=node /lila /lila
 WORKDIR /lila

@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo:7.0.15-jammy
+    image: mongo:7.0.16-jammy
     restart: unless-stopped
     command: mongod --bind_ip_all --replSet rs0
     healthcheck:
@@ -16,14 +16,14 @@ services:
       - ./scripts:/scripts
 
   mongodb_secondary:
-    image: mongo:7.0.15-jammy
+    image: mongo:7.0.16-jammy
     restart: unless-stopped
     command: mongod --bind_ip_all --replSet rs0
     networks:
       - lila-network
 
   redis:
-    image: redis:7.4.1-alpine3.20
+    image: redis:7.4.2-alpine3.21
     restart: unless-stopped
     networks:
       - lila-network
@@ -76,7 +76,7 @@ services:
       - ./conf/lila-ws.conf:/lila-ws.conf
 
   nginx:
-    image: nginx:1.27.2-alpine3.20-slim
+    image: nginx:1.27.3-alpine3.20-slim
     restart: unless-stopped
     networks:
       - lila-network
@@ -146,7 +146,7 @@ services:
       - pgn-viewer
 
   lila_engine:
-    image: rust:1.82.0-slim-bookworm
+    image: rust:1.84.0-slim-bookworm
     working_dir: /lila-engine
     entrypoint: cargo run -- --bind 0.0.0.0:9666 --mongodb mongodb://mongodb
     restart: unless-stopped
@@ -261,7 +261,7 @@ services:
       - search
 
   elasticvue:
-    image: cars10/elasticvue:1.0.12
+    image: cars10/elasticvue:1.3.1
     restart: unless-stopped
     volumes:
       - ./conf/elasticvue.json:/usr/share/nginx/html/api/default_clusters.json
@@ -331,7 +331,7 @@ services:
       - search
 
   lila_gif:
-    image: rust:1.82.0-slim-bookworm
+    image: rust:1.84.0-slim-bookworm
     working_dir: /lila-gif
     entrypoint: cargo run -- --bind 0.0.0.0:6175
     restart: unless-stopped
@@ -385,7 +385,7 @@ services:
       - mongo-express
 
   influxdb:
-    image: influxdb:2.7.10-alpine
+    image: influxdb:2.7.11-alpine
     restart: unless-stopped
     ports:
       - 8086:8086
