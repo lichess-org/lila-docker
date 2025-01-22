@@ -1,0 +1,24 @@
+{
+  "data":[
+    {
+      "id":"123456789",
+      "user_id":"98765",
+      "user_login":"lichessdotorg",
+      "user_name":"lichessdotorg",
+      "game_id":"743",
+      "game_name":"Chess",
+      "type":"live",
+      "title":"Taking challenges on lichess.org",
+      "tags":["English"],
+      "viewer_count":78365,
+      "started_at":"2021-03-10T15:04:21Z",
+      "language":"en",
+      "thumbnail_url":"https://static-cdn.jtvnw.net/previews-ttv/live_user_auronplay-{width}x{height}.jpg",
+      "tag_ids":[],
+      "is_mature":false
+    }
+  ],
+  "pagination":{
+    "cursor":"eyJiIjp7IkN1cnNvciI6ImV5SnpJam8zT0RNMk5TNDBORFF4TlRjMU1UY3hOU3dpWkNJNlptRnNjMlVzSW5RaU9uUnlkV1Y5In0sImEiOnsiQ3Vyc29yIjoiZXlKeklqb3hOVGs0TkM0MU56RXhNekExTVRZNU1ESXNJbVFpT21aaGJITmxMQ0owSWpwMGNuVmxmUT09In19"
+  }
+}
