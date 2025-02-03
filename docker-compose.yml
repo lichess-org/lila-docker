@@ -146,7 +146,7 @@ services:
       - pgn-viewer
 
   lila_engine:
-    image: rust:1.84.0-slim-bookworm
+    image: rust:1.84.0-bookworm
     working_dir: /lila-engine
     entrypoint: cargo run -- --bind 0.0.0.0:9666 --mongodb mongodb://mongodb
     restart: unless-stopped
@@ -331,7 +331,7 @@ services:
       - search
 
   lila_gif:
-    image: rust:1.84.0-slim-bookworm
+    image: rust:1.84.0-bookworm
     working_dir: /lila-gif
     entrypoint: cargo run -- --bind 0.0.0.0:6175
     restart: unless-stopped
