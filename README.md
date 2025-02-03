@@ -42,6 +42,10 @@ Also, see [gitpod-prebuilds.md](gitpod-prebuilds.md) for more information on how
 
     Starting new services may take 5-10 minutes. Some services will start before others and you may see errors in the logs until everything comes online.
 
+    Lila requires about 12GB of RAM to build. Make sure there is enough RAM
+    available, especially when using Docker Desktop, which allocates 50% of
+    the available RAM by default.
+
     Lila will be the last service to complete, at which point you can visit http://localhost:8080/ to see the site.
 
 ### Stopping
