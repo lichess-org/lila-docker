@@ -146,7 +146,9 @@ services:
       - pgn-viewer
 
   lila_engine:
-    image: rust:1.84.0-slim-bookworm
+    build:
+      context: docker
+      dockerfile: rustmake.Dockerfile
     working_dir: /lila-engine
     entrypoint: cargo run -- --bind 0.0.0.0:9666 --mongodb mongodb://mongodb
     restart: unless-stopped
