@@ -4,6 +4,7 @@ FROM node:22-bookworm AS node
 COPY repos/lila /lila
 COPY conf/ci.conf /lila/conf/application.conf
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+ENV COREPACK_INTEGRITY_KEYS=0
 RUN corepack enable \
     && /lila/ui/build --clean --debug
 
