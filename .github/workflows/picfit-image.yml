@@ -8,7 +8,7 @@ on:
       - 'docker/picfit-image.Dockerfile'
 
 env:
-  PICFIT_VERSION: 0.14.0
+  PICFIT_VERSION: 0.15.1
 
 jobs:
   build-and-publish:
