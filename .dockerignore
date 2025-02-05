@@ -1,1 +1,7 @@
 **/node_modules
+
+command/
+
+repos/lila/logs/
+repos/lila/target/
+repos/lila-db-seed/spamdb/venv/
