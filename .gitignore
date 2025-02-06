@@ -11,3 +11,6 @@ settings.toml
 
 .metals
 ran_as_gitpod_prebuild
+
+# picfit-generated files
+docker/assets/*.webp
