@@ -1,7 +1,7 @@
 # Build stage
 FROM golang:1.23.6-alpine3.21 AS build
 
-RUN apk --no-cache add g++ git make
+RUN apk --no-cache add g++ gcc git make
 
 COPY /picfit /picfit
 WORKDIR /picfit
