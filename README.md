@@ -238,13 +238,15 @@ By default, your local lila instance will use the version of chessground + pgn-v
 
 ### InfluxDB Monitoring
 
-To view the InfluxDB monitoring dashboard, start your environment with the `Monitoring` service enabled and then visit http://localhost:8086/ (admin/password)
+To view the InfluxDB monitoring dashboard, start your environment with the `Monitoring` service enabled. You can view the metrics at:
 
-You can also see all the metrics logged by running:
+1. http://localhost:8086 (admin/password)
+2. http://localhost:8080/prometheus-metrics/x
+3. or by running:
 
-```bash
-curl --get http://localhost:8086/query \
-    --header "Authorization: Token secret" \
-    --data-urlencode "db=kamon"  \
-    --data-urlencode "q=show measurements;"
-```
+    ```bash
+    curl --get http://localhost:8086/query \
+        --header "Authorization: Token secret" \
+        --data-urlencode "db=kamon"  \
+        --data-urlencode "q=show measurements;"
+    ```
