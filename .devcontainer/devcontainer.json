@@ -1,5 +1,5 @@
 {
-    "image": "sbtscala/scala-sbt:eclipse-temurin-jammy-21.0.2_13_1.10.4_3.5.2",
+    "image": "sbtscala/scala-sbt:eclipse-temurin-21.0.6_7_1.10.7_3.6.3",
 	"customizations": {
         "vscode": {
             "extensions": [
