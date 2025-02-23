@@ -76,7 +76,7 @@ services:
       - ./conf/lila-ws.conf:/lila-ws.conf
 
   nginx:
-    image: nginx:1.27.3-alpine3.20-slim
+    image: nginx:1.27.4-alpine3.21-slim
     restart: unless-stopped
     networks:
       - lila-network
@@ -146,7 +146,7 @@ services:
       - pgn-viewer
 
   lila_engine:
-    image: rust:1.84.0-bookworm
+    image: rust:1.85.0-bookworm
     working_dir: /lila-engine
     entrypoint: cargo run -- --bind 0.0.0.0:9666 --mongodb mongodb://mongodb
     restart: unless-stopped
@@ -261,7 +261,7 @@ services:
       - search
 
   elasticvue:
-    image: cars10/elasticvue:1.3.1
+    image: cars10/elasticvue:1.4.0
     restart: unless-stopped
     volumes:
       - ./conf/elasticvue.json:/usr/share/nginx/html/api/default_clusters.json
@@ -331,7 +331,7 @@ services:
       - search
 
   lila_gif:
-    image: rust:1.84.0-bookworm
+    image: rust:1.85.0-bookworm
     working_dir: /lila-gif
     entrypoint: cargo run -- --bind 0.0.0.0:6175
     restart: unless-stopped
@@ -360,7 +360,7 @@ services:
       - thumbnails
 
   mailpit:
-    image: axllent/mailpit:v1.21.0
+    image: axllent/mailpit:v1.22.3
     restart: unless-stopped
     ports:
       - 8025:8025
