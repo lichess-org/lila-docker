@@ -12,7 +12,7 @@ run_setup() {
 
     rust_cmd setup
 
-    mkdir .pnpm-store
+    mkdir -p .pnpm-store
 
     docker compose build
     docker compose --profile utils build
