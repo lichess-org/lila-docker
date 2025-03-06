@@ -322,7 +322,7 @@ fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io
         );
     }
 
-    if Gitpod::is_host() 
+    if Gitpod::is_host()
         && !noninteractive
         && confirm("By default, only this browser session can access your Lichess development site.\nWould you like it to be accessible to other clients?")
             .initial_value(false)
