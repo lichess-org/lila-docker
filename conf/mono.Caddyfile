@@ -6,7 +6,9 @@
 }
 
 handle_errors 502 {
-    respond "Waiting for lila service to start..."
+    root * /errors
+    rewrite * /502.html
+    file_server
 }
 
 reverse_proxy @websockets :9664
