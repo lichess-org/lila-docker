@@ -13,4 +13,6 @@ handle_errors 502 {
 
 reverse_proxy @websockets :9664
 
-reverse_proxy :9663
+reverse_proxy :9663 {
+    header_up Host {$LILA_DOMAIN}
+}
