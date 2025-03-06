@@ -1,6 +1,6 @@
 # lila-docker
 
-[![Publish CI image](https://github.com/lichess-org/lila-docker/actions/workflows/ci-image.yml/badge.svg)](https://github.com/lichess-org/lila-docker/actions/workflows/ci-image.yml)
+[![Publish Image](https://github.com/lichess-org/lila-docker/actions/workflows/publish-image.yml/badge.svg)](https://github.com/lichess-org/lila-docker/actions/workflows/publish-image.yml)
 
 Lichess development environment using Docker Compose, for developing on Mac, Linux, or Windows (via WSL).
 
