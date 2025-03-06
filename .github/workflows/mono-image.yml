@@ -1,4 +1,4 @@
-name: Publish CI image
+name: Publish mono image
 
 on:
   workflow_dispatch:
@@ -6,9 +6,9 @@ on:
     - cron: '0 17 * * *'
   push:
     paths:
-      - '.github/workflows/ci-image.yml'
-      - 'conf/ci.conf'
-      - 'docker/ci.Dockerfile'
+      - '.github/workflows/mono-image.yml'
+      - 'conf/mono.conf'
+      - 'docker/mono.Dockerfile'
 
 jobs:
   build-and-publish:
@@ -61,11 +61,13 @@ jobs:
           images: ghcr.io/${{ github.repository }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64,linux/arm64
-          file: docker/ci.Dockerfile
+          file: docker/mono.Dockerfile
           push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

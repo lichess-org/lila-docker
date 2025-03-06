@@ -1,0 +1,16 @@
+:8080
+
+@websockets {
+    header Connection *Upgrade*
+    header Upgrade websocket
+}
+
+handle_errors 502 {
+    root * /errors
+    rewrite * /502.html
+    file_server
+}
+
+reverse_proxy @websockets :9664
+
+reverse_proxy :9663

@@ -12,16 +12,21 @@ run_setup() {
 
     rust_cmd setup
 
-    mkdir -p .pnpm-store
+    if [ "$QUICK_SETUP" == "true" ]; then
+        docker compose up -d
+    else
+        mkdir -p .pnpm-store
 
-    docker compose build
-    docker compose --profile utils build
-    docker compose up -d
+        docker compose build
+        docker compose --profile utils build
+        docker compose up -d
 
-    run_ui_build
+        run_ui_build
 
-    setup_bbppairings
-    setup_database
+        setup_bbppairings
+        setup_database
+    fi
+
     rust_cmd welcome
 
     if is_gitpod_prebuild; then
@@ -162,8 +167,8 @@ run_hostname() {
     rust_cmd hostname
 
     if [ ! -z "$(docker compose ps -a --services | xargs)" ]; then
-        docker compose down lila lila_ws nginx
-        docker compose up -d lila lila_ws nginx
+        docker compose down lila lila_ws nginx mono
+        docker compose up -d
     fi
 }
 
@@ -221,6 +226,7 @@ show_help() {
     echo "  stop          Stop the containers"
     echo "  restart       Restart the containers"
     echo "  down          Stop the containers and remove their volumes"
+    echo "  logs          Stream the logs of all the running containers"
     echo "  build         Pre-fetch and pre-build all the images necessary for the containers"
     echo "  format        Run the code formatter to match Lichess code style"
     echo "  hostname      Set the hostname to something different than the default localhost"
@@ -264,6 +270,9 @@ case "$@" in
         ;;
     db)
         reset_database
+        ;;
+    logs)
+        COMPOSE_PROFILES=$(all_profiles) docker compose logs --follow
         ;;
     "lila clean")
         docker compose run --rm --entrypoint bash lila -c "rm .sbtopts || true; sbt clean"

@@ -27,6 +27,7 @@ const DEFAULT_PASSWORD: &str = "password";
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 struct Config {
+    quick_setup: Option<bool>,
     compose_profiles: Option<Vec<String>>,
     setup_database: Option<bool>,
     setup_bbppairings: Option<bool>,
@@ -74,6 +75,7 @@ impl Config {
 
     fn to_env(&self) -> String {
         let Self {
+            quick_setup,
             compose_profiles,
             setup_database,
             setup_bbppairings,
@@ -92,6 +94,7 @@ impl Config {
             .unwrap_or_default();
 
         vec![
+            to_env!(quick_setup),
             to_env!(compose_profiles, compose_profiles_string),
             to_env!(setup_database),
             to_env!(setup_bbppairings),
@@ -225,6 +228,12 @@ fn pwd_input(user_type: &str) -> std::io::Result<String> {
     .interact()
 }
 
+#[derive(Debug, Clone, Eq, PartialEq)]
+enum SetupMethod {
+    Quick,
+    Advanced,
+}
+
 #[allow(clippy::too_many_lines)]
 fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io::Result<()> {
     if first_setup {
@@ -238,7 +247,31 @@ fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io
 
     let mut services: Vec<OptionalService<'static>> = vec![];
 
-    if noninteractive {
+    info(
+        [
+            "Your Lichess development site will include a basic instance of Lichess.",
+            "You will be able to use the site, play games, and test most of the main functionality.",
+            "If you want additional features, you can select them here.",
+        ]
+        .join("\n"),
+    )?;
+    let is_quick_setup = noninteractive
+        || select("Choose a setup method:")
+            .item(
+                SetupMethod::Quick,
+                "Quick",
+                "If you just want a basic lila instance without making any code changes",
+            )
+            .item(
+                SetupMethod::Advanced,
+                "Advanced",
+                "If you want to make changes or test specific features",
+            )
+            .interact()?
+            == SetupMethod::Quick;
+    config.quick_setup = Some(is_quick_setup);
+
+    if noninteractive || is_quick_setup {
         config.password = Some(DEFAULT_PASSWORD.to_string());
         config.su_password = Some(DEFAULT_PASSWORD.to_string());
         config.setup_api_tokens = Some(true);
@@ -270,14 +303,6 @@ fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io
         config.su_password = Some(su_password);
         config.password = Some(password);
 
-        if Gitpod::is_host()
-        && confirm("By default, only this browser session can access your Gitpod development site.\nWould you like it to be accessible to other clients?")
-        .initial_value(false)
-        .interact()?
-        {
-            gitpod_public()?;
-        }
-
         config.setup_bbppairings = Some(
             services
                 .iter()
@@ -297,6 +322,15 @@ fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io
         );
     }
 
+    if Gitpod::is_host()
+        && !noninteractive
+        && confirm("By default, only this browser session can access your Lichess development site.\nWould you like it to be accessible to other clients?")
+            .initial_value(false)
+            .interact()?
+    {
+        gitpod_public()?;
+    }
+
     let selected_profiles: Vec<String> = services
         .iter()
         .filter_map(|service| service.compose_profile.as_ref())
@@ -307,6 +341,11 @@ fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io
     let mut profiles: Vec<String> = selected_profiles;
     if !first_setup {
         profiles.extend(config.compose_profiles.unwrap_or_default());
+    }
+    if is_quick_setup {
+        profiles.push("quick".to_string());
+    } else {
+        profiles.push("base".to_string());
     }
     profiles.sort();
     profiles.dedup();
@@ -321,52 +360,54 @@ fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io
 
     config.save()?;
 
-    create_placeholder_dirs();
+    if !is_quick_setup {
+        create_placeholder_dirs();
 
-    let mut repos_to_clone: Vec<Repository> = vec![
-        Repository::new("lichess-org", "lila"),
-        Repository::new("lichess-org", "lila-ws"),
-    ];
+        let mut repos_to_clone: Vec<Repository> = vec![
+            Repository::new("lichess-org", "lila"),
+            Repository::new("lichess-org", "lila-ws"),
+        ];
 
-    if config.setup_database.unwrap_or_default() {
-        repos_to_clone.push(Repository::new("lichess-org", "lila-db-seed"));
-    }
-
-    let optional_repos: Vec<Repository> = services
-        .iter()
-        .filter_map(|service| service.repositories.clone())
-        .flatten()
-        .collect();
-
-    repos_to_clone.extend(optional_repos);
-
-    for repo in repos_to_clone {
-        let progress = spinner();
-        progress.start(format!("Cloning {}...", repo.full_name()));
-
-        if repo.clone_path().read_dir()?.next().is_some() {
-            progress.stop(format!("✓ Already cloned {}", repo.full_name()));
-            continue;
+        if config.setup_database.unwrap_or_default() {
+            repos_to_clone.push(Repository::new("lichess-org", "lila-db-seed"));
         }
 
-        let mut cmd = Command::new("git");
-        cmd.arg("clone")
-            .arg("--origin")
-            .arg("upstream")
-            .arg("--depth")
-            .arg("1")
-            .arg("--recurse-submodules")
-            .arg(repo.url())
-            .arg(repo.clone_path());
+        let optional_repos: Vec<Repository> = services
+            .iter()
+            .filter_map(|service| service.repositories.clone())
+            .flatten()
+            .collect();
 
-        let output = cmd.output()?;
-        assert!(
-            output.status.success(),
-            "Failed to clone repo: {} - {output:?}",
-            repo.full_name()
-        );
+        repos_to_clone.extend(optional_repos);
 
-        progress.stop(format!("✓ Cloned {}", repo.full_name()));
+        for repo in repos_to_clone {
+            let progress = spinner();
+            progress.start(format!("Cloning {}...", repo.full_name()));
+
+            if repo.clone_path().read_dir()?.next().is_some() {
+                progress.stop(format!("✓ Already cloned {}", repo.full_name()));
+                continue;
+            }
+
+            let mut cmd = Command::new("git");
+            cmd.arg("clone")
+                .arg("--origin")
+                .arg("upstream")
+                .arg("--depth")
+                .arg("1")
+                .arg("--recurse-submodules")
+                .arg(repo.url())
+                .arg(repo.clone_path());
+
+            let output = cmd.output()?;
+            assert!(
+                output.status.success(),
+                "Failed to clone repo: {} - {output:?}",
+                repo.full_name()
+            );
+
+            progress.stop(format!("✓ Cloned {}", repo.full_name()));
+        }
     }
 
     if Gitpod::is_host() {
@@ -448,14 +489,6 @@ fn gitpod_checkout_pr() -> std::io::Result<()> {
 
 #[allow(clippy::too_many_lines)]
 fn prompt_for_services() -> Result<Vec<OptionalService<'static>>, Error> {
-    info(
-        [
-            "Your Lichess development site will include a basic instance of Lichess.",
-            "You will be able to use the site, play games, and test most of the main functionality.",
-            "If you want additional features, you can select them here.",
-        ]
-        .join("\n"),
-    )?;
     multiselect(
         "Select which optional services to include:\n    (Use arrows, <space> to toggle, <enter> to continue)\n",
     )
@@ -662,10 +695,10 @@ fn hostname(mut config: Config) -> std::io::Result<()> {
 }
 
 fn welcome(config: Config) -> std::io::Result<()> {
-    intro("Your Lichess development environment is starting!")?;
+    intro("Your Lichess instance is starting!")?;
 
     note(
-        "Your development site will be available at:",
+        "The site will be available at:",
         config
             .lila_url
             .unwrap_or("http://localhost:8080".to_owned()),
@@ -683,10 +716,7 @@ fn welcome(config: Config) -> std::io::Result<()> {
         )?;
     }
 
-    note(
-        "To monitor the progress:",
-        "docker compose logs lila --follow",
-    )?;
+    note("To monitor the progress:", "./lila-docker logs")?;
 
     outro("🚀")
 }
@@ -742,6 +772,7 @@ mod tests {
     #[test]
     fn test_set_env_vars_from_struct() {
         let contents = Config {
+            quick_setup: Some(true),
             compose_profiles: Some(vec!["foo".to_string(), "bar".to_string()]),
             setup_database: Some(true),
             setup_bbppairings: Some(false),
@@ -759,6 +790,7 @@ mod tests {
         assert_eq!(
             contents,
             vec![
+                "QUICK_SETUP=true",
                 "COMPOSE_PROFILES=foo,bar",
                 "SETUP_DATABASE=true",
                 "SETUP_BBPPAIRINGS=false",
@@ -778,6 +810,7 @@ mod tests {
     #[test]
     fn test_env_removes_empty_lines() {
         let contents = Config {
+            quick_setup: None,
             compose_profiles: None,
             setup_database: None,
             setup_bbppairings: None,

@@ -14,6 +14,8 @@ services:
     volumes:
       - ./repos/lila:/lila
       - ./scripts:/scripts
+    profiles:
+      - base
 
   mongodb_secondary:
     image: mongo:7.0.16-jammy
@@ -21,12 +23,16 @@ services:
     command: mongod --bind_ip_all --replSet rs0
     networks:
       - lila-network
+    profiles:
+      - base
 
   redis:
     image: redis:7.4.2-alpine3.21
     restart: unless-stopped
     networks:
       - lila-network
+    profiles:
+      - base
 
   lila:
     build:
@@ -54,6 +60,8 @@ services:
       - ./repos/bbpPairings:/opt/bbpPairings
       - ./repos/scalachess:/scalachess
       - ./conf/lila.conf:/lila/conf/application.conf
+    profiles:
+      - base
 
   lila_ws:
     build:
@@ -74,6 +82,8 @@ services:
     volumes:
       - ./repos/lila-ws:/lila-ws
       - ./conf/lila-ws.conf:/lila-ws.conf
+    profiles:
+      - base
 
   nginx:
     image: nginx:1.27.4-alpine3.21-slim
@@ -90,6 +100,19 @@ services:
     depends_on:
       - lila
       - lila_ws
+    profiles:
+      - base
+
+  mono:
+    image: ghcr.io/lichess-org/lila-docker:main
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    environment:
+      - LILA_DOMAIN=${LILA_DOMAIN:-localhost:8080}
+      - LILA_URL=${LILA_URL:-http://localhost:8080}
+    profiles:
+      - quick
 
   api_docs:
     build:
