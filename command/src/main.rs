@@ -344,6 +344,8 @@ fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io
     }
     if is_quick_setup {
         profiles.push("quick".to_string());
+    } else {
+        profiles.push("base".to_string());
     }
     profiles.sort();
     profiles.dedup();
