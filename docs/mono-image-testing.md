@@ -42,13 +42,13 @@ docker exec -it lichess bash
 ## Manually push to ghcr.io
 
 ```bash
-docker tag lila-mono ghcr.io/lichess-org/lila-docker:mono
-docker push ghcr.io/lichess-org/lila-docker:mono
+docker tag lila-mono ghcr.io/lichess-org/lila-docker:testing
+docker push ghcr.io/lichess-org/lila-docker:testing
 ```
 
 ## Run ghcr-hosted image
 
 ```bash
-docker pull ghcr.io/lichess-org/lila-docker:mono
-docker run --rm -p 8080:8080 ghcr.io/lichess-org/lila-docker:mono
+docker pull ghcr.io/lichess-org/lila-docker:main
+docker run --rm -p 8080:8080 ghcr.io/lichess-org/lila-docker:main
 ```
