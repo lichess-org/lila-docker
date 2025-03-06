@@ -25,10 +25,10 @@ docker run -it --rm -p 8080:8080 --name lichess -e LILA_DOMAIN=custom:8080 -e LI
 
 ## Test
 
-Visit: <http://localhost:9663/>
+Visit: <http://localhost:8080/>
 
 ```bash
-curl localhost:9663/api/user/lichess
+curl localhost:8080/api/user/lichess
 ```
 
 ## Get a shell in the container for debugging:
