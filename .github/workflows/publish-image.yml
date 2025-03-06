@@ -1,4 +1,4 @@
-name: Publish mono image
+name: Publish image
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     - cron: '0 17 * * *'
   push:
     paths:
-      - '.github/workflows/mono-image.yml'
+      - '.github/workflows/publish-image.yml'
       - 'conf/mono.conf'
       - 'docker/mono.Dockerfile'
 
