@@ -303,14 +303,6 @@ fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io
         config.su_password = Some(su_password);
         config.password = Some(password);
 
-        if Gitpod::is_host()
-        && confirm("By default, only this browser session can access your Lichess development site.\nWould you like it to be accessible to other clients?")
-        .initial_value(false)
-        .interact()?
-        {
-            gitpod_public()?;
-        }
-
         config.setup_bbppairings = Some(
             services
                 .iter()
@@ -328,6 +320,15 @@ fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io
                 .iter()
                 .any(|service| service.compose_profile == Some(vec!["monitoring"])),
         );
+    }
+
+    if Gitpod::is_host() 
+        && !noninteractive
+        && confirm("By default, only this browser session can access your Lichess development site.\nWould you like it to be accessible to other clients?")
+            .initial_value(false)
+            .interact()?
+    {
+        gitpod_public()?;
     }
 
     let selected_profiles: Vec<String> = services
