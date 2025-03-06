@@ -104,7 +104,7 @@ services:
       - base
 
   mono:
-    image: ghcr.io/lichess-org/lila-docker:mono
+    image: ghcr.io/lichess-org/lila-docker:main
     restart: unless-stopped
     ports:
       - 8080:8080
