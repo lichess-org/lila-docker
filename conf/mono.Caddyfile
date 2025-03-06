@@ -1,0 +1,14 @@
+:8080
+
+@websockets {
+    header Connection *Upgrade*
+    header Upgrade websocket
+}
+
+handle_errors 502 {
+    respond "Waiting for lila service to start..."
+}
+
+reverse_proxy @websockets :9664
+
+reverse_proxy :9663
