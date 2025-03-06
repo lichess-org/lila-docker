@@ -1,11 +1,17 @@
 {
-    "image": "sbtscala/scala-sbt:eclipse-temurin-21.0.6_7_1.10.7_3.6.3",
-	"customizations": {
-        "vscode": {
-            "extensions": [
-                "scalameta.metals",
-                "scala-lang.scala"
-            ]
+    "image": "ghcr.io/lichess-org/lila-docker:main",
+    "portsAttributes": {
+        "8080": {
+            "label": "Lichess",
+            "onAutoForward": "openPreview"
         }
-    }
+    },
+    "otherPortsAttributes": {
+        "onAutoForward": "ignore"
+    },
+    "containerEnv": {
+        "LILA_DOMAIN": "${localEnv:CODESPACE_NAME}-8080.app.github.dev",
+        "LILA_URL": "https://${localEnv:CODESPACE_NAME}-8080.app.github.dev"
+    },
+    "postStartCommand": "supervisord -c /etc/supervisor/supervisord.conf"
 }
