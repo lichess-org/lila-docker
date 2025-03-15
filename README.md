@@ -209,15 +209,15 @@ docker compose run --rm -w /scalachess --entrypoint="sbt package" lila
 
 By default, your local lila instance will use the version of chessground + pgn-viewer that are published to npm. If you want to make changes to either library and see them reflected in your local lila instance, you can do the following:
 
+1. Start lila-docker with the optional chessground and/or pgn-viewer services
+
 1. Have lila use the local copy:
 
     ```bash
     docker compose run --rm -w /lila ui bash -c "pnpm link /chessground"
-
-    docker compose run --rm ui bash -c "for dir in ui/bits ui/opening ui/site ui/tutor ui/common; do cd /lila/\$dir && pnpm link /pgn-viewer; done"
     ```
 
-2. Start the compilers in watch mode:
+1. Start the compilers in watch mode:
 
     ```bash
     docker compose run --rm -w /chessground ui bash -c "pnpm install && pnpm run compile --watch"
@@ -228,7 +228,7 @@ By default, your local lila instance will use the version of chessground + pgn-v
     See the updated chessground demo: http://localhost:8090/demo.html
     See the updated pgn-viewer demo: http://localhost:8091/
 
-3. Start the lila ui build in watch mode:
+1. Start the lila ui build in watch mode:
 
     ```bash
     ./lila-docker ui
