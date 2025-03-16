@@ -220,7 +220,7 @@ By default, your local lila instance will use the version of chessground + pgn-v
 1. Start the compilers in watch mode:
 
     ```bash
-    docker compose run --rm -w /chessground ui bash -c "pnpm install && pnpm run compile --watch"
+    docker compose run --rm -w /chessground ui bash -c "pnpm install && pnpm run bundle && pnpm run compile --watch"
 
     docker compose run --rm -w /pgn-viewer ui bash -c "pnpm install && pnpm run dist"
     ```
