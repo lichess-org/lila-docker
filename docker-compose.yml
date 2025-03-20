@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo:7.0.16-jammy
+    image: mongo:7.0.17-jammy
     restart: unless-stopped
     command: mongod --bind_ip_all --replSet rs0
     healthcheck:
@@ -18,7 +18,7 @@ services:
       - base
 
   mongodb_secondary:
-    image: mongo:7.0.16-jammy
+    image: mongo:7.0.17-jammy
     restart: unless-stopped
     command: mongod --bind_ip_all --replSet rs0
     networks:
@@ -284,7 +284,7 @@ services:
       - search
 
   elasticvue:
-    image: cars10/elasticvue:1.4.0
+    image: cars10/elasticvue:1.5.0
     restart: unless-stopped
     volumes:
       - ./conf/elasticvue.json:/usr/share/nginx/html/api/default_clusters.json
@@ -383,7 +383,7 @@ services:
       - thumbnails
 
   mailpit:
-    image: axllent/mailpit:v1.22.3
+    image: axllent/mailpit:v1.23.2
     restart: unless-stopped
     ports:
       - 8025:8025
