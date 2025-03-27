@@ -92,6 +92,10 @@ run_ui_build() {
     ARGS=(--debug $@)
     echo "Running: ./ui/build ${ARGS[@]}"
     docker compose run --rm ui /lila/ui/build "${ARGS[@]}"
+
+    if [[ ! " ${ARGS[@]} " =~ " --watch " ]]; then
+        echo "💡 Tip: Run './lila-docker ui --watch' to automatically recompile on changes"
+    fi
 }
 
 setup_database() {
@@ -234,7 +238,7 @@ show_help() {
     echo "  lila clean    Run 'sbt clean' in the lila container. Useful if there are compilation errors"
     echo "  lila restart  Restart the lila container to apply changes to the codebase"
     echo "  gitpod public Make http port 8080 public on the Gitpod instance"
-    echo "  ui            Compile the frontend code. Runs in watch mode to automatically recompile on changes"
+    echo "  ui            Compile the frontend code. Run with --watch to automatically recompile on changes"
     echo "  add-services  Add new services to the existing setup"
     echo "  status        Show the status of all git repositories in ./repos"
     echo "  pull          Pull the latest changes from all git repositories in ./repos"
@@ -280,8 +284,8 @@ case "$@" in
     "lila restart")
         docker compose restart lila
         ;;
-    ui)
-        run_ui_build --watch
+    ui|"ui --watch")
+        run_ui_build $2
         ;;
     "gitpod public")
         rust_cmd gitpod_public
