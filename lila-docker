@@ -94,7 +94,7 @@ run_ui_build() {
     docker compose run --rm ui /lila/ui/build "${ARGS[@]}"
 
     if [[ ! " ${ARGS[@]} " =~ " --watch " ]]; then
-        echo "💡 Tip: Run './lila-docker ui --watch' to automatically recompile on changes"
+        echo "💡 Tip: Run './lila-docker ui --watch' to watch typescript and scss sources so any changes are visible on browser reloads"
     fi
 }
 
