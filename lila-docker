@@ -92,6 +92,10 @@ run_ui_build() {
     ARGS=(--debug $@)
     echo "Running: ./ui/build ${ARGS[@]}"
     docker compose run --rm ui /lila/ui/build "${ARGS[@]}"
+
+    if [[ ${#ARGS[@]} -eq 0 ]]; then
+        echo "💡 Tip: Run './lila-docker ui --watch' to watch typescript and scss sources so any changes are visible on browser reloads"
+    fi
 }
 
 setup_database() {
@@ -234,7 +238,7 @@ show_help() {
     echo "  lila clean    Run 'sbt clean' in the lila container. Useful if there are compilation errors"
     echo "  lila restart  Restart the lila container to apply changes to the codebase"
     echo "  gitpod public Make http port 8080 public on the Gitpod instance"
-    echo "  ui            Compile the frontend code. Runs in watch mode to automatically recompile on changes"
+    echo "  ui            Compile the frontend code. Run with --watch to automatically recompile on changes"
     echo "  add-services  Add new services to the existing setup"
     echo "  status        Show the status of all git repositories in ./repos"
     echo "  pull          Pull the latest changes from all git repositories in ./repos"
@@ -242,7 +246,7 @@ show_help() {
 
 cd "$(dirname "$0")"
 
-case "$@" in
+case "$1" in
     --help|-h)
         show_help
         exit 0
@@ -274,16 +278,34 @@ case "$@" in
     logs)
         COMPOSE_PROFILES=$(all_profiles) docker compose logs --follow
         ;;
-    "lila clean")
-        docker compose run --rm --entrypoint bash lila -c "rm .sbtopts || true; sbt clean"
-        ;;
-    "lila restart")
-        docker compose restart lila
+    lila)
+        shift
+        case "$1" in
+            clean)
+                docker compose run --rm --entrypoint bash lila -c "rm .sbtopts || true; sbt clean"
+                ;;
+            restart)
+                docker compose restart lila
+                ;;
+            *)
+                echo "Unknown lila command: $1"
+                exit 1
+                ;;
+        esac
         ;;
     ui)
-        run_ui_build --watch
+        shift
+        run_ui_build "$@"
         ;;
-    "gitpod public")
+    gitpod)
+        if [ "$2" == "public" ]; then
+            rust_cmd gitpod_public
+        else
+            echo "Unknown gitpod command: $2"
+            exit 1
+        fi
+        ;;
+     public)
         rust_cmd gitpod_public
         ;;
     "add-services")
