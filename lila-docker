@@ -284,8 +284,9 @@ case "$@" in
     "lila restart")
         docker compose restart lila
         ;;
-    ui|"ui --watch")
-        run_ui_build $2
+    ui)
+        shift
+        run_ui_build "$@"
         ;;
     "gitpod public")
         rust_cmd gitpod_public
