@@ -295,8 +295,7 @@ case "$1" in
         ;;
     ui)
         shift
-        echo "$@"
-        #run_ui_build "$@"
+        run_ui_build "$@"
         ;;
     gitpod)
         if [ "$2" == "public" ]; then
