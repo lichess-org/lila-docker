@@ -2,7 +2,7 @@
 
 use cliclack::{
     confirm, input, intro,
-    log::{error, info, step, warning},
+    log::{error, info, step, success, warning},
     multiselect, note, outro, select, spinner,
 };
 use local_ip_address::local_ip;
@@ -278,6 +278,22 @@ fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io
         config.enable_rate_limiting = Some(true);
         config.setup_database = Some(true);
     } else {
+        if has_git_lfs() {
+            success("✓ Git LFS is installed")?;
+        } else {
+            assert!(confirm(
+                [
+                    "Git LFS is not installed. It is used to manage large files in Git repositories.",
+                    "Some optional features may not work without it.",
+                    "You can read about it at https://git-lfs.com/",
+                    "Do you want to continue anyway?",
+                ]
+                .join("\n"),
+            )
+            .initial_value(true)
+            .interact()?, "Cancelled setup");
+        }
+
         services = prompt_for_services()?;
 
         let options = prompt_for_options(first_setup)?;
@@ -425,7 +441,6 @@ fn create_placeholder_dirs() {
         Repository::new("lichess-org", "lila"),
         Repository::new("lichess-org", "lila-ws"),
         Repository::new("lichess-org", "lila-db-seed"),
-        Repository::new("lichess-org", "lifat"),
         Repository::new("lichess-org", "lila-fishnet"),
         Repository::new("lichess-org", "lila-engine"),
         Repository::new("lichess-org", "lila-search"),
@@ -527,27 +542,11 @@ fn prompt_for_services() -> Result<Vec<OptionalService<'static>>, Error> {
     )
     .item(
         OptionalService {
-            compose_profile: None,
-            repositories: vec![Repository::new("lichess-org", "lifat")].into(),
-        },
-        "Stockfish Analysis Board",
-        "for toggling engine when analyzing positions of games or puzzles",
-    )
-    .item(
-        OptionalService {
             compose_profile: vec!["external-engine"].into(),
             repositories: vec![Repository::new("lichess-org", "lila-engine")].into(),
         },
         "External Engine",
         "for connecting a local chess engine to the analysis board",
-    )
-    .item(
-        OptionalService {
-            compose_profile: None,
-            repositories: vec![Repository::new("lichess-org", "lifat")].into(),
-        },
-        "Larger static assets",
-        "Background images, voice move models, etc",
     )
     .item(
         OptionalService {
@@ -747,6 +746,15 @@ fn gitpod_public() -> std::io::Result<()> {
 
     progress.stop("✓ Port 8080 is now publicly accessible");
     outro(Gitpod::load().url)
+}
+
+fn has_git_lfs() -> bool {
+    Command::new("git")
+        .arg("lfs")
+        .arg("version")
+        .output()
+        .map(|output| output.status.success())
+        .unwrap_or(false)
 }
 
 #[cfg(test)]
