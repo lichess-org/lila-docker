@@ -278,7 +278,7 @@ fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io
         config.enable_rate_limiting = Some(true);
         config.setup_database = Some(true);
     } else {
-        if !has_git_lfs() {
+        if has_git_lfs() {
             success("✓ Git LFS is installed")?;
         } else {
             assert!(confirm(
