@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: mongo:7.0.17-jammy
+    image: mongo:7.0.20-jammy
     restart: unless-stopped
     command: mongod --bind_ip_all --replSet rs0
     healthcheck:
@@ -18,7 +18,7 @@ services:
       - base
 
   mongodb_secondary:
-    image: mongo:7.0.17-jammy
+    image: mongo:7.0.20-jammy
     restart: unless-stopped
     command: mongod --bind_ip_all --replSet rs0
     networks:
@@ -27,7 +27,7 @@ services:
       - base
 
   redis:
-    image: redis:7.4.2-alpine3.21
+    image: redis:7.4.3-alpine3.21
     restart: unless-stopped
     networks:
       - lila-network
@@ -86,7 +86,7 @@ services:
       - base
 
   nginx:
-    image: nginx:1.27.4-alpine3.21-slim
+    image: nginx:1.27.5-alpine3.21-slim
     restart: unless-stopped
     networks:
       - lila-network
@@ -168,7 +168,7 @@ services:
       - pgn-viewer
 
   lila_engine:
-    image: rust:1.85.0-bookworm
+    image: rust:1.86.0-bookworm
     working_dir: /lila-engine
     entrypoint: cargo run -- --bind 0.0.0.0:9666 --mongodb mongodb://mongodb
     restart: unless-stopped
@@ -210,7 +210,7 @@ services:
       - stockfish-play
 
   fishnet_play:
-    image: niklasf/fishnet:2.9.4
+    image: niklasf/fishnet:2.9.5
     restart: unless-stopped
     environment:
       - ENDPOINT=http://lila_fishnet:9665/fishnet
@@ -222,7 +222,7 @@ services:
       - stockfish-play
 
   fishnet_analysis:
-    image: niklasf/fishnet:2.9.4
+    image: niklasf/fishnet:2.9.5
     restart: unless-stopped
     environment:
       - ENDPOINT=http://lila:9663/fishnet
@@ -283,7 +283,7 @@ services:
       - search
 
   elasticvue:
-    image: cars10/elasticvue:1.5.0
+    image: cars10/elasticvue:1.6.2
     restart: unless-stopped
     volumes:
       - ./conf/elasticvue.json:/usr/share/nginx/html/api/default_clusters.json
@@ -353,7 +353,7 @@ services:
       - search
 
   lila_gif:
-    image: rust:1.85.0-bookworm
+    image: rust:1.86.0-bookworm
     working_dir: /lila-gif
     entrypoint: cargo run -- --bind 0.0.0.0:6175
     restart: unless-stopped
@@ -382,7 +382,7 @@ services:
       - thumbnails
 
   mailpit:
-    image: axllent/mailpit:v1.23.2
+    image: axllent/mailpit:v1.24.1
     restart: unless-stopped
     ports:
       - 8025:8025
