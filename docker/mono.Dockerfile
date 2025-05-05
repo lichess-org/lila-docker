@@ -38,14 +38,14 @@ RUN mkdir /seeded \
     && mongosh --quiet lichess /lila/bin/mongodb/indexes.js
 
 ##################################################################################
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.7_6_1.10.11_3.3.5 AS lilawsbuilder
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.7_6_1.10.11_3.6.4 AS lilawsbuilder
 
 COPY repos/lila-ws /lila-ws
 WORKDIR /lila-ws
 RUN sbt stage
 
 ##################################################################################
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.7_6_1.10.11_3.3.5 AS lilabuilder
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.7_6_1.10.11_3.6.4 AS lilabuilder
 
 COPY --from=node /lila /lila
 WORKDIR /lila
