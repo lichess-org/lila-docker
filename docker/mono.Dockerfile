@@ -9,7 +9,7 @@ RUN corepack enable \
     && /lila/ui/build --clean --debug
 
 ##################################################################################
-FROM mongo:7-jammy AS dbbuilder
+FROM mongo:8-noble AS dbbuilder
 
 RUN apt update \
     && apt install -y \
@@ -52,7 +52,7 @@ WORKDIR /lila
 RUN ./lila.sh stage
 
 ##################################################################################
-FROM mongo:7-jammy
+FROM mongo:8-noble
 
 RUN apt update \
     && apt install -y debian-keyring debian-archive-keyring apt-transport-https curl \
