@@ -9,7 +9,7 @@ use local_ip_address::local_ip;
 use serde::{Deserialize, Serialize};
 use std::{
     format,
-    io::{Error, ErrorKind},
+    io::Error,
     path::{Path, PathBuf},
     process::Command,
 };
@@ -722,8 +722,7 @@ fn welcome(config: Config) -> std::io::Result<()> {
 
 fn gitpod_public() -> std::io::Result<()> {
     if !Gitpod::is_host() {
-        return Err(std::io::Error::new(
-            ErrorKind::Other,
+        return Err(std::io::Error::other(
             "This command is only available on Gitpod",
         ));
     }
@@ -738,10 +737,7 @@ fn gitpod_public() -> std::io::Result<()> {
     let stdout = String::from_utf8(output.stdout).expect("Failed to parse stdout");
 
     if !stdout.contains("port 8080 is now public") {
-        return Err(std::io::Error::new(
-            ErrorKind::Other,
-            "Failed to make port 8080 public",
-        ));
+        return Err(std::io::Error::other("Failed to make port 8080 public"));
     }
 
     progress.stop("✓ Port 8080 is now publicly accessible");
