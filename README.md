@@ -110,7 +110,7 @@ To restart lila (after making changes to any Scala code):
 To watch for Typescript/SCSS changes and automatically recompile:
 
 ```bash
-./lila-docker ui
+./lila-docker ui --watch
 ```
 
 ### Updating Routes
