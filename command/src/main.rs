@@ -445,6 +445,7 @@ fn create_placeholder_dirs() {
         Repository::new("lichess-org", "lila-engine"),
         Repository::new("lichess-org", "lila-search"),
         Repository::new("lichess-org", "lila-gif"),
+        Repository::new("lichess-org", "lila-push"),
         Repository::new("lichess-org", "api"),
         Repository::new("lichess-org", "chessground"),
         Repository::new("lichess-org", "pgn-viewer"),
@@ -563,6 +564,14 @@ fn prompt_for_services() -> Result<Vec<OptionalService<'static>>, Error> {
         },
         "GIF + image generation",
         "for generating animated GIFs and screenshots of games",
+    )
+    .item(
+        OptionalService {
+            compose_profile: vec!["push"].into(),
+            repositories: vec![Repository::new("lichess-org", "lila-push")].into(),
+        },
+        "Push server",
+        "for Lichess notifications",
     )
     .item(
         OptionalService {
