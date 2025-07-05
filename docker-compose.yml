@@ -367,6 +367,22 @@ services:
     profiles:
       - gifs
 
+  lila_push:
+    image: rust:1.86.0-bookworm
+    working_dir: /lila-push
+    entrypoint: cargo run --release -- --vapid private.pem --vapid-subject mailto:contact@lichess.org --bind 0.0.0.0:9054
+    restart: unless-stopped
+    user: ${USER_ID}:${GROUP_ID}
+    ports:
+      - 9054:9054
+    networks:
+      - lila-network
+    volumes:
+      - ./repos/lila-push:/lila-push
+      - ./conf/private.pem:/lila-push/private.pem
+    profiles:
+      - push
+
   picfit:
     build:
       context: docker
