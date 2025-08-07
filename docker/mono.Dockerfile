@@ -1,5 +1,5 @@
 ##################################################################################
-FROM node:22-bookworm AS node
+FROM node:24-bookworm AS node
 
 COPY repos/lila /lila
 COPY conf/mono.conf /lila/conf/mono.conf

@@ -1,4 +1,4 @@
-FROM node:24.4.1-bookworm-slim
+FROM node:24.5.0-bookworm-slim
 
 USER root
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
