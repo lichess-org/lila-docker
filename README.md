@@ -93,6 +93,7 @@ Depending on which optional services you start:
 | API docs              | http://localhost:8089/                                   |
 | Chessground           | http://localhost:8090/demo.html                          |
 | PGN Viewer            | http://localhost:8091/                                   |
+| Prometheus            | http://localhost:9090/                                   |
 | InfluxDB              | http://localhost:8086/ (admin/password)                  |
 
 ## Usage
@@ -234,19 +235,33 @@ By default, your local lila instance will use the version of chessground + pgn-v
     ./lila-docker ui
     ```
 
-   and when you refresh lila, it will use the local copy of chessground and/or pgn-viewer.
+    and when you refresh lila, it will use the local copy of chessground and/or pgn-viewer.
 
-### InfluxDB Monitoring
+### Monitoring
 
-To view the InfluxDB monitoring dashboard, start your environment with the `Monitoring` service enabled. You can view the metrics at:
+To view the monitoring dashboards, start your environment with the `Monitoring` optional services enabled. You can view the metrics at:
 
-1. http://localhost:8086 (admin/password)
-2. http://localhost:8080/prometheus-metrics/x
-3. or by running:
+| Service      | URL                                        |
+| ------------ | ------------------------------------------ |
+| lila metrics | http://localhost:8080/prometheus-metrics/x |
+| Prometheus   | http://localhost:9090/                     |
+| InfluxDB     | http://localhost:8086/ (admin/password)    |
 
-    ```bash
-    curl --get http://localhost:8086/query \
-        --header "Authorization: Token secret" \
-        --data-urlencode "db=kamon"  \
-        --data-urlencode "q=show measurements;"
-    ```
+You can run queries against the InfluxDB database using curl:
+
+```bash
+curl --get http://localhost:8086/query \
+    --header "Authorization: Token secret" \
+    --data-urlencode 'db=kamon'  \
+    --data-urlencode 'q=show measurements;'
+
+curl --get http://localhost:8086/query \
+    --header "Authorization: Token secret" \
+    --data-urlencode 'db=kamon'  \
+    --data-urlencode 'q=show field keys'
+
+curl --get http://localhost:8086/query \
+    --header "Authorization: Token secret" \
+    --data-urlencode 'db=kamon' \
+    --data-urlencode 'q=show tag keys'
+```

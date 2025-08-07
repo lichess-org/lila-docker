@@ -421,6 +421,17 @@ services:
       - mongodb
     profiles:
       - mongo-express
+  
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    volumes:
+      - ./conf/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    networks:
+      - lila-network
+    profiles:
+      - monitoring
 
   influxdb:
     image: influxdb:2.7.11-alpine
