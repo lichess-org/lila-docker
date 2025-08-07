@@ -9,8 +9,6 @@ services:
       timeout: 30s
       start_period: 0s
       retries: 30
-    networks:
-      - lila-network
     volumes:
       - ./repos/lila:/lila
       - ./scripts:/scripts
@@ -21,16 +19,12 @@ services:
     image: mongo:7.0.20-jammy
     restart: unless-stopped
     command: mongod --bind_ip_all --replSet rs0
-    networks:
-      - lila-network
     profiles:
       - base
 
   redis:
     image: redis:7.4.3-alpine3.21
     restart: unless-stopped
-    networks:
-      - lila-network
     profiles:
       - base
 
@@ -45,8 +39,6 @@ services:
     working_dir: /lila
     entrypoint: ./lila.sh run
     restart: unless-stopped
-    networks:
-      - lila-network
     environment:
       - LILA_DOMAIN=${LILA_DOMAIN:-localhost:8080}
       - LILA_URL=${LILA_URL:-http://localhost:8080}
@@ -74,8 +66,6 @@ services:
     working_dir: /lila-ws
     entrypoint: sbt run -Dconfig.file=/lila-ws.conf
     restart: unless-stopped
-    networks:
-      - lila-network
     environment:
       - LILA_URL=${LILA_URL:-http://localhost:8080}
       - ENABLE_MONITORING=${ENABLE_MONITORING:-false}
@@ -88,8 +78,6 @@ services:
   nginx:
     image: nginx:1.27.5-alpine3.21-slim
     restart: unless-stopped
-    networks:
-      - lila-network
     ports:
       - 8080:80
     volumes:
@@ -175,8 +163,6 @@ services:
     user: ${USER_ID}:${GROUP_ID}
     environment:
       - LILA_ENGINE_LOG=lila_engine=debug,tower_http=debug
-    networks:
-      - lila-network
     ports:
       - 9666:9666
     volumes:
@@ -202,8 +188,6 @@ services:
       - REDIS_HOST=redis
       # - HTTP_API_LOGGER=true
     restart: unless-stopped
-    networks:
-      - lila-network
     volumes:
       - ./repos/lila-fishnet:/lila-fishnet
     profiles:
@@ -216,8 +200,6 @@ services:
       - ENDPOINT=http://lila_fishnet:9665/fishnet
       - MAX_BACKOFF=5
       - STATS_FILE=/stats.json
-    networks:
-      - lila-network
     profiles:
       - stockfish-play
 
@@ -228,8 +210,6 @@ services:
       - ENDPOINT=http://lila:9663/fishnet
       - MAX_BACKOFF=5
       - STATS_FILE=/stats.json
-    networks:
-      - lila-network
     profiles:
       - stockfish-analysis
 
@@ -237,8 +217,6 @@ services:
     build:
       context: docker
       dockerfile: python.Dockerfile
-    networks:
-      - lila-network
     volumes:
       - ./repos/berserk:/berserk
       - ./repos/lila-db-seed:/lila-db-seed
@@ -257,8 +235,6 @@ services:
     user: ${USER_ID}:${GROUP_ID}
     environment:
       - CI=1 # to disable pnpm install prompts
-    networks:
-      - lila-network
     volumes:
       - ./repos/lila:/lila
       - ./repos/chessground:/chessground
@@ -275,8 +251,6 @@ services:
       - http.cors.allow-origin=/.*/
       - http.cors.enabled=true
       - xpack.security.enabled=false
-    networks:
-      - lila-network
     ports:
       - 9200:9200
     profiles:
@@ -289,8 +263,6 @@ services:
       - ./conf/elasticvue.json:/usr/share/nginx/html/api/default_clusters.json
     ports:
       - 8092:8080
-    networks:
-      - lila-network
     profiles:
       - search
 
@@ -313,8 +285,6 @@ services:
       - OTEL_TRACES_EXPORTER=none
     ports:
       - 9673:9673
-    networks:
-      - lila-network
     volumes:
       - ./repos/lila-search:/lila-search
     profiles:
@@ -345,8 +315,6 @@ services:
       - INGESTOR_STUDY_START_AT=1344789787
       - OTEL_METRICS_EXPORTER=none
       - OTEL_TRACES_EXPORTER=none
-    networks:
-      - lila-network
     volumes:
       - ./repos/lila-search:/lila-search
     profiles:
@@ -360,8 +328,6 @@ services:
     user: ${USER_ID}:${GROUP_ID}
     ports:
       - 6175:6175
-    networks:
-      - lila-network
     volumes:
       - ./repos/lila-gif:/lila-gif
     profiles:
@@ -375,8 +341,6 @@ services:
     user: ${USER_ID}:${GROUP_ID}
     ports:
       - 9054:9054
-    networks:
-      - lila-network
     volumes:
       - ./repos/lila-push:/lila-push
       - ./conf/private.pem:/lila-push/private.pem
@@ -389,8 +353,6 @@ services:
       dockerfile: picfit.Dockerfile
     ports:
       - 3001:3001
-    networks:
-      - lila-network
     volumes:
       - ./conf/picfit.json:/mnt/config.json
       - ./docker/assets:/uploads
@@ -402,8 +364,6 @@ services:
     restart: unless-stopped
     ports:
       - 8025:8025
-    networks:
-      - lila-network
     profiles:
       - email
 
@@ -415,8 +375,6 @@ services:
     environment:
       - ME_CONFIG_BASICAUTH=false
       - ME_CONFIG_MONGODB_SERVER=mongodb
-    networks:
-      - lila-network
     depends_on:
       - mongodb
     profiles:
@@ -428,8 +386,6 @@ services:
       - ./conf/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
-    networks:
-      - lila-network
     profiles:
       - monitoring
 
@@ -445,11 +401,10 @@ services:
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=secret
       - DOCKER_INFLUXDB_INIT_ORG=lila-docker
       - DOCKER_INFLUXDB_INIT_BUCKET=kamon
-    networks:
-      - lila-network
     profiles:
       - monitoring
 
 networks:
-  lila-network:
+  default:
+    name: lila-network
     driver: bridge
