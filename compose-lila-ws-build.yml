@@ -1,0 +1,20 @@
+services:
+  lila_ws:
+    build:
+      context: docker
+      args:
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
+      dockerfile: sbt.Dockerfile
+    user: ${USER_ID}:${GROUP_ID}
+    working_dir: /lila-ws
+    entrypoint: sbt run -Dconfig.file=/lila-ws.conf
+    restart: unless-stopped
+    environment:
+      - LILA_URL=${LILA_URL:-http://localhost:8080}
+      - ENABLE_MONITORING=${ENABLE_MONITORING:-false}
+    volumes:
+      - ./repos/lila-ws:/lila-ws
+      - ./conf/lila-ws.conf:/lila-ws.conf
+    profiles:
+      - lila-ws-build
