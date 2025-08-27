@@ -29,6 +29,7 @@ const DEFAULT_PASSWORD: &str = "password";
 struct Config {
     quick_setup: Option<bool>,
     compose_profiles: Option<Vec<String>>,
+    lila_ws_container: Option<String>,
     setup_database: Option<bool>,
     setup_bbppairings: Option<bool>,
     mock_email: Option<bool>,
@@ -77,6 +78,7 @@ impl Config {
         let Self {
             quick_setup,
             compose_profiles,
+            lila_ws_container,
             setup_database,
             setup_bbppairings,
             mock_email,
@@ -96,6 +98,7 @@ impl Config {
         vec![
             to_env!(quick_setup),
             to_env!(compose_profiles, compose_profiles_string),
+            to_env!(lila_ws_container),
             to_env!(setup_database),
             to_env!(setup_bbppairings),
             to_env!(mock_email),
@@ -336,6 +339,17 @@ fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io
                 .iter()
                 .any(|service| service.compose_profile == Some(vec!["monitoring"])),
         );
+
+        config.lila_ws_container = Some(
+            if services
+                .iter()
+                .any(|service| service.compose_profile == Some(vec!["lila-ws-build"]))
+            {
+                "build".to_string()
+            } else {
+                "image".to_string()
+            },
+        );
     }
 
     if Gitpod::is_host()
@@ -379,10 +393,7 @@ fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io
     if !is_quick_setup {
         create_placeholder_dirs();
 
-        let mut repos_to_clone: Vec<Repository> = vec![
-            Repository::new("lichess-org", "lila"),
-            Repository::new("lichess-org", "lila-ws"),
-        ];
+        let mut repos_to_clone: Vec<Repository> = vec![Repository::new("lichess-org", "lila")];
 
         if config.setup_database.unwrap_or_default() {
             repos_to_clone.push(Repository::new("lichess-org", "lila-db-seed"));
@@ -516,6 +527,14 @@ fn prompt_for_services() -> Result<Vec<OptionalService<'static>>, Error> {
         },
         "Database admin interface",
         "Mongo Express for viewing database structure and data",
+    )
+    .item(
+        OptionalService {
+            compose_profile: vec!["lila-ws-build"].into(),
+            repositories: vec![Repository::new("lichess-org", "lila-ws")].into(),
+        },
+        "Websocket source code",
+        "Only needed if you want to make changes, otherwise a prebuilt lila-ws image will be used",
     )
     .item(
         OptionalService {
@@ -787,6 +806,7 @@ mod tests {
         let contents = Config {
             quick_setup: Some(true),
             compose_profiles: Some(vec!["foo".to_string(), "bar".to_string()]),
+            lila_ws_container: Some("image".to_string()),
             setup_database: Some(true),
             setup_bbppairings: Some(false),
             mock_email: Some(false),
@@ -805,6 +825,7 @@ mod tests {
             vec![
                 "QUICK_SETUP=true",
                 "COMPOSE_PROFILES=foo,bar",
+                "LILA_WS_CONTAINER=image",
                 "SETUP_DATABASE=true",
                 "SETUP_BBPPAIRINGS=false",
                 "MOCK_EMAIL=false",
@@ -825,6 +846,7 @@ mod tests {
         let contents = Config {
             quick_setup: None,
             compose_profiles: None,
+            lila_ws_container: None,
             setup_database: None,
             setup_bbppairings: None,
             mock_email: None,

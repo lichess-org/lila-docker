@@ -1,0 +1,13 @@
+services:
+  lila_ws:
+    image: ghcr.io/lichess-org/lila-ws:latest
+    restart: unless-stopped
+    environment:
+      - CONFIG_FORCE_csrf.origin=${LILA_URL:-http://localhost:8080}
+      - CONFIG_FORCE_kamon.enabled=${ENABLE_MONITORING:-false}
+      - CONFIG_FORCE_influxdb.hostname=influxdb
+      - CONFIG_FORCE_influxdb.authentication.token=secret
+      - CONFIG_FORCE_mongo_uri=mongodb://mongodb:27017/lichess?appName=lila-ws
+      - CONFIG_FORCE_redis.uri=redis://redis
+    profiles:
+      - base
