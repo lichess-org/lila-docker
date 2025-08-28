@@ -1,6 +1,7 @@
 services:
   lila_ws:
     image: ghcr.io/lichess-org/lila-ws:latest
+    platform: linux/amd64
     restart: unless-stopped
     environment:
       - CONFIG_FORCE_csrf.origin=${LILA_URL:-http://localhost:8080}
