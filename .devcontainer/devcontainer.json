@@ -1,5 +1,5 @@
 {
-    "containerEnv": {
+    "remoteEnv": {
         "LILA_DOMAIN": "${localEnv:CODESPACE_NAME}-8080.app.github.dev",
         "LILA_URL": "https://${localEnv:CODESPACE_NAME}-8080.app.github.dev"
     },
