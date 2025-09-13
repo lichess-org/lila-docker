@@ -1,5 +1,8 @@
 {
-    "image": "ghcr.io/lichess-org/lila-docker:main",
+    "containerEnv": {
+        "LILA_DOMAIN": "${localEnv:CODESPACE_NAME}-8080.app.github.dev",
+        "LILA_URL": "https://${localEnv:CODESPACE_NAME}-8080.app.github.dev"
+    },
     "portsAttributes": {
         "8080": {
             "label": "Lichess",
@@ -9,9 +12,6 @@
     "otherPortsAttributes": {
         "onAutoForward": "ignore"
     },
-    "containerEnv": {
-        "LILA_DOMAIN": "${localEnv:CODESPACE_NAME}-8080.app.github.dev",
-        "LILA_URL": "https://${localEnv:CODESPACE_NAME}-8080.app.github.dev"
-    },
-    "postStartCommand": "supervisord -c /etc/supervisor/supervisord.conf"
+    "onCreateCommand": "sudo apt update && sudo apt install --yes rustup && rustup default stable && cargo build --release --manifest-path command/Cargo.toml",
+    "postAttachCommand": "./lila-docker start"
 }

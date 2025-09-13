@@ -2,6 +2,8 @@
 
 set -e
 
+RUST_BUILD_IMAGE=messense/cargo-zigbuild:0.20.1
+
 run_setup() {
     write_user_id_to_env
 
@@ -83,6 +85,9 @@ all_profiles() {
 
 build_all_profiles() {
     write_user_id_to_env
+
+    # pre-pull the zigbuild image if rustup is not installed on the host
+    command -v rustup >/dev/null 2>&1 || docker pull $RUST_BUILD_IMAGE
 
     COMPOSE_PROFILES=$(all_profiles) docker compose pull
     COMPOSE_PROFILES=$(all_profiles) docker compose build
@@ -186,11 +191,11 @@ rust_cmd() {
         cargo build --release --manifest-path command/Cargo.toml
         eval "$COMMAND_EXE $@"
     elif [ "$(uname)" = "Darwin" ]; then
-        docker run --rm -v "$PWD/command:/command" -w /command messense/cargo-zigbuild:0.20.0 \
+        docker run --rm -v "$PWD/command:/command" -w /command $RUST_BUILD_IMAGE \
             cargo zigbuild --release --target universal2-apple-darwin
         ./command/target/universal2-apple-darwin/release/command "$@"
     else
-        docker run --rm -v "$PWD/command:/command" -w /command messense/cargo-zigbuild:0.20.0 \
+        docker run --rm -v "$PWD/command:/command" -w /command $RUST_BUILD_IMAGE \
             cargo zigbuild --release
         ./command/target/release/command "$@"
     fi
