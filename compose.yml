@@ -35,10 +35,10 @@ services:
     build:
       context: docker
       args:
-        USER_ID: ${USER_ID}
-        GROUP_ID: ${GROUP_ID}
+        USER_ID: ${USER_ID:-}
+        GROUP_ID: ${GROUP_ID:-}
       dockerfile: sbt.Dockerfile
-    user: ${USER_ID}:${GROUP_ID}
+    user: ${USER_ID:-}:${GROUP_ID:-}
     working_dir: /lila
     entrypoint: ./lila.sh run
     restart: unless-stopped
@@ -85,13 +85,13 @@ services:
     build:
       context: docker
       args:
-        USER_ID: ${USER_ID}
-        GROUP_ID: ${GROUP_ID}
+        USER_ID: ${USER_ID:-}
+        GROUP_ID: ${GROUP_ID:-}
       dockerfile: ui.Dockerfile
     working_dir: /api/doc
     entrypoint: ["/bin/sh", "-c", "npm install && npm run serve -- --host=0.0.0.0"]
     restart: unless-stopped
-    user: ${USER_ID}:${GROUP_ID}
+    user: ${USER_ID:-}:${GROUP_ID:-}
     ports:
       - 8089:8089
     volumes:
@@ -103,12 +103,12 @@ services:
     build:
       context: docker
       args:
-        USER_ID: ${USER_ID}
-        GROUP_ID: ${GROUP_ID}
+        USER_ID: ${USER_ID:-}
+        GROUP_ID: ${GROUP_ID:-}
       dockerfile: ui.Dockerfile
     entrypoint: ["/bin/sh", "-c", "pnpm install && pnpm run compile && pnpx http-server -p 8080"]
     restart: unless-stopped
-    user: ${USER_ID}:${GROUP_ID}
+    user: ${USER_ID:-}:${GROUP_ID:-}
     ports:
       - 8090:8080
     volumes:
@@ -121,12 +121,12 @@ services:
     build:
       context: docker
       args:
-        USER_ID: ${USER_ID}
-        GROUP_ID: ${GROUP_ID}
+        USER_ID: ${USER_ID:-}
+        GROUP_ID: ${GROUP_ID:-}
       dockerfile: ui.Dockerfile
     entrypoint: ["/bin/sh", "-c", "pnpm install && pnpm run demo"]
     restart: unless-stopped
-    user: ${USER_ID}:${GROUP_ID}
+    user: ${USER_ID:-}:${GROUP_ID:-}
     ports:
       - 8091:8080
     volumes:
@@ -140,7 +140,7 @@ services:
     working_dir: /lila-engine
     entrypoint: cargo run -- --bind 0.0.0.0:9666 --mongodb mongodb://mongodb
     restart: unless-stopped
-    user: ${USER_ID}:${GROUP_ID}
+    user: ${USER_ID:-}:${GROUP_ID:-}
     environment:
       - LILA_ENGINE_LOG=lila_engine=debug,tower_http=debug
     ports:
@@ -154,10 +154,10 @@ services:
     build:
       context: docker
       args:
-        USER_ID: ${USER_ID}
-        GROUP_ID: ${GROUP_ID}
+        USER_ID: ${USER_ID:-}
+        GROUP_ID: ${GROUP_ID:-}
       dockerfile: sbt.Dockerfile
-    user: ${USER_ID}:${GROUP_ID}
+    user: ${USER_ID:-}:${GROUP_ID:-}
     working_dir: /lila-fishnet
     entrypoint: sbt app/run
     environment:
@@ -208,11 +208,11 @@ services:
     build:
       context: docker
       args:
-        USER_ID: ${USER_ID}
-        GROUP_ID: ${GROUP_ID}
+        USER_ID: ${USER_ID:-}
+        GROUP_ID: ${GROUP_ID:-}
       dockerfile: ui.Dockerfile
     restart: unless-stopped
-    user: ${USER_ID}:${GROUP_ID}
+    user: ${USER_ID:-}:${GROUP_ID:-}
     environment:
       - CI=1 # to disable pnpm install prompts
     volumes:
@@ -250,10 +250,10 @@ services:
     build:
       context: docker
       args:
-        USER_ID: ${USER_ID}
-        GROUP_ID: ${GROUP_ID}
+        USER_ID: ${USER_ID:-}
+        GROUP_ID: ${GROUP_ID:-}
       dockerfile: sbt.Dockerfile
-    user: ${USER_ID}:${GROUP_ID}
+    user: ${USER_ID:-}:${GROUP_ID:-}
     working_dir: /lila-search
     entrypoint: sbt app/run
     restart: unless-stopped
@@ -274,10 +274,10 @@ services:
     build:
       context: docker
       args:
-        USER_ID: ${USER_ID}
-        GROUP_ID: ${GROUP_ID}
+        USER_ID: ${USER_ID:-}
+        GROUP_ID: ${GROUP_ID:-}
       dockerfile: sbt.Dockerfile
-    user: ${USER_ID}:${GROUP_ID}
+    user: ${USER_ID:-}:${GROUP_ID:-}
     working_dir: /lila-search
     entrypoint: sbt 'ingestor/runMain lila.search.ingestor.App'
     restart: unless-stopped
@@ -305,7 +305,7 @@ services:
     working_dir: /lila-gif
     entrypoint: cargo run -- --bind 0.0.0.0:6175
     restart: unless-stopped
-    user: ${USER_ID}:${GROUP_ID}
+    user: ${USER_ID:-}:${GROUP_ID:-}
     ports:
       - 6175:6175
     volumes:
@@ -318,7 +318,7 @@ services:
     working_dir: /lila-push
     entrypoint: cargo run --release -- --vapid private.pem --vapid-subject mailto:contact@lichess.org --bind 0.0.0.0:9054
     restart: unless-stopped
-    user: ${USER_ID}:${GROUP_ID}
+    user: ${USER_ID:-}:${GROUP_ID:-}
     ports:
       - 9054:9054
     volumes:

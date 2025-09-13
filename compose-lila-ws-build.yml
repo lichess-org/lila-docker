@@ -3,10 +3,10 @@ services:
     build:
       context: docker
       args:
-        USER_ID: ${USER_ID}
-        GROUP_ID: ${GROUP_ID}
+        USER_ID: ${USER_ID:-}
+        GROUP_ID: ${GROUP_ID:-}
       dockerfile: sbt.Dockerfile
-    user: ${USER_ID}:${GROUP_ID}
+    user: ${USER_ID:-}:${GROUP_ID:-}
     working_dir: /lila-ws
     entrypoint: sbt run -Dconfig.file=/lila-ws.conf
     restart: unless-stopped
