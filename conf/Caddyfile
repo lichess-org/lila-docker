@@ -27,7 +27,7 @@ handle_path /display* {
 }
 
 reverse_proxy @websockets lila_ws:9664 {
-	header_up Host {$LILA_DOMAIN}
+	header_up Origin {$LILA_URL}
 }
 
 reverse_proxy lila:9663 {
