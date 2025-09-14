@@ -20,22 +20,22 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Checkout lila
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: 'lichess-org/lila'
           path: 'repos/lila'
 
       - name: Checkout lila-ws
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: 'lichess-org/lila-ws'
           path: 'repos/lila-ws'
 
       - name: Checkout lila-db-seed
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: 'lichess-org/lila-db-seed'
           path: 'repos/lila-db-seed'
