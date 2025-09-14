@@ -1,4 +1,4 @@
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.7_6_1.10.11_3.6.4
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-24.0.1_9_1.11.6_3.7.3
 
 ARG USER_ID
 ARG GROUP_ID

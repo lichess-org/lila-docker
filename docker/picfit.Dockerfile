@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.24.2-alpine3.21 AS build
+FROM golang:1.25.1-alpine3.22 AS build
 
 RUN apk --no-cache add g++ gcc make \
     && wget https://github.com/thoas/picfit/archive/refs/tags/0.15.1.zip \
@@ -11,7 +11,7 @@ WORKDIR /picfit
 RUN make build
 
 # Runtime stage
-FROM alpine:3.21
+FROM alpine:3.22.1
 
 COPY --from=build /picfit/bin/picfit /picfit
 

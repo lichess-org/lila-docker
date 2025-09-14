@@ -1,5 +1,5 @@
 ##################################################################################
-FROM node:24-bookworm AS node
+FROM node:24-trixie AS node
 
 COPY repos/lila /lila
 COPY conf/mono.conf /lila/conf/mono.conf
@@ -38,14 +38,14 @@ RUN mkdir /seeded \
     && mongosh --quiet lichess /lila/bin/mongodb/indexes.js
 
 ##################################################################################
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.7_6_1.10.11_3.6.4 AS lilawsbuilder
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-24.0.1_9_1.11.6_3.7.3 AS lilawsbuilder
 
 COPY repos/lila-ws /lila-ws
 WORKDIR /lila-ws
 RUN sbt stage
 
 ##################################################################################
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-21.0.7_6_1.10.11_3.6.4 AS lilabuilder
+FROM sbtscala/scala-sbt:eclipse-temurin-alpine-24.0.1_9_1.11.6_3.7.3 AS lilabuilder
 
 COPY --from=node /lila /lila
 WORKDIR /lila
