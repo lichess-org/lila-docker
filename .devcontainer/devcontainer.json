@@ -13,5 +13,12 @@
         "onAutoForward": "ignore"
     },
     "onCreateCommand": "sudo apt update && sudo apt install --yes rustup && rustup default stable && cargo build --release --manifest-path command/Cargo.toml",
-    "postAttachCommand": "./lila-docker start"
+    "postAttachCommand": "./lila-docker start",
+    "customizations": {
+        "codespaces": {
+            "openFiles": [
+                "docs/codespaces-welcome.md"
+            ]
+        }
+    }
 }

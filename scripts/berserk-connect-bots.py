@@ -4,7 +4,7 @@ import concurrent.futures
 
 def connect_bot(token):
     session = berserk.TokenSession(token)
-    client = berserk.Client(session, base_url="http://nginx")
+    client = berserk.Client(session, base_url="http://caddy")
     generator = client.bots.stream_incoming_events()
 
     for event in generator:
