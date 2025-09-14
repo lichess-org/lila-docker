@@ -78,7 +78,7 @@ COPY --from=node /lila/public /lila/target/universal/stage/public
 
 COPY conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY conf/mono.Caddyfile /mono.Caddyfile
-COPY nginx/errors/502/lila.html /errors/502.html
+COPY static /static
 
 ENV JAVA_HOME=/opt/java/openjdk
 ENV JAVA_OPTS="-Xms4g -Xmx4g"

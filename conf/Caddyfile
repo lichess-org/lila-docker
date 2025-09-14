@@ -1,0 +1,54 @@
+:80
+
+handle_path /oops* {
+	root * /lila/public/oops
+	file_server
+}
+
+# for http://localhost:8080/oops/font.html
+handle_path /font* {
+	root * /lila/public/font
+	file_server
+}
+
+handle_path /static* {
+	root * /static
+	file_server
+}
+
+handle_path /display* {
+	rewrite * /display
+	reverse_proxy picfit:3001
+}
+
+@websockets {
+	header Connection *Upgrade*
+	header Upgrade websocket
+}
+
+reverse_proxy @websockets lila_ws:9664 {
+	header_up Host {$LILA_DOMAIN}
+}
+
+reverse_proxy lila:9663 {
+	header_up Host {$LILA_DOMAIN}
+
+	header_down Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
+}
+
+handle_errors {
+	@502 expression {http.error.status_code} == 502
+
+	route @502 {
+		route /display* {
+			root * /static/errors
+			rewrite * /picfit-placeholder.png
+			file_server
+		}
+		route {
+			root * /static/errors
+			rewrite * /502.html
+			file_server
+		}
+	}
+}

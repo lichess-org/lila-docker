@@ -176,7 +176,7 @@ run_hostname() {
     rust_cmd hostname
 
     if [ ! -z "$(docker compose ps -a --services | xargs)" ]; then
-        docker compose down lila lila_ws nginx mono
+        docker compose down lila lila_ws caddy mono
         docker compose up -d
     fi
 }
