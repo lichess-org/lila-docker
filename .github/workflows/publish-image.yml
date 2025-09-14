@@ -7,6 +7,7 @@ on:
   push:
     paths:
       - '.github/workflows/publish-image.yml'
+      - 'conf/mono.Caddyfile'
       - 'conf/mono.conf'
       - 'docker/mono.Dockerfile'
 
