@@ -260,7 +260,6 @@ services:
       - ELASTIC_URI=http://elasticsearch:9200
       - HTTP_SHUTDOWN_TIMEOUT=1
       - HTTP_ENABLE_DOCS=true
-      - HTTP_PORT=9674
       - OTEL_METRICS_EXPORTER=none
       - OTEL_TRACES_EXPORTER=none
       - OTEL_EXPORTER_PROMETHEUS_HOST=0.0.0.0
