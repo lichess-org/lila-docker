@@ -454,7 +454,6 @@ fn create_placeholder_dirs() {
         Repository::new("lichess-org", "lila-db-seed"),
         Repository::new("lichess-org", "lila-fishnet"),
         Repository::new("lichess-org", "lila-engine"),
-        Repository::new("lichess-org", "lila-search"),
         Repository::new("lichess-org", "lila-gif"),
         Repository::new("lichess-org", "lila-push"),
         Repository::new("lichess-org", "api"),
@@ -571,7 +570,7 @@ fn prompt_for_services() -> Result<Vec<OptionalService<'static>>, Error> {
     .item(
         OptionalService {
             compose_profile: vec!["search"].into(),
-            repositories: vec![Repository::new("lichess-org", "lila-search")].into(),
+            repositories: None,
         },
         "Search",
         "for searching games, forum posts, etc",

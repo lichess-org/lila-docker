@@ -247,58 +247,51 @@ services:
       - 8092:8080
     profiles:
       - search
-
-  lila_search:
-    build:
-      context: docker
-      args:
-        USER_ID: ${USER_ID:-}
-        GROUP_ID: ${GROUP_ID:-}
-      dockerfile: sbt.Dockerfile
-    user: ${USER_ID:-}:${GROUP_ID:-}
-    working_dir: /lila-search
-    entrypoint: sbt app/run
-    restart: unless-stopped
+  
+  lila-search-app:
+    image: ghcr.io/lichess-org/lila-search-app:3.2.2
+    volumes:
+      - ./conf/lila-search-logback.xml:/opt/config/logback.xml
     environment:
+      - MONGO_URI=mongodb://mongodb:27017/?readPreference=secondary
+      - MONGO_DATABASE=lichess
+      - MONGO_STUDY_URI=mongodb://mongodb:27017
+      - MONGO_STUDY_DATABASE=lichess
       - ELASTIC_URI=http://elasticsearch:9200
-      - HTTP_API_LOGGER=true
+      - HTTP_SHUTDOWN_TIMEOUT=1
       - HTTP_ENABLE_DOCS=true
+      - HTTP_PORT=9674
       - OTEL_METRICS_EXPORTER=none
       - OTEL_TRACES_EXPORTER=none
-    ports:
-      - 9673:9673
-    volumes:
-      - ./repos/lila-search:/lila-search
+      - OTEL_EXPORTER_PROMETHEUS_HOST=0.0.0.0
+      - OTEL_EXPORTER_PROMETHEUS_PORT=9465
+    restart: unless-stopped
     profiles:
       - search
 
-  lila_search_ingestor:
-    build:
-      context: docker
-      args:
-        USER_ID: ${USER_ID:-}
-        GROUP_ID: ${GROUP_ID:-}
-      dockerfile: sbt.Dockerfile
-    user: ${USER_ID:-}:${GROUP_ID:-}
-    working_dir: /lila-search
-    entrypoint: sbt 'ingestor/runMain lila.search.ingestor.App'
-    restart: unless-stopped
+  lila-search-ingestor:
+    image: ghcr.io/lichess-org/lila-search-ingestor-app:3.2.3-SNAPSHOT
+    volumes:
+      - ./conf/lila-search-logback.xml:/opt/config/logback.xml
     environment:
-      - APP_LOG_LEVEL=DEBUG
-      - ELASTIC_URI=http://elasticsearch:9200
-      - ELASTIC4S_LOG_LEVEL=DEBUG
+      - MONGO_URI=mongodb://mongodb:27017/?readPreference=secondary
       - MONGO_DATABASE=lichess
+      - MONGO_STUDY_URI=mongodb://mongodb:27017
       - MONGO_STUDY_DATABASE=lichess
-      - MONGO_DRIVER_LOG_LEVEL=DEBUG
-      - MONGO_URI=mongodb://mongodb_secondary
-      - MONGO_STUDY_URI=mongodb://mongodb_secondary
-      - INGESTOR_FORUM_TIME_WINDOWS=1
-      - INGESTOR_STUDY_INTERVAL=10
-      - INGESTOR_STUDY_START_AT=1344789787
+      - ELASTIC_URI=http://elasticsearch:9200
       - OTEL_METRICS_EXPORTER=none
       - OTEL_TRACES_EXPORTER=none
-    volumes:
-      - ./repos/lila-search:/lila-search
+      - OTEL_EXPORTER_PROMETHEUS_HOST=0.0.0.0
+      - OTEL_EXPORTER_PROMETHEUS_PORT=9465
+      - INGESTOR_FORUM_TIME_WINDOWS=1
+      - INGESTOR_FORUM_MAX_POST_LENGTH=5000
+      - INGESTOR_TEAM_TIME_WINDOWS=1
+      - INGESTOR_STUDY_BATCH_SIZE=100
+      - INGESTOR_STUDY_INTERVAL=30
+      - INGESTOR_GAME_BATCH_SIZE=100
+      - INGESTOR_GAME_TIME_WINDOWS=2
+      - INGESTOR_GAME_START_AT=0
+    restart: unless-stopped
     profiles:
       - search
 
