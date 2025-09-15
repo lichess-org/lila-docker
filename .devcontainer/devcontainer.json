@@ -7,6 +7,50 @@
         "8080": {
             "label": "Lichess",
             "onAutoForward": "openPreview"
+        },
+        "8025": {
+            "label": "Mailpit (Outbound email debugging)",
+            "onAutoForward": "silent"
+        },
+        "8081": {
+            "label": "Mongo Express (Database explorer)",
+            "onAutoForward": "silent"
+        },
+        "8086": {
+            "label": "InfluxDB Metrics (u: admin / p: password)",
+            "onAutoForward": "silent"
+        },
+        "8089": {
+            "label": "API docs",
+            "onAutoForward": "silent"
+        },
+        "8090": {
+            "label": "Chessground",
+            "onAutoForward": "silent"
+        },
+        "8091": {
+            "label": "pgn-viewer",
+            "onAutoForward": "silent"
+        },
+        "9666": {
+            "label": "lila-engine (External engine)",
+            "onAutoForward": "silent"
+        },
+        "6175": {
+            "label": "lila-gif",
+            "onAutoForward": "silent"
+        },
+        "3001": {
+            "label": "Picfit (Image resizing)",
+            "onAutoForward": "silent"
+        },
+        "8092": {
+            "label": "Elasticvue (Elasticsearch explorer)",
+            "onAutoForward": "silent"
+        },
+        "9200": {
+            "label": "Elasticsearch",
+            "onAutoForward": "silent"
         }
     },
     "otherPortsAttributes": {
@@ -18,6 +62,13 @@
         "codespaces": {
             "openFiles": [
                 "docs/codespaces-welcome.md"
+            ]
+        },
+        "vscode": {
+            "extensions": [
+                "ms-azuretools.vscode-docker",
+                "scala-lang.scala",
+                "scalameta.metals"
             ]
         }
     }
