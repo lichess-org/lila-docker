@@ -248,7 +248,7 @@ services:
     profiles:
       - search
   
-  lila-search-app:
+  lila_search_app:
     image: ghcr.io/lichess-org/lila-search-app:3.2.2
     volumes:
       - ./conf/lila-search-logback.xml:/opt/config/logback.xml
@@ -270,7 +270,7 @@ services:
     profiles:
       - search
 
-  lila-search-ingestor:
+  lila_search_ingestor:
     image: ghcr.io/lichess-org/lila-search-ingestor-app:3.2.3-SNAPSHOT
     volumes:
       - ./conf/lila-search-logback.xml:/opt/config/logback.xml
