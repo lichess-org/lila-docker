@@ -140,7 +140,7 @@ setup_database() {
         done
 
         docker compose exec elasticsearch curl -X DELETE "localhost:9200/_all?pretty"
-        # docker compose exec lila_search_ingestor sbt 'ingestor/runMain lila.search.ingestor.cli index --all --since 0'
+        docker compose run --rm lila_search_ingestor_cli
     fi
 
     docker compose run --rm python python /scripts/users.py

@@ -1,5 +1,6 @@
 include:
   - compose-lila-ws-${LILA_WS_CONTAINER:-image}.yml
+  - compose-search.yml
 
 services:
   mongodb:
@@ -224,78 +225,6 @@ services:
       - ./.pnpm-store:/.pnpm-store
     profiles:
       - utils
-
-  elasticsearch:
-    image: elasticsearch:7.17.4
-    restart: unless-stopped
-    environment:
-      - discovery.type=single-node
-      - http.cors.allow-origin=/.*/
-      - http.cors.enabled=true
-      - xpack.security.enabled=false
-    ports:
-      - 9200:9200
-    profiles:
-      - search
-
-  elasticvue:
-    image: cars10/elasticvue:1.8.0
-    restart: unless-stopped
-    volumes:
-      - ./conf/elasticvue.json:/usr/share/nginx/html/api/default_clusters.json
-    ports:
-      - 8092:8080
-    profiles:
-      - search
-  
-  lila_search_app:
-    image: ghcr.io/lichess-org/lila-search-app:3.2.2
-    volumes:
-      - ./conf/lila-search-logback.xml:/opt/config/logback.xml
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/?readPreference=secondary
-      - MONGO_DATABASE=lichess
-      - MONGO_STUDY_URI=mongodb://mongodb:27017
-      - MONGO_STUDY_DATABASE=lichess
-      - ELASTIC_URI=http://elasticsearch:9200
-      - HTTP_SHUTDOWN_TIMEOUT=1
-      - HTTP_ENABLE_DOCS=true
-      - OTEL_METRICS_EXPORTER=none
-      - OTEL_TRACES_EXPORTER=none
-      - OTEL_EXPORTER_PROMETHEUS_HOST=0.0.0.0
-      - OTEL_EXPORTER_PROMETHEUS_PORT=9465
-      - JAVA_TOOL_OPTIONS=-Dlogback.configurationFile=/opt/config/logback.xml
-    restart: unless-stopped
-    profiles:
-      - search
-
-  lila_search_ingestor:
-    image: ghcr.io/lichess-org/lila-search-ingestor-app:3.2.3-SNAPSHOT
-    volumes:
-      - ./conf/lila-search-logback.xml:/opt/config/logback.xml
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/?readPreference=secondary
-      - MONGO_DATABASE=lichess
-      - MONGO_STUDY_URI=mongodb://mongodb:27017
-      - MONGO_STUDY_DATABASE=lichess
-      - ELASTIC_URI=http://elasticsearch:9200
-      - OTEL_METRICS_EXPORTER=none
-      - OTEL_TRACES_EXPORTER=none
-      - OTEL_EXPORTER_PROMETHEUS_HOST=0.0.0.0
-      - OTEL_EXPORTER_PROMETHEUS_PORT=9465
-      - INGESTOR_FORUM_TIME_WINDOWS=1
-      - INGESTOR_FORUM_MAX_POST_LENGTH=5000
-      - INGESTOR_TEAM_TIME_WINDOWS=1
-      - INGESTOR_STUDY_BATCH_SIZE=100
-      - INGESTOR_STUDY_INTERVAL=30
-      - INGESTOR_GAME_BATCH_SIZE=100
-      - INGESTOR_GAME_TIME_WINDOWS=2
-      - INGESTOR_GAME_START_AT=0
-      - JAVA_TOOL_OPTIONS=-Dlogback.configurationFile=/opt/config/logback.xml
-      - KV_STORE_PATH=/tmp/json.store
-    restart: unless-stopped
-    profiles:
-      - search
 
   lila_gif:
     image: rust:1.89.0-trixie
