@@ -1,0 +1,18 @@
+<configuration>
+  <variable name="APP_LOG_LEVEL" value="${APP_LOG_LEVEL:-INFO}" />
+  <variable name="ELASTIC4S_LOG_LEVEL" value="${ELASTIC4S_LOG_LEVEL:-WARN}" />
+  <variable name="MONGO_DRIVER_LOG_LEVEL" value="${MONGO_DRIVER_LOG_LEVEL:-INFO}" />
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS,UTC} %-5level [%thread] %logger{20} - %msg%n%xException</pattern>
+    </encoder>
+  </appender>
+
+  <root level="${APP_LOG_LEVEL}">
+    <appender-ref ref="STDOUT"/>
+  </root>
+
+  <logger name="com.sksamuel.elastic4s" level="${ELASTIC4S_LOG_LEVEL}"/>
+  <logger name="org.mongodb.driver" level="${MONGO_DRIVER_LOG_LEVEL}"/>
+</configuration>

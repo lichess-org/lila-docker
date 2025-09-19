@@ -1,5 +1,6 @@
 include:
   - compose-lila-ws-${LILA_WS_CONTAINER:-image}.yml
+  - compose-search.yml
 
 services:
   mongodb:
@@ -225,83 +226,6 @@ services:
       - ./.pnpm-store:/.pnpm-store
     profiles:
       - utils
-
-  elasticsearch:
-    image: elasticsearch:7.17.4
-    restart: unless-stopped
-    environment:
-      - discovery.type=single-node
-      - http.cors.allow-origin=/.*/
-      - http.cors.enabled=true
-      - xpack.security.enabled=false
-    ports:
-      - 9200:9200
-    profiles:
-      - search
-
-  elasticvue:
-    image: cars10/elasticvue:1.8.0
-    restart: unless-stopped
-    volumes:
-      - ./conf/elasticvue.json:/usr/share/nginx/html/api/default_clusters.json
-    ports:
-      - 8092:8080
-    profiles:
-      - search
-
-  lila_search:
-    build:
-      context: docker
-      args:
-        USER_ID: ${USER_ID:-}
-        GROUP_ID: ${GROUP_ID:-}
-      dockerfile: sbt.Dockerfile
-    user: ${USER_ID:-}:${GROUP_ID:-}
-    working_dir: /lila-search
-    entrypoint: sbt app/run
-    restart: unless-stopped
-    environment:
-      - ELASTIC_URI=http://elasticsearch:9200
-      - HTTP_API_LOGGER=true
-      - HTTP_ENABLE_DOCS=true
-      - OTEL_METRICS_EXPORTER=none
-      - OTEL_TRACES_EXPORTER=none
-    ports:
-      - 9673:9673
-    volumes:
-      - ./repos/lila-search:/lila-search
-    profiles:
-      - search
-
-  lila_search_ingestor:
-    build:
-      context: docker
-      args:
-        USER_ID: ${USER_ID:-}
-        GROUP_ID: ${GROUP_ID:-}
-      dockerfile: sbt.Dockerfile
-    user: ${USER_ID:-}:${GROUP_ID:-}
-    working_dir: /lila-search
-    entrypoint: sbt 'ingestor/runMain lila.search.ingestor.App'
-    restart: unless-stopped
-    environment:
-      - APP_LOG_LEVEL=DEBUG
-      - ELASTIC_URI=http://elasticsearch:9200
-      - ELASTIC4S_LOG_LEVEL=DEBUG
-      - MONGO_DATABASE=lichess
-      - MONGO_STUDY_DATABASE=lichess
-      - MONGO_DRIVER_LOG_LEVEL=DEBUG
-      - MONGO_URI=mongodb://mongodb_secondary
-      - MONGO_STUDY_URI=mongodb://mongodb_secondary
-      - INGESTOR_FORUM_TIME_WINDOWS=1
-      - INGESTOR_STUDY_INTERVAL=10
-      - INGESTOR_STUDY_START_AT=1344789787
-      - OTEL_METRICS_EXPORTER=none
-      - OTEL_TRACES_EXPORTER=none
-    volumes:
-      - ./repos/lila-search:/lila-search
-    profiles:
-      - search
 
   lila_gif:
     image: rust:1.89.0-trixie
