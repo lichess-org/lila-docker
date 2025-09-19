@@ -23,7 +23,7 @@ services:
       - search
   
   lila_search_app:
-    image: ghcr.io/lichess-org/lila-search-app:3.2.2
+    image: ghcr.io/lichess-org/lila-search-app:latest
     volumes:
       - ./conf/lila-search-logback.xml:/opt/config/logback.xml
     environment:
@@ -44,7 +44,7 @@ services:
       - search
 
   lila_search_ingestor:
-    image: ghcr.io/lichess-org/lila-search-ingestor-app:3.2.3-SNAPSHOT
+    image: ghcr.io/lichess-org/lila-search-ingestor-app:latest
     volumes:
       - ./conf/lila-search-logback.xml:/opt/config/logback.xml
     environment:
@@ -72,7 +72,7 @@ services:
       - search
 
   lila_search_ingestor_cli:
-    image: ghcr.io/lichess-org/lila-search-ingestor-cli:3.2.3-SNAPSHOT
+    image: ghcr.io/lichess-org/lila-search-ingestor-cli:latest
     volumes:
       - ./conf/lila-search-logback.xml:/opt/config/logback.xml
     environment:
