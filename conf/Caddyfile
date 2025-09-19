@@ -32,6 +32,7 @@ reverse_proxy @websockets lila_ws:9664 {
 
 reverse_proxy lila:9663 {
 	header_up Host {$LILA_DOMAIN}
+	header_up Origin {$LILA_URL}
 
 	header_down Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
 }

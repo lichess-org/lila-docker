@@ -17,4 +17,5 @@ reverse_proxy @websockets :9664 {
 
 reverse_proxy :9663 {
 	header_up Host {$LILA_DOMAIN}
+	header_up Origin {$LILA_URL}
 }

@@ -49,8 +49,7 @@ docker push ghcr.io/lichess-org/lila-docker:testing
 ## Run ghcr-hosted image
 
 ```bash
-docker pull ghcr.io/lichess-org/lila-docker:main
-docker run --rm -p 8080:8080 ghcr.io/lichess-org/lila-docker:main
+docker run --rm -p 8080:8080 --pull always ghcr.io/lichess-org/lila-docker:main
 ```
 
 Visit: http://localhost:8080
