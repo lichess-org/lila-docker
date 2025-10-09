@@ -34,10 +34,6 @@ services:
       - ELASTIC_URI=http://elasticsearch:9200
       - HTTP_SHUTDOWN_TIMEOUT=1
       - HTTP_ENABLE_DOCS=true
-      - OTEL_METRICS_EXPORTER=none
-      - OTEL_TRACES_EXPORTER=none
-      - OTEL_EXPORTER_PROMETHEUS_HOST=0.0.0.0
-      - OTEL_EXPORTER_PROMETHEUS_PORT=9465
       - JAVA_TOOL_OPTIONS=-Dlogback.configurationFile=/opt/config/logback.xml
     restart: unless-stopped
     profiles:
@@ -53,8 +49,6 @@ services:
       - MONGO_STUDY_URI=mongodb://mongodb:27017
       - MONGO_STUDY_DATABASE=lichess
       - ELASTIC_URI=http://elasticsearch:9200
-      - OTEL_METRICS_EXPORTER=none
-      - OTEL_TRACES_EXPORTER=none
       - OTEL_EXPORTER_PROMETHEUS_HOST=0.0.0.0
       - OTEL_EXPORTER_PROMETHEUS_PORT=9465
       - INGESTOR_FORUM_TIME_WINDOWS=1
@@ -81,10 +75,6 @@ services:
       - MONGO_STUDY_URI=mongodb://mongodb:27017
       - MONGO_STUDY_DATABASE=lichess
       - ELASTIC_URI=http://elasticsearch:9200
-      - OTEL_METRICS_EXPORTER=none
-      - OTEL_TRACES_EXPORTER=none
-      - OTEL_EXPORTER_PROMETHEUS_HOST=0.0.0.0
-      - OTEL_EXPORTER_PROMETHEUS_PORT=9465
 
       - INGESTOR_FORUM_TIME_WINDOWS=1
       - INGESTOR_FORUM_MAX_POST_LENGTH=5000
