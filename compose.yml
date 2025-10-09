@@ -165,10 +165,6 @@ services:
     working_dir: /lila-fishnet
     entrypoint: sbt app/run
     environment:
-      - APP_BACKUP_FILE=/backup.json
-      - CONFIG_FORCE_kamon_influxdb_authentication_token=secret
-      - CONFIG_FORCE_kamon_influxdb_hostname=influxdb
-      - KAMON_ENABLED=${ENABLE_MONITORING:-false}
       - REDIS_HOST=redis
       # - HTTP_API_LOGGER=true
     restart: unless-stopped
