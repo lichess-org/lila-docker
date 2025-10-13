@@ -96,6 +96,7 @@ services:
       - "--all"
       - "--since"
       - "0"
+      - "--refresh"
     
     profiles:
       - utils
