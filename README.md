@@ -8,21 +8,6 @@ The only requirement for running on your local machine is Docker Desktop, and op
 
 ![image](https://github.com/user-attachments/assets/0192574a-4cb7-42da-a19e-e75af24b0565)
 
-## Running in Gitpod
-
-As an alternative to running it on your local machine, you can use Gitpod (a free, online, VS Code-like IDE) for contributing. With a single click, it will launch a workspace and automatically:
-
--   Clone the necessary Lichess repositories
--   Install all the dependencies
--   Seed your database with test data
--   Start your development site
-
-Click here to create a workspace:
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/new/#https://github.com/lichess-org/lila-docker)
-
-Also, see [gitpod-prebuilds.md](gitpod-prebuilds.md) for more information on how to use prebuilds to speed up your development.
-
 ## Instructions
 
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and have it running
