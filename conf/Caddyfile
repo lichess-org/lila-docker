@@ -11,6 +11,12 @@ handle_path /font* {
 	file_server
 }
 
+# for http://localhost:8080/oops/flair.html
+handle_path /flair/list.txt {
+	root * /lila/public/flair/list.txt
+	file_server
+}
+
 handle_path /static* {
 	root * /static
 	file_server
