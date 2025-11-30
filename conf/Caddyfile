@@ -27,6 +27,16 @@ handle_path /display* {
 	reverse_proxy picfit:3001
 }
 
+handle_path /embed/* {
+	rewrite * /embed{uri}
+	reverse_proxy lila:9663 {
+		header_up Host {$LILA_DOMAIN}
+		header_up Origin {$LILA_URL}
+
+		header_down Cross-Origin-Embedder-Policy "credentialless"
+	}
+}
+
 @websockets {
 	header Connection *Upgrade*
 	header Upgrade websocket
