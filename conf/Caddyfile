@@ -40,6 +40,9 @@ reverse_proxy lila:9663 {
 	header_up Host {$LILA_DOMAIN}
 	header_up Origin {$LILA_URL}
 
+	# allow CORS for requests from web client on lichess.org/api
+	header_down Access-Control-Allow-Origin "*"
+
 	header_down Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
 }
 
