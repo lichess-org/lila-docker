@@ -1,0 +1,12 @@
+# config/analysis/synonyms.txt
+
+# US / UK spelling
+defence, defense
+colour, color
+centre, center
+analyse, analyze
+organise, organize
+centralisation, centralization
+recognise, recognize
+specialise, specialize
+mate, checkmate

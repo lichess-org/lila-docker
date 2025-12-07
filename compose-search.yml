@@ -7,6 +7,8 @@ services:
       - http.cors.allow-origin=/.*/
       - http.cors.enabled=true
       - xpack.security.enabled=false
+    volumes:
+      - ./conf/elasticsearch/synonyms:/usr/share/elasticsearch/config/synonyms
     ports:
       - 9200:9200
     profiles:
@@ -21,7 +23,7 @@ services:
       - 8092:8080
     profiles:
       - search
-  
+
   lila_search_app:
     image: ghcr.io/lichess-org/lila-search-app:latest
     volumes:
