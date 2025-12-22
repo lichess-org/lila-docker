@@ -25,6 +25,8 @@ The only requirement for running on your local machine is Docker Desktop, and op
     ./lila-docker start
     ```
 
+    Then complete the dialog to set up lila-docker.
+
     Starting new services may take 5-10 minutes. Some services will start before others and you may see errors in the logs until everything comes online.
 
     Lila requires about 12GB of RAM to build. Make sure there is enough RAM available, especially when using Docker Desktop, which allocates 50% of the available RAM by default.
