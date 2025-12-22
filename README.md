@@ -127,7 +127,9 @@ docker compose run --rm -w /lila ui pnpm run i18n-file-gen
 docker compose cp mongodb:/data/db ./database
 ```
 
-Then in `docker-compose.yml`add `- ./database:/data/db` to mongodb volumes
+Then, in `compose.yml`,  under `services.mongodb.volumes`: 
+
+Add `- ./database:/data/db`
 
 ### Berserk (Python library):
 
