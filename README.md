@@ -25,6 +25,8 @@ The only requirement for running on your local machine is Docker Desktop, and op
     ./lila-docker start
     ```
 
+    Then complete the dialog to set up lila-docker.
+
     Starting new services may take 5-10 minutes. Some services will start before others and you may see errors in the logs until everything comes online.
 
     Lila requires about 12GB of RAM to build. Make sure there is enough RAM available, especially when using Docker Desktop, which allocates 50% of the available RAM by default.
@@ -127,7 +129,9 @@ docker compose run --rm -w /lila ui pnpm run i18n-file-gen
 docker compose cp mongodb:/data/db ./database
 ```
 
-Then in `docker-compose.yml`add `- ./database:/data/db` to mongodb volumes
+Then, in `compose.yml`,  under `services.mongodb.volumes`: 
+
+Add `- ./database:/data/db`
 
 ### Berserk (Python library):
 
