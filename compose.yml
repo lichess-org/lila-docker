@@ -56,6 +56,7 @@ services:
       - ./repos/bbpPairings:/opt/bbpPairings
       - ./repos/scalachess:/scalachess
       - ./conf/lila.conf:/lila/conf/application.conf
+      - ./conf/firebase-service-account.json:/opt/firebase-service-account.json:ro
     profiles:
       - base
 

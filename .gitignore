@@ -1,6 +1,9 @@
 .env
 .pnpm-store
 
+conf/firebase-service-account.json
+firebase.env
+
 command/.cargo
 command/repos
 command/target
@@ -14,3 +17,7 @@ ran_as_gitpod_prebuild
 
 # picfit-generated files
 docker/assets/*.webp
+
+.bsp
+.scala-build
+settings.json
