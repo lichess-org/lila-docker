@@ -11,6 +11,8 @@ RUN corepack enable \
 ##################################################################################
 FROM mongo:7-jammy AS dbbuilder
 
+ARG SEED_PASSWORD=password
+
 RUN apt update \
     && apt install -y \
         curl \
@@ -30,8 +32,8 @@ RUN mkdir /seeded \
     && mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /seeded \
     && ./spamdb/spamdb.py \
         --drop-db \
-        --password=password \
-        --su-password=password \
+        --password=${SEED_PASSWORD} \
+        --su-password=${SEED_PASSWORD} \
         --streamers \
         --coaches \
         --tokens \
