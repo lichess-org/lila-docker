@@ -88,8 +88,7 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 ENV LANG=C.utf8
 COPY --from=eclipse-temurin:25-jdk $JAVA_HOME $JAVA_HOME
 
-ARG LILA_DOMAIN=localhost:8080
-ENV LILA_DOMAIN=${LILA_DOMAIN}
-ENV LILA_URL=http://${LILA_DOMAIN}
+ENV LILA_DOMAIN=localhost:8080
+ENV LILA_URL=http://localhost:8080
 
 CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
