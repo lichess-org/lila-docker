@@ -11,8 +11,6 @@ RUN corepack enable \
 ##################################################################################
 FROM mongo:7-jammy AS dbbuilder
 
-ARG SEED_PASSWORD=password
-
 RUN apt update \
     && apt install -y \
         curl \
@@ -31,7 +29,7 @@ WORKDIR /lila-db-seed
 
 RUN mkdir /seeded \
     && mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /seeded \
-    && /scripts/reset-db.sh ${SEED_PASSWORD} \
+    && /scripts/reset-db.sh password \
     && mongosh --quiet lichess /lila/bin/mongodb/indexes.js
 
 ##################################################################################
