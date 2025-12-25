@@ -26,17 +26,12 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 COPY repos/lila /lila
 COPY repos/lila-db-seed /lila-db-seed
+COPY scripts/reset-db.sh /scripts/reset-db.sh
 WORKDIR /lila-db-seed
 
 RUN mkdir /seeded \
     && mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /seeded \
-    && ./spamdb/spamdb.py \
-        --drop-db \
-        --password=${SEED_PASSWORD} \
-        --su-password=${SEED_PASSWORD} \
-        --streamers \
-        --coaches \
-        --tokens \
+    && /scripts/reset-db.sh ${SEED_PASSWORD} \
     && mongosh --quiet lichess /lila/bin/mongodb/indexes.js
 
 ##################################################################################
@@ -71,6 +66,7 @@ RUN apt update \
     && pip3 install berserk pytest \
     && mkdir -p /var/log/supervisor
 
+COPY --from=dbbuilder /lila-db-seed /lila-db-seed
 COPY --from=dbbuilder /seeded /seeded
 COPY --from=lilawsbuilder /lila-ws/target /lila-ws/target
 COPY --from=lilabuilder /lila/target /lila/target

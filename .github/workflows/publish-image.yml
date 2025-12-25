@@ -8,11 +8,6 @@ on:
         required: false
         default: 'master'
         type: string
-      seed_password:
-        description: 'User seed password for database initialization'
-        required: false
-        default: 'password'
-        type: string
       platforms:
         description: 'Target platforms for the build'
         required: false
@@ -108,5 +103,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            SEED_PASSWORD=${{ github.event.inputs.seed_password || 'password' }}
