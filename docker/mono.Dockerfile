@@ -65,6 +65,7 @@ RUN apt update \
     && mkdir -p /var/log/supervisor
 
 COPY --from=dbbuilder /lila-db-seed /lila-db-seed
+COPY --from=dbbuilder /scripts /scripts
 COPY --from=dbbuilder /seeded /seeded
 COPY --from=lilawsbuilder /lila-ws/target /lila-ws/target
 COPY --from=lilabuilder /lila/target /lila/target
