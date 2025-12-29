@@ -4,7 +4,7 @@ include:
 
 services:
   mongodb:
-    image: mongo:7.0.24-jammy
+    image: mongo:7.0.28-jammy
     restart: unless-stopped
     command: mongod --bind_ip_all --replSet rs0
     healthcheck:
@@ -20,7 +20,7 @@ services:
       - base
 
   mongodb_secondary:
-    image: mongo:7.0.24-jammy
+    image: mongo:7.0.28-jammy
     restart: unless-stopped
     command: mongod --bind_ip_all --replSet rs0
     profiles:
