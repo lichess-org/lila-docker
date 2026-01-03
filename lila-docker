@@ -193,7 +193,14 @@ rust_cmd() {
     elif [ "$(uname)" = "Darwin" ]; then
         docker run --rm -v "$PWD/command:/command" -w /command $RUST_BUILD_IMAGE \
             cargo zigbuild --release --target universal2-apple-darwin
-        ./command/target/universal2-apple-darwin/release/command "$@"
+        CMD=./command/target/universal2-apple-darwin/release/command
+        if "$CMD" "$@"; then
+            :
+        else
+            # If it failed, macOS may be blocking execution due to a signing issue
+            codesign --force --sign - "$CMD" 2>/dev/null || true
+            "$CMD" "$@"
+        fi
     else
         docker run --rm -v "$PWD/command:/command" -w /command $RUST_BUILD_IMAGE \
             cargo zigbuild --release
