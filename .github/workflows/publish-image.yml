@@ -3,8 +3,13 @@ name: Publish Image
 on:
   workflow_dispatch:
     inputs:
-      lila_branch:
-        description: 'Lila repository branch to build'
+      repo:
+        description: 'Lila repository to build'
+        required: false
+        default: 'lichess-org/lila'
+        type: string
+      branch:
+        description: 'Branch to build'
         required: false
         default: 'master'
         type: string
@@ -49,8 +54,8 @@ jobs:
       - name: Checkout lila
         uses: actions/checkout@v5
         with:
-          repository: 'lichess-org/lila'
-          ref: ${{ github.event.inputs.lila_branch || 'master' }}
+          repository: ${{ github.event.inputs.repo }}
+          ref: ${{ github.event.inputs.branch }}
           path: 'repos/lila'
 
       - name: Checkout lila-ws
@@ -87,7 +92,8 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=ref,event=branch
-            type=raw,prefix=lila-,value=${{ github.event.inputs.lila_branch || 'master' }}
+            type=raw,prefix=lila-,value=${{ github.event.inputs.branch }}
+            type=raw,value=latest,enable=${{ github.event.inputs.repo == 'lichess-org/lila' && github.event.inputs.branch == 'master' }}
       
       - name: Free disk space on Ubuntu runner
         uses: kfir4444/free-disk-space@main
