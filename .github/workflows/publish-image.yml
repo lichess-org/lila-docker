@@ -39,23 +39,25 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Determine build platforms
-        id: platforms
+      - name: Setup build variables
+        id: build_vars
         run: |
-          if [ "${{ github.event.inputs.platforms }}" = "all" ] || [ -z "${{ github.event.inputs.platforms }}" ]; then
+          echo "repo=${{ github.event.inputs.repo || 'lichess-org/lila' }}" >> $GITHUB_OUTPUT
+          echo "branch=${{ github.event.inputs.branch || 'master' }}" >> $GITHUB_OUTPUT
+          if [ "${{ github.event.inputs.platforms || 'all' }}" = "all" ]; then
             echo "platforms=linux/amd64,linux/arm64" >> $GITHUB_OUTPUT
           else
             echo "platforms=${{ github.event.inputs.platforms }}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
       - name: Checkout lila
         uses: actions/checkout@v5
         with:
-          repository: ${{ github.event.inputs.repo }}
-          ref: ${{ github.event.inputs.branch }}
+          repository: ${{ steps.build_vars.outputs.repo }}
+          ref: ${{ steps.build_vars.outputs.branch }}
           path: 'repos/lila'
 
       - name: Checkout lila-ws
@@ -91,9 +93,8 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=ref,event=branch
-            type=raw,prefix=lila-,value=${{ github.event.inputs.branch }}
-            type=raw,value=latest,enable=${{ github.event.inputs.repo == 'lichess-org/lila' && github.event.inputs.branch == 'master' }}
+            type=raw,prefix=lila-,value=${{ steps.build_vars.outputs.branch }}
+            type=raw,value=latest,enable=${{ steps.build_vars.outputs.repo == 'lichess-org/lila' && steps.build_vars.outputs.branch == 'master' }}
       
       - name: Free disk space on Ubuntu runner
         uses: kfir4444/free-disk-space@main
@@ -104,7 +105,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: ${{ steps.platforms.outputs.platforms }}
+          platforms: ${{ steps.build_vars.outputs.platforms }}
           file: docker/mono.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}

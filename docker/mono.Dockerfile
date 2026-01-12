@@ -29,7 +29,7 @@ WORKDIR /lila-db-seed
 
 RUN mkdir /seeded \
     && mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /seeded \
-    && /scripts/reset-db.sh password \
+    && /scripts/reset-db.sh \
     && mongosh --quiet lichess /lila/bin/mongodb/indexes.js
 
 ##################################################################################
@@ -44,6 +44,7 @@ FROM sbtscala/scala-sbt:eclipse-temurin-alpine-25_36_1.11.6_3.7.3 AS lilabuilder
 
 COPY --from=node /lila /lila
 WORKDIR /lila
+RUN TZ=UTC git log -1 --date=iso-strict-local --pretty='format:app.version.commit = "%H"%napp.version.date = "%ad"%napp.version.message = """%s"""%n' | tee conf/version.conf
 RUN ./lila.sh stage
 
 ##################################################################################
