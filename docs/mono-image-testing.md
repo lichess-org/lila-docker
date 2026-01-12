@@ -4,6 +4,7 @@
 
 ```bash
 docker build -t lila-mono -f docker/mono.Dockerfile .
+docker build -t lila-mono --no-cache -f docker/mono.Dockerfile .
 
 ## or
 
@@ -20,6 +21,10 @@ docker buildx imagetools inspect lila-mono
 
 ```bash
 docker run --rm -p 8080:8080 --name lichess lila-mono
+
+## with a custom password for each user account
+docker run --rm -p 8080:8080 --name lichess -e LILA_DB_PASSWORD=password lila-mono
+
 docker run -it --rm -p 8080:8080 --name lichess -e LILA_DOMAIN=custom:8080 -e LILA_URL=http://custom:8080 lila-mono
 ```
 
