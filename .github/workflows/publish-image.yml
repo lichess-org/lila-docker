@@ -37,7 +37,8 @@ jobs:
     permissions:
       contents: read
       packages: write
-
+    outputs:
+      is_lila_main: ${{ steps.build_vars.outputs.is_lila_main }}
     steps:
       - name: Setup build variables
         id: build_vars
@@ -49,6 +50,7 @@ jobs:
           else
             echo "platforms=${{ github.event.inputs.platforms }}" >> $GITHUB_OUTPUT
           fi
+          echo "is_lila_main=$([ "${{ github.event.inputs.repo || 'lichess-org/lila' }}" = "lichess-org/lila" ] && [ "${{ github.event.inputs.branch || 'master' }}" = "master" ] && echo "true" || echo "false")" >> $GITHUB_OUTPUT
 
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -94,7 +96,8 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=raw,prefix=lila-,value=${{ steps.build_vars.outputs.branch }}
-            type=raw,value=latest,enable=${{ steps.build_vars.outputs.repo == 'lichess-org/lila' && steps.build_vars.outputs.branch == 'master' }}
+            type=raw,value=main,enable=${{ steps.build_vars.outputs.is_lila_main }}
+            type=raw,value=latest,enable=${{ steps.build_vars.outputs.is_lila_main }}
       
       - name: Free disk space on Ubuntu runner
         uses: kfir4444/free-disk-space@main
@@ -110,3 +113,11 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+    if: needs.build-and-publish.outputs.is_lila_main == 'true'
+    steps:
+      - name: Deploy nightly test site
+        run: curl --fail -X POST ${{ secrets.WEBHOOK_DEPLOY_NIGHTLY }}
