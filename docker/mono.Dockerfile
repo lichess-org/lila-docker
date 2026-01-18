@@ -29,8 +29,7 @@ WORKDIR /lila-db-seed
 
 RUN mkdir /seeded \
     && mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath /seeded \
-    && /scripts/reset-db.sh \
-    && mongosh --quiet lichess /lila/bin/mongodb/indexes.js
+    && /scripts/reset-db.sh
 
 ##################################################################################
 FROM sbtscala/scala-sbt:eclipse-temurin-alpine-25_36_1.11.6_3.7.3 AS lilawsbuilder
@@ -69,6 +68,7 @@ COPY --from=dbbuilder /lila-db-seed /lila-db-seed
 COPY --from=dbbuilder /scripts /scripts
 COPY --from=dbbuilder /seeded /seeded
 COPY --from=lilawsbuilder /lila-ws/target /lila-ws/target
+COPY --from=lilabuilder /lila/bin/mongodb/indexes.js /lila/bin/mongodb/indexes.js
 COPY --from=lilabuilder /lila/target /lila/target
 COPY --from=lilabuilder /lila/public /lila/public
 COPY --from=lilabuilder /lila/conf   /lila/conf

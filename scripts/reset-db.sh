@@ -21,3 +21,5 @@ fi
     --streamers \
     --coaches \
     $ADDL_PARAMS
+
+mongosh --quiet lichess /lila/bin/mongodb/indexes.js
