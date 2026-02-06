@@ -9,6 +9,7 @@ command/repos
 command/target
 command/.intentionally-empty-file.o
 database
+repos
 
 settings.env
 settings.toml
@@ -22,3 +23,6 @@ docker/assets/*.webp
 .bsp
 .scala-build
 settings.json
+
+# IntelliJ auto-generated files
+.idea
