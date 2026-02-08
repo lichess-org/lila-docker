@@ -7,6 +7,7 @@ RUN pip install --upgrade pip \
         berserk \
         pymongo \
         requests \
-        termcolor
+        termcolor \
+        faker
 
 WORKDIR /lila-db-seed
