@@ -11,7 +11,7 @@ services:
       - ./conf/Caddyfile:/etc/caddy/Caddyfile
 
   lila:
-    image: ghcr.io/fitztrev/lila-server:docker-github-action
+    image: ghcr.io/lichess-org/lila-server:latest
     environment:
       - LILA_DOMAIN=${LILA_DOMAIN:-localhost}
       - LILA_URL=${LILA_URL:-http://localhost}
@@ -20,7 +20,7 @@ services:
       - lila-assets-data:/lila/public
 
   lila_assets:
-    image: ghcr.io/fitztrev/lila-assets:docker-github-action
+    image: ghcr.io/lichess-org/lila-assets:latest
     volumes:
       - lila-assets-data:/usr/share/nginx/html/public
 
@@ -62,7 +62,7 @@ services:
     entrypoint: /usr/local/bin/lila-gif --bind 0.0.0.0:6175
   
   lila_db_seed:
-    image: ghcr.io/fitztrev/lila-db-seed:docker
+    image: ghcr.io/lichess-org/lila-db-seed:latest
   
   picfit:
     image: thoas/picfit:0.16.1
