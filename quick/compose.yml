@@ -71,6 +71,11 @@ services:
     volumes:
       - ./conf/picfit.json:/mnt/config.json
 
+  mailpit:
+    image: axllent/mailpit:latest
+    environment:
+      - MP_WEBROOT=mailpit
+
 volumes:
   lila-assets-data:
 
