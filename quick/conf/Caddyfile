@@ -1,0 +1,41 @@
+:80
+
+handle_path /oops/* {
+	rewrite * /public/oops{path}
+	reverse_proxy lila_assets:80
+}
+
+# for http://localhost/oops/font.html
+handle_path /font/* {
+	rewrite * /public/font{path}
+	reverse_proxy lila_assets:80
+}
+
+handle_path /display* {
+	rewrite * /display
+	reverse_proxy picfit:3001
+}
+
+handle_path /mailpit* {
+	rewrite * /mailpit{path}
+	reverse_proxy mailpit:8025
+}
+
+@websockets {
+	header Connection *Upgrade*
+	header Upgrade websocket
+}
+
+reverse_proxy @websockets lila_ws:9664 {
+	header_up Origin {$LILA_URL}
+}
+
+reverse_proxy lila:9663 {
+	header_up Host {$LILA_DOMAIN}
+	header_up Origin {$LILA_URL}
+
+	# allow CORS for requests from web client on lichess.org/api
+	header_down Access-Control-Allow-Origin "*"
+
+	header_down Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
+}

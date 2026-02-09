@@ -1,0 +1,84 @@
+services:
+
+  caddy:
+    image: caddy:2
+    ports:
+      - 80:80
+    environment:
+      - LILA_DOMAIN=${LILA_DOMAIN:-localhost}
+      - LILA_URL=${LILA_URL:-http://localhost}
+    volumes:
+      - ./conf/Caddyfile:/etc/caddy/Caddyfile
+
+  lila:
+    image: ghcr.io/lichess-org/lila-server:latest
+    environment:
+      - LILA_DOMAIN=${LILA_DOMAIN:-localhost}
+      - LILA_URL=${LILA_URL:-http://localhost}
+    volumes:
+      - ./conf/lila.conf:/lila/conf/application.conf
+      - lila-assets-data:/lila/public
+
+  lila_assets:
+    image: ghcr.io/lichess-org/lila-assets:latest
+    volumes:
+      - lila-assets-data:/usr/share/nginx/html/public
+
+  lila_ws:
+    image: ghcr.io/lichess-org/lila-ws:latest
+    environment:
+      - CONFIG_FORCE_csrf.origin=${LILA_URL:-http://localhost}
+      - CONFIG_FORCE_mongo_uri=mongodb://mongodb:27017/lichess?appName=lila-ws
+      - CONFIG_FORCE_redis.uri=redis://redis
+
+  mongodb:
+    image: mongo:8.2-noble
+
+  redis:
+    image: redis:8
+
+  lila_fishnet:
+    image: ghcr.io/lichess-org/lila-fishnet:latest
+    environment:
+      - REDIS_HOST=redis
+      # - HTTP_API_LOGGER=true
+
+  fishnet_play:
+    image: niklasf/fishnet:master
+    environment:
+      - ENDPOINT=http://lila_fishnet:9665/fishnet
+      - MAX_BACKOFF=5
+      - STATS_FILE=/stats.json
+
+  fishnet_analysis:
+    image: niklasf/fishnet:master
+    environment:
+      - ENDPOINT=http://lila:9663/fishnet
+      - MAX_BACKOFF=5
+      - STATS_FILE=/stats.json
+  
+  lila_gif:
+    image: ghcr.io/lichess-org/lila-gif:latest
+    entrypoint: /usr/local/bin/lila-gif --bind 0.0.0.0:6175
+  
+  lila_db_seed:
+    image: ghcr.io/lichess-org/lila-db-seed:latest
+  
+  picfit:
+    image: thoas/picfit:0.16.1
+    environment:
+      - PICFIT_CONFIG_PATH=/mnt/config.json
+    volumes:
+      - ./conf/picfit.json:/mnt/config.json
+
+  mailpit:
+    image: axllent/mailpit:latest
+    environment:
+      - MP_WEBROOT=mailpit
+
+volumes:
+  lila-assets-data:
+
+networks:
+  default:
+    driver: bridge
