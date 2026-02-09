@@ -81,4 +81,4 @@ volumes:
 
 networks:
   default:
-    driver: bridge
+    driver: ${NETWORK_DRIVER:-bridge}
