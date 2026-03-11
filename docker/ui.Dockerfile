@@ -1,5 +1,5 @@
 # match node version from https://github.com/lichess-org/lila/blob/master/.node-version
-FROM node:24.14-trixie-slim
+FROM node:24.13-trixie-slim
 
 USER root
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
