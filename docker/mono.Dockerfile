@@ -16,7 +16,8 @@ RUN apt update \
         curl \
         python3-pip \
         python3-venv \
-    && apt clean
+    && apt clean \
+    && pip3 install faker pymongo requests
 
 ENV JAVA_HOME=/opt/java/openjdk
 COPY --from=eclipse-temurin:25-jdk $JAVA_HOME $JAVA_HOME
