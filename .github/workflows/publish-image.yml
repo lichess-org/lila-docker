@@ -113,11 +113,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-  deploy:
-    needs: build-and-publish
-    runs-on: ubuntu-latest
-    if: needs.build-and-publish.outputs.is_lila_main == 'true'
-    steps:
-      - name: Deploy nightly test site
-        run: curl --fail -X POST ${{ secrets.WEBHOOK_DEPLOY_NIGHTLY }}
