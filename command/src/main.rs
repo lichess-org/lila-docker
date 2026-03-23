@@ -165,7 +165,15 @@ fn main() -> std::io::Result<()> {
 
     match args[1].as_str() {
         "setup" => setup(config, true, std::env::var("NONINTERACTIVE").is_ok()),
-        "add_services" => setup(config, false, false),
+        "add_services" => {
+            if config.quick_setup.unwrap_or(false) {
+                cliclack::log::error(
+                    "Cannot add services to a quick/mono setup. Re-run setup (`./lila-docker down && ./lila-docker start`) and switch to advanced mode.",
+                )?;
+                std::process::exit(1);
+            }
+            setup(config, false, false)
+        }
         "hostname" => hostname(config),
         "welcome" => welcome(config),
         _ => panic!("Unknown command"),
