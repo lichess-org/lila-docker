@@ -2,7 +2,7 @@
 
 use cliclack::{
     confirm, input, intro,
-    log::{error, info, step, success, warning},
+    log::{info, success, warning},
     multiselect, note, outro, select, spinner,
 };
 use local_ip_address::local_ip;
