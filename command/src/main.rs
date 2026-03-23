@@ -353,7 +353,8 @@ fn setup(mut config: Config, first_setup: bool, noninteractive: bool) -> std::io
             }
 
             let mut cmd = Command::new("git");
-            cmd.arg("clone")
+            cmd.env("GIT_LFS_SKIP_SMUDGE", "1")
+                .arg("clone")
                 .arg("--origin")
                 .arg("upstream")
                 .arg("--depth")
