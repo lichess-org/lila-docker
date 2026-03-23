@@ -414,7 +414,7 @@ fn create_placeholder_dirs() {
 #[allow(clippy::too_many_lines)]
 fn prompt_for_services() -> Result<Vec<OptionalService<'static>>, Error> {
     multiselect(
-        "Select which optional services to include:\n    (Use arrows, <space> to toggle, <enter> to continue)\n",
+        "Select which optional services to include:\n⚠️  Only enable the services you need. Enabling multiple services can consume a lot of resources and may cause performance issues.\n(Use arrows, <space> to toggle, <enter> to continue)\n",
     )
     .required(false)
     .item(
