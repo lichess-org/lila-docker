@@ -62,7 +62,12 @@ RUN apt update \
         redis \
         supervisor \
     && apt clean \
-    && pip3 install berserk pytest \
+    && pip3 install \
+        berserk \
+        faker \
+        pymongo \
+        pytest \
+        requests \
     && mkdir -p /var/log/supervisor
 
 COPY --from=dbbuilder /lila-db-seed /lila-db-seed
