@@ -73,11 +73,12 @@ build_all_profiles() {
 }
 
 run_ui_build() {
-    ARGS=(--debug $@)
+    local no_args=$(( $# == 0 ))
+    ARGS=(--debug "$@")
     echo "Running: ./ui/build ${ARGS[@]}"
     docker compose run --rm ui /lila/ui/build "${ARGS[@]}"
 
-    if [[ ${#ARGS[@]} -eq 0 ]]; then
+    if (( no_args )); then
         echo "💡 Tip: Run './lila-docker ui --watch' to watch typescript and scss sources so any changes are visible on browser reloads"
     fi
 }
