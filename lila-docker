@@ -16,7 +16,7 @@ run_setup() {
 
         docker compose build
         docker compose --profile utils build
-        docker compose up -d
+        docker compose up -d --pull always
 
         run_ui_build
 
@@ -31,7 +31,7 @@ add_services() {
     rust_cmd add_services
 
     docker compose build
-    docker compose up -d
+    docker compose up -d --pull always
     setup_bbppairings
     setup_database
 }
@@ -68,7 +68,7 @@ build_all_profiles() {
     # pre-pull the zigbuild image if rustup is not installed on the host
     command -v rustup >/dev/null 2>&1 || docker pull $RUST_BUILD_IMAGE
 
-    COMPOSE_PROFILES=$(all_profiles) docker compose pull
+    COMPOSE_PROFILES=$(all_profiles) docker compose pull --policy always
     COMPOSE_PROFILES=$(all_profiles) docker compose build
 }
 
