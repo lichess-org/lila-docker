@@ -1,5 +1,7 @@
 :80
 
+log
+
 handle_path /oops* {
 	root * /lila/public/oops
 	file_server
@@ -27,6 +29,10 @@ handle_path /display* {
 	reverse_proxy picfit:3001
 }
 
+handle_path /explorer* {
+	reverse_proxy openingexplorer:9002
+}
+
 handle_path /embed/* {
 	rewrite * /embed{uri}
 	reverse_proxy lila:9663 {
@@ -49,6 +55,8 @@ reverse_proxy @websockets lila_ws:9664 {
 reverse_proxy lila:9663 {
 	header_up Host {$LILA_DOMAIN}
 	header_up Origin {$LILA_URL}
+
+	# header_up X-Lichess-School true
 
 	# allow CORS for requests from web client on lichess.org/api
 	header_down Access-Control-Allow-Origin "*"
