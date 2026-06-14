@@ -639,8 +639,7 @@ fn has_git_lfs() -> bool {
         .arg("lfs")
         .arg("version")
         .output()
-        .map(|output| output.status.success())
-        .unwrap_or(false)
+        .is_ok_and(|output| output.status.success())
 }
 
 #[cfg(test)]
