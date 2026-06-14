@@ -3,6 +3,15 @@ include:
   - compose-search.yml
 
 services:
+  openingexplorer:
+    image: ghcr.io/lichess-org/lila-openingexplorer:docker
+    restart: unless-stopped
+    ports:
+      - 9002:9002
+    environment:
+      - LILA_URL=http://caddy
+      - EXPLORER_BEARER=lip_openingexplorer
+
   mongodb:
     image: mongo:7.0.28-jammy
     restart: unless-stopped
