@@ -1,4 +1,4 @@
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-25_36_1.11.6_3.7.3
+FROM sbtscala/scala-sbt:eclipse-temurin-25.0.3_9_1.12.13_3.8.4
 
 RUN apk add build-base
 

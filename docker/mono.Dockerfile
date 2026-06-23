@@ -33,14 +33,14 @@ RUN mkdir /seeded \
     && /scripts/reset-db.sh
 
 ##################################################################################
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-25_36_1.11.6_3.7.3 AS lilawsbuilder
+FROM sbtscala/scala-sbt:eclipse-temurin-25.0.3_9_1.12.13_3.8.4 AS lilawsbuilder
 
 COPY repos/lila-ws /lila-ws
 WORKDIR /lila-ws
 RUN sbt stage
 
 ##################################################################################
-FROM sbtscala/scala-sbt:eclipse-temurin-alpine-25_36_1.11.6_3.7.3 AS lilabuilder
+FROM sbtscala/scala-sbt:eclipse-temurin-25.0.3_9_1.12.13_3.8.4 AS lilabuilder
 
 COPY --from=node /lila /lila
 WORKDIR /lila
