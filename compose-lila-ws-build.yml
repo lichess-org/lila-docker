@@ -8,9 +8,13 @@ services:
       dockerfile: sbt.Dockerfile
     user: ${USER_ID:-}:${GROUP_ID:-}
     working_dir: /lila-ws
-    entrypoint: sbt run -Dconfig.file=/lila-ws.conf
+    # sbt 2.x defaults `run / fork` to true, so `sbt run -Dconfig.file=...` passes the
+    # option as an application argument instead of a JVM option and it gets ignored.
+    # JAVA_TOOL_OPTIONS is read by every JVM, including the forked one.
+    entrypoint: sbt run
     restart: unless-stopped
     environment:
+      - JAVA_TOOL_OPTIONS=-Dconfig.file=/lila-ws.conf
       - LILA_URL=${LILA_URL:-http://localhost:8080}
       - ENABLE_MONITORING=${ENABLE_MONITORING:-false}
     volumes:
