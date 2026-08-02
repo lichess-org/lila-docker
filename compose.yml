@@ -176,6 +176,7 @@ services:
     entrypoint: sbt app/run
     environment:
       - REDIS_HOST=redis
+      - HTTP_AUTH_MASK=255.255.0.0 # allow token free requests from /16
       # - HTTP_API_LOGGER=true
     restart: unless-stopped
     volumes:
