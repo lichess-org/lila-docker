@@ -4,10 +4,12 @@ include:
 
 services:
   openingexplorer:
-    image: ghcr.io/lichess-org/lila-openingexplorer:docker
+    image: ghcr.io/lichess-org/lila-openingexplorer:latest
     restart: unless-stopped
     ports:
       - 9002:9002
+    volumes:
+      - openingexplorer-data:/app/_db
     environment:
       - LILA_URL=http://caddy
       - EXPLORER_BEARER=lip_openingexplorer
@@ -316,6 +318,9 @@ services:
       - DOCKER_INFLUXDB_INIT_BUCKET=kamon
     profiles:
       - monitoring
+
+volumes:
+  openingexplorer-data:
 
 networks:
   default:
