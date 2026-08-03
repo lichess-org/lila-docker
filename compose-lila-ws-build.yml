@@ -1,3 +1,4 @@
+---
 services:
   lila_ws:
     build:

@@ -1,3 +1,4 @@
+---
 services:
   lila_ws:
     image: ghcr.io/lichess-org/lila-ws:latest

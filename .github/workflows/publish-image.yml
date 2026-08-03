@@ -1,35 +1,36 @@
+---
 name: Publish Image
 
 on:
   workflow_dispatch:
     inputs:
       repo:
-        description: 'Lila repository to build'
+        description: Lila repository to build
         required: false
-        default: 'lichess-org/lila'
+        default: lichess-org/lila
         type: string
       branch:
-        description: 'Branch to build'
+        description: Branch to build
         required: false
-        default: 'master'
+        default: master
         type: string
       platforms:
-        description: 'Target platforms for the build'
+        description: Target platforms for the build
         required: false
-        default: 'all'
+        default: all
         type: choice
         options:
-          - 'all'
-          - 'linux/amd64'
-          - 'linux/arm64'
+          - all
+          - linux/amd64
+          - linux/arm64
   schedule:
-    - cron: '0 17 * * *'
+    - cron: 0 17 * * *
   push:
     paths:
-      - '.github/workflows/publish-image.yml'
-      - 'conf/mono.Caddyfile'
-      - 'conf/mono.conf'
-      - 'docker/mono.Dockerfile'
+      - .github/workflows/publish-image.yml
+      - conf/mono.Caddyfile
+      - conf/mono.conf
+      - docker/mono.Dockerfile
 
 jobs:
   build-and-publish:
@@ -51,61 +52,51 @@ jobs:
             echo "platforms=${{ github.event.inputs.platforms }}" >> $GITHUB_OUTPUT
           fi
           echo "is_lila_main=$([ "${{ github.event.inputs.repo || 'lichess-org/lila' }}" = "lichess-org/lila" ] && [ "${{ github.event.inputs.branch || 'master' }}" = "master" ] && echo "true" || echo "false")" >> $GITHUB_OUTPUT
-
       - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       - name: Checkout lila
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           repository: ${{ steps.build_vars.outputs.repo }}
           ref: ${{ steps.build_vars.outputs.branch }}
-          path: 'repos/lila'
-
+          path: repos/lila
       - name: Checkout lila-ws
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
-          repository: 'lichess-org/lila-ws'
-          path: 'repos/lila-ws'
-
+          repository: lichess-org/lila-ws
+          path: repos/lila-ws
       - name: Checkout lila-db-seed
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
-          repository: 'lichess-org/lila-db-seed'
-          path: 'repos/lila-db-seed'
-
+          repository: lichess-org/lila-db-seed
+          path: repos/lila-db-seed
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
+        uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8  # v4.2.0
         with:
           image: tonistiigi/binfmt:qemu-v7.0.0
-
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
-
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c  # v4.2.0
       - name: Log in to the Container registry
-        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f  # v4.6.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302  # v6.2.0
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=raw,prefix=lila-,value=${{ steps.build_vars.outputs.branch }}
             type=raw,value=main,enable=${{ steps.build_vars.outputs.is_lila_main }}
             type=raw,value=latest,enable=${{ steps.build_vars.outputs.is_lila_main }}
-      
       - name: Free disk space on Ubuntu runner
         uses: kfir4444/free-disk-space@main
         with:
           tool-cache: true
-
       - name: Build and push Docker image
-        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a  # v7.3.0
         with:
           context: .
           platforms: ${{ steps.build_vars.outputs.platforms }}
