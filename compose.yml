@@ -152,7 +152,7 @@ services:
     profiles:
       - pgn-viewer
   lila_engine:
-    image: rust:1.89.0-trixie
+    image: rust:1.95.0-trixie
     working_dir: /lila-engine
     entrypoint: cargo run -- --bind 0.0.0.0:9666 --mongodb mongodb://mongodb
     restart: unless-stopped
@@ -230,7 +230,7 @@ services:
     profiles:
       - utils
   lila_gif:
-    image: rust:1.89.0-trixie
+    image: rust:1.95.0-trixie
     working_dir: /lila-gif
     entrypoint: cargo run -- --bind 0.0.0.0:6175
     restart: unless-stopped
@@ -242,7 +242,7 @@ services:
     profiles:
       - gifs
   lila_push:
-    image: rust:1.89.0-trixie
+    image: rust:1.95.0-trixie
     working_dir: /lila-push
     entrypoint: cargo run --release -- --vapid private.pem --vapid-subject mailto:contact@lichess.org
       --bind 0.0.0.0:9054
