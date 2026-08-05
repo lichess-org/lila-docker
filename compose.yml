@@ -102,7 +102,7 @@ services:
     entrypoint:
       - /bin/sh
       - -c
-      - npm install && npm run serve -- --host=0.0.0.0
+      - pnpm install && pnpm dev --host 0.0.0.0
     restart: unless-stopped
     user: ${USER_ID:-}:${GROUP_ID:-}
     ports:
