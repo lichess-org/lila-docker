@@ -9,9 +9,10 @@ services:
       dockerfile: sbt.Dockerfile
     user: ${USER_ID:-}:${GROUP_ID:-}
     working_dir: /lila-ws
-    entrypoint: sbt run -Dconfig.file=/lila-ws.conf
+    entrypoint: sbt run
     restart: unless-stopped
     environment:
+      - JAVA_TOOL_OPTIONS=-Dconfig.file=/lila-ws.conf
       - LILA_URL=${LILA_URL:-http://localhost:8080}
       - ENABLE_MONITORING=${ENABLE_MONITORING:-false}
     volumes:
