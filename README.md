@@ -129,7 +129,7 @@ docker compose run --rm -w /lila ui pnpm run i18n-file-gen
 docker compose cp mongodb:/data/db ./database
 ```
 
-Then, in `compose.yml`,  under `services.mongodb.volumes`: 
+Then, in `compose.yml`, under `services.mongodb.volumes`:
 
 Add `- ./database:/data/db`
 
@@ -160,8 +160,8 @@ If you're making changes to the Scalachess library, you can have lila use it ins
 1. Update the `build.sbt` file in the scalachess repo:
 
     ```diff
-    -  ThisBuild / version           := "15.6.7"
-    +  ThisBuild / version           := "my-test-1"  # give it a custom version
+    -  version := "17.16.1"
+    +  version := "my-test-1"  # give it a custom version
     ```
 
 2. Update the `Dependencies.scala` file in the lila repo:
