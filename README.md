@@ -176,7 +176,7 @@ If you're making changes to the Scalachess library, you can have lila use it ins
 
     ```bash
     docker compose exec -w /scalachess lila sbt publishLocal
-    docker compose restart lila
+    ./lila-docker lila restart
     ```
 
 Other Scalachess commands:
