@@ -167,8 +167,9 @@ If you're making changes to the Scalachess library, you can have lila use it ins
 2. Update the `Dependencies.scala` file in the lila repo:
 
     ```diff
-    -  val chess = "org.lichess" %% "scalachess" % "15.6.7"
-    +  val chess = "org.lichess" %% "scalachess" % "my-test-1"
+       object chess:
+    -    val version = "17.16.1"
+    +    val version = "my-test-1"
     ```
 
 3. Publish the local scalachess changes and restart lila:
