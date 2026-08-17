@@ -129,7 +129,7 @@ docker compose run --rm -w /lila ui pnpm run i18n-file-gen
 docker compose cp mongodb:/data/db ./database
 ```
 
-Then, in `compose.yml`,  under `services.mongodb.volumes`: 
+Then, in `compose.yml`, under `services.mongodb.volumes`:
 
 Add `- ./database:/data/db`
 
@@ -157,25 +157,40 @@ Once the build has been imported, you should have code completion, go to definit
 
 If you're making changes to the Scalachess library, you can have lila use it instead of the published Maven version:
 
-1. Update the `build.sbt` file in the scalachess repo:
+1. Make sure you already have lila-docker up and running, with lila currently using the published Maven version of scalachess.
+
+2. Then, update the `build.sbt` file in the scalachess repo:
 
     ```diff
-    -  ThisBuild / version           := "15.6.7"
-    +  ThisBuild / version           := "my-test-1"  # give it a custom version
+    -  version := "17.16.1"
+    -  organization := "com.github.lichess-org.scalachess"
+    +  version := "my-test-1"  # give it a custom version
+    +  organization := "org.lichess"
     ```
 
-2. Update the `Dependencies.scala` file in the lila repo:
-
-    ```diff
-    -  val chess = "org.lichess" %% "scalachess" % "15.6.7"
-    +  val chess = "org.lichess" %% "scalachess" % "my-test-1"
-    ```
-
-3. Publish the local scalachess changes and restart lila:
+3. Publish your local scalachess changes:
 
     ```bash
     docker compose exec -w /scalachess lila sbt publishLocal
-    docker compose restart lila
+    ```
+
+4. Make any code changes you may require in lila to use your scalachess version.
+
+5. Update the `Dependencies.scala` file in lila:
+
+    ```diff
+       object chess:
+    -    val version = "17.16.1"
+    -    val org = "com.github.lichess-org.scalachess"
+    -    // val org = "org.lichess" // for publishLocal
+    +    val version = "my-test-1"
+    +    val org = "org.lichess" // for publishLocal
+    ```
+
+6. Restart lila:
+
+    ```bash
+    ./lila-docker lila restart
     ```
 
 Other Scalachess commands:
