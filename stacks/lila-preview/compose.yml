@@ -76,7 +76,6 @@ services:
 
   openingexplorer:
     image: ghcr.io/lichess-org/lila-openingexplorer:latest
-    restart: unless-stopped
     environment:
       - LILA_URL=https://preview.${SUBDOMAIN:-test}.lichess.app
       - EXPLORER_BEARER=lip_openingexplorer-${USER_SEED_PASSWORD:-password}
@@ -114,7 +113,7 @@ services:
       - lila
 
   fishnet_play:
-    image: niklasf/fishnet:master
+    image: niklasf/fishnet:latest
     environment:
       - ENDPOINT=http://lila_fishnet:9665/fishnet
       - MAX_BACKOFF=5
@@ -123,7 +122,7 @@ services:
       - lila
 
   fishnet_analysis:
-    image: niklasf/fishnet:master
+    image: niklasf/fishnet:latest
     environment:
       - ENDPOINT=http://lila:9663/fishnet
       - MAX_BACKOFF=5
