@@ -9,7 +9,7 @@ services:
       - ./conf/Caddyfile:/etc/caddy/Caddyfile
     networks:
       - frontend
-      - lila
+      - default
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend
@@ -44,16 +44,12 @@ services:
       - lila-assets-data:/lila/public:ro
     secrets:
       - lila_preview_firebase_service_account
-    networks:
-      - lila
 
   lila_assets:
     image: ghcr.io/lichess-org/lila-assets:${LILA_ASSETS_TAG:-latest}
     volumes:
       - lila-assets-data:/assets:rw
       - ./scripts/update-asset-volume.sh:/docker-entrypoint.d/50-update-assets.sh:ro
-    networks:
-      - lila
 
   lila_ws:
     image: ghcr.io/lichess-org/lila-ws:${LILA_WS_TAG:-latest}
@@ -61,18 +57,12 @@ services:
       - CONFIG_FORCE_csrf.origin=https://preview.${SUBDOMAIN:-test}.lichess.app
       - CONFIG_FORCE_mongo_uri=mongodb://mongodb:27017/lichess?appName=lila-ws
       - CONFIG_FORCE_redis.uri=redis://redis
-    networks:
-      - lila
 
   mongodb:
     image: mongo:8.2-noble
-    networks:
-      - lila
 
   redis:
     image: redis:8
-    networks:
-      - lila
 
   openingexplorer:
     image: ghcr.io/lichess-org/lila-openingexplorer:latest
@@ -83,7 +73,7 @@ services:
       - openingexplorer-data:/app/_db
     networks:
       - frontend
-      - lila
+      - default
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend
@@ -109,8 +99,6 @@ services:
     environment:
       - REDIS_HOST=redis
       # - HTTP_API_LOGGER=true
-    networks:
-      - lila
 
   fishnet_play:
     image: niklasf/fishnet:latest
@@ -118,8 +106,6 @@ services:
       - ENDPOINT=http://lila_fishnet:9665/fishnet
       - MAX_BACKOFF=5
       - STATS_FILE=/stats.json
-    networks:
-      - lila
 
   fishnet_analysis:
     image: niklasf/fishnet:latest
@@ -127,15 +113,11 @@ services:
       - ENDPOINT=http://lila:9663/fishnet
       - MAX_BACKOFF=5
       - STATS_FILE=/stats.json
-    networks:
-      - lila
-  
+
   lila_gif:
     image: ghcr.io/lichess-org/lila-gif:latest
     entrypoint: /usr/local/bin/lila-gif --bind 0.0.0.0:6175
-    networks:
-      - lila
-  
+
   lila_push:
     image: ghcr.io/lichess-org/lila-push:latest
     entrypoint: /usr/local/bin/lila-push --vapid /app/private.pem --vapid-subject mailto:contact@lichess.org --bind 0.0.0.0:9054
@@ -143,27 +125,21 @@ services:
       - PUSH_LOG=debug
     volumes:
       - /data/lila-preview/lila-push/private.pem:/app/private.pem:ro
-    networks:
-      - lila
 
   lila_db_seed:
     image: ghcr.io/lichess-org/lila-db-seed:latest
     environment:
       - USER_SEED_PASSWORD=${USER_SEED_PASSWORD:-password}
-    networks:
-      - lila
     deploy:
       restart_policy:
         condition: none
-  
+
   picfit:
     image: thoas/picfit:0.16.1
     environment:
       - PICFIT_CONFIG_PATH=/mnt/config.json
     volumes:
       - ./conf/picfit.json:/mnt/config.json
-    networks:
-      - lila
 
   mailpit:
     image: axllent/mailpit:latest
@@ -172,7 +148,7 @@ services:
       - MP_MAX_AGE=1h
     networks:
       - frontend
-      - lila
+      - default
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend
@@ -193,7 +169,7 @@ services:
       - mongodb
     networks:
       - frontend
-      - lila
+      - default
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend
@@ -217,6 +193,6 @@ secrets:
 networks:
   frontend:
     external: true
-  lila:
+  default:
     driver: overlay
     # driver: bridge
