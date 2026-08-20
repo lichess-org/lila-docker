@@ -1,3 +1,7 @@
+x-public-networks: &public-networks
+  - frontend
+  - default
+
 services:
 
   caddy:
@@ -7,9 +11,7 @@ services:
       - LILA_URL=https://preview.${SUBDOMAIN:-test}.lichess.app
     volumes:
       - ./conf/Caddyfile:/etc/caddy/Caddyfile
-    networks:
-      - frontend
-      - default
+    networks: *public-networks
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend
@@ -71,9 +73,7 @@ services:
       - EXPLORER_BEARER=lip_openingexplorer-${USER_SEED_PASSWORD:-password}
     volumes:
       - openingexplorer-data:/app/_db
-    networks:
-      - frontend
-      - default
+    networks: *public-networks
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend
@@ -146,9 +146,7 @@ services:
     environment:
       - MP_WEBROOT=mailpit
       - MP_MAX_AGE=1h
-    networks:
-      - frontend
-      - default
+    networks: *public-networks
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend
@@ -167,9 +165,7 @@ services:
       - ME_CONFIG_SITE_BASEURL=/mongodb
     depends_on:
       - mongodb
-    networks:
-      - frontend
-      - default
+    networks: *public-networks
     labels:
       - traefik.enable=true
       - traefik.docker.network=frontend
