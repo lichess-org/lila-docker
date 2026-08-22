@@ -186,7 +186,7 @@ services:
 volumes:
   lila-assets-data:
   openingexplorer-data:
-    external: true
+    # external: true
 
 secrets:
   lila_preview_firebase_service_account:
