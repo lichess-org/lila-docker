@@ -59,6 +59,12 @@ services:
       - CONFIG_FORCE_csrf.origin=https://preview.${SUBDOMAIN:-test}.lichess.app
       - CONFIG_FORCE_mongo_uri=mongodb://mongodb:27017/lichess?appName=lila-ws
       - CONFIG_FORCE_redis.uri=redis://redis
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '(exec 3<>/dev/tcp/127.0.0.1/9664) 2>/dev/null'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   mongodb:
     image: mongo:8.2-noble
