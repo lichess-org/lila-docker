@@ -35,7 +35,7 @@ services:
       - traefik.http.routers.lila-preview-outpost-${SUBDOMAIN:-test}.service=authentik-server@file
 
   lila:
-    image: ghcr.io/lichess-org/lila-server:${LILA_SERVER_TAG:-latest}
+    image: ${LILA_SERVER_IMAGE:-ghcr.io/lichess-org/lila-server:latest}
     environment:
       - LILA_DOMAIN=preview.${SUBDOMAIN:-test}.lichess.app
       - LILA_URL=https://preview.${SUBDOMAIN:-test}.lichess.app
@@ -48,13 +48,13 @@ services:
       - lila_preview_firebase_service_account
 
   lila_assets:
-    image: ghcr.io/lichess-org/lila-assets:${LILA_ASSETS_TAG:-latest}
+    image: ${LILA_ASSETS_IMAGE:-ghcr.io/lichess-org/lila-assets:latest}
     volumes:
       - lila-assets-data:/assets:rw
       - ./scripts/update-asset-volume.sh:/docker-entrypoint.d/50-update-assets.sh:ro
 
   lila_ws:
-    image: ghcr.io/lichess-org/lila-ws:${LILA_WS_TAG:-latest}
+    image: ${LILA_WS_IMAGE:-ghcr.io/lichess-org/lila-ws:latest}
     environment:
       - CONFIG_FORCE_csrf.origin=https://preview.${SUBDOMAIN:-test}.lichess.app
       - CONFIG_FORCE_mongo_uri=mongodb://mongodb:27017/lichess?appName=lila-ws
