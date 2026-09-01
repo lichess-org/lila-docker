@@ -7,9 +7,9 @@ handle_path /oops* {
 	file_server
 }
 
-# for http://localhost:8080/oops/font.html
-handle_path /font* {
-	root * /lila/public/font
+# for http://localhost:8080/oops/icons.html
+handle_path /images* {
+	root * /lila/public/images
 	file_server
 }
 

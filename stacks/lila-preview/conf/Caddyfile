@@ -12,9 +12,9 @@ handle_path /oops/* {
 	reverse_proxy lila_assets:80
 }
 
-# for /oops/font.html
-handle_path /font/* {
-	rewrite * /public/font{path}
+# for /oops/icons.html
+handle_path /images/* {
+	rewrite * /public/images{path}
 	reverse_proxy lila_assets:80
 }
 
