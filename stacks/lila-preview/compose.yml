@@ -107,14 +107,15 @@ services:
       # - HTTP_API_LOGGER=true
 
   fishnet_play:
-    image: niklasf/fishnet:latest
+    image: niklasf/fishnet:main
     environment:
       - ENDPOINT=http://lila_fishnet:9665/fishnet
+      - KEY=fishnet-play-dev
       - MAX_BACKOFF=5
       - STATS_FILE=/stats.json
 
   fishnet_analysis:
-    image: niklasf/fishnet:latest
+    image: niklasf/fishnet:main
     environment:
       - ENDPOINT=http://lila:9663/fishnet
       - MAX_BACKOFF=5
