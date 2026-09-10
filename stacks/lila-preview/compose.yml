@@ -167,7 +167,7 @@ services:
     image: amir20/dozzle:latest
     environment:
       - DOZZLE_BASE=/logs
-      - DOZZLE_FILTER=label=com.docker.stack.namespace=${PREVIEW_NAMESPACE:-lila-preview-${SUBDOMAIN:-test}}
+      - DOZZLE_FILTER=label=com.docker.stack.namespace=${PREVIEW_NAMESPACE:-lila-preview-${SUBDOMAIN:-test}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks: *public-networks
