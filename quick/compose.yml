@@ -47,7 +47,7 @@ services:
     image: niklasf/fishnet:master
     environment:
       - ENDPOINT=http://lila_fishnet:9665/fishnet
-      - KEY=fishnet-play-dev
+      - KEY=fishnetplaydev
       - MAX_BACKOFF=5
       - STATS_FILE=/stats.json
 
