@@ -163,6 +163,25 @@ services:
       - traefik.http.routers.lila-mailpit-${SUBDOMAIN:-test}.tls.certresolver=myresolver
       - traefik.http.routers.lila-mailpit-${SUBDOMAIN:-test}.priority=100
 
+  dozzle:
+    image: amir20/dozzle:latest
+    environment:
+      - DOZZLE_BASE=/logs
+      - DOZZLE_FILTER=label=com.docker.stack.namespace=${PREVIEW_NAMESPACE:-lila-preview-${SUBDOMAIN:-test}}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks: *public-networks
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=frontend
+      - traefik.http.services.lila-dozzle-${SUBDOMAIN:-test}.loadbalancer.server.port=8080
+      - traefik.http.routers.lila-dozzle-${SUBDOMAIN:-test}.rule=Host(`preview.${SUBDOMAIN:-test}.lichess.app`) && PathPrefix(`/logs`)
+      - traefik.http.routers.lila-dozzle-${SUBDOMAIN:-test}.entrypoints=websecure
+      - traefik.http.routers.lila-dozzle-${SUBDOMAIN:-test}.tls=true
+      - traefik.http.routers.lila-dozzle-${SUBDOMAIN:-test}.tls.certresolver=myresolver
+      - traefik.http.routers.lila-dozzle-${SUBDOMAIN:-test}.middlewares=authentik@file
+      - traefik.http.routers.lila-dozzle-${SUBDOMAIN:-test}.priority=100
+
   mongo_express:
     image: mongo-express:1-20-alpine3.19
     environment:
