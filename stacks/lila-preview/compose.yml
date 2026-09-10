@@ -169,6 +169,7 @@ services:
     environment:
       - DOZZLE_BASE=/logs
       - DOZZLE_FILTER=label=com.docker.stack.namespace=${PREVIEW_NAMESPACE:-lila-preview-${SUBDOMAIN:-test}
+      - DOZZLE_NO_ANALYTICS=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks: *public-networks
