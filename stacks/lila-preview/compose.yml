@@ -13,6 +13,7 @@ services:
       - ./conf/Caddyfile:/etc/caddy/Caddyfile
     networks: *public-networks
     labels:
+      - dev.dozzle.icon=caddy
       - traefik.enable=true
       - traefik.docker.network=frontend
       - traefik.http.services.lila-preview-${SUBDOMAIN:-test}.loadbalancer.server.port=80
@@ -46,12 +47,16 @@ services:
       - lila-assets-data:/lila/public:ro
     secrets:
       - lila_preview_firebase_service_account
+    labels:
+      - dev.dozzle.icon=lichess
 
   lila_assets:
     image: ${LILA_ASSETS_IMAGE:-ghcr.io/lichess-org/lila-assets:latest}
     volumes:
       - lila-assets-data:/assets:rw
       - ./scripts/update-asset-volume.sh:/docker-entrypoint.d/50-update-assets.sh:ro
+    labels:
+      - dev.dozzle.icon=filebrowser
 
   lila_ws:
     image: ${LILA_WS_IMAGE:-ghcr.io/lichess-org/lila-ws:latest}
@@ -65,12 +70,18 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
+    labels:
+      - dev.dozzle.icon=websocket
 
   mongodb:
     image: mongo:8.2-noble
+    labels:
+      - dev.dozzle.icon=mongodb
 
   redis:
     image: redis:8
+    labels:
+      - dev.dozzle.icon=redis
 
   openingexplorer:
     image: ghcr.io/lichess-org/lila-openingexplorer:latest
@@ -81,6 +92,7 @@ services:
       - openingexplorer-data:/app/_db
     networks: *public-networks
     labels:
+      - dev.dozzle.icon=meilisearch
       - traefik.enable=true
       - traefik.docker.network=frontend
       - traefik.http.services.lila-explorer-${SUBDOMAIN:-test}.loadbalancer.server.port=9002
@@ -105,6 +117,8 @@ services:
     environment:
       - REDIS_HOST=redis
       # - HTTP_API_LOGGER=true
+    labels:
+      - dev.dozzle.icon=docker
 
   fishnet_play:
     image: niklasf/fishnet:main
@@ -113,6 +127,8 @@ services:
       - KEY=fishnetplaydev
       - MAX_BACKOFF=5
       - STATS_FILE=/stats.json
+    labels:
+      - dev.dozzle.icon=docker
 
   fishnet_analysis:
     image: niklasf/fishnet:main
@@ -120,10 +136,14 @@ services:
       - ENDPOINT=http://lila:9663/fishnet
       - MAX_BACKOFF=5
       - STATS_FILE=/stats.json
+    labels:
+      - dev.dozzle.icon=docker
 
   lila_gif:
     image: ghcr.io/lichess-org/lila-gif:latest
     entrypoint: /usr/local/bin/lila-gif --bind 0.0.0.0:6175
+    labels:
+      - dev.dozzle.icon=photoview
 
   lila_push:
     image: ghcr.io/lichess-org/lila-push:latest
@@ -132,6 +152,8 @@ services:
       - PUSH_LOG=debug
     volumes:
       - /data/lila-preview/lila-push/private.pem:/app/private.pem:ro
+    labels:
+      - dev.dozzle.icon=ntfy
 
   lila_db_seed:
     image: ghcr.io/lichess-org/lila-db-seed:latest
@@ -140,6 +162,8 @@ services:
     deploy:
       restart_policy:
         condition: none
+    labels:
+      - dev.dozzle.icon=docker
 
   picfit:
     image: thoas/picfit:0.16.1
@@ -147,6 +171,8 @@ services:
       - PICFIT_CONFIG_PATH=/mnt/config.json
     volumes:
       - ./conf/picfit.json:/mnt/config.json
+    labels:
+      - dev.dozzle.icon=synology-photo-station
 
   mailpit:
     image: axllent/mailpit:latest
@@ -155,6 +181,7 @@ services:
       - MP_MAX_AGE=1h
     networks: *public-networks
     labels:
+      - dev.dozzle.icon=mailpit
       - traefik.enable=true
       - traefik.docker.network=frontend
       - traefik.http.services.lila-mailpit-${SUBDOMAIN:-test}.loadbalancer.server.port=8025
@@ -174,6 +201,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks: *public-networks
     labels:
+      - dev.dozzle.icon=dozzle
       - traefik.enable=true
       - traefik.docker.network=frontend
       - traefik.http.services.lila-dozzle-${SUBDOMAIN:-test}.loadbalancer.server.port=8080
@@ -194,6 +222,7 @@ services:
       - mongodb
     networks: *public-networks
     labels:
+      - dev.dozzle.icon=adminer
       - traefik.enable=true
       - traefik.docker.network=frontend
       - traefik.http.services.lila-mongo-express-${SUBDOMAIN:-test}.loadbalancer.server.port=8081
