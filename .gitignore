@@ -1,5 +1,6 @@
 .env
 .pnpm-store
+node_modules
 
 conf/firebase-service-account.json
 firebase.env
@@ -13,6 +14,8 @@ repos
 
 settings.env
 settings.toml
+
+previews/lila
 
 .metals
 
