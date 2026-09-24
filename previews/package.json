@@ -1,0 +1,16 @@
+{
+  "name": "preview-bot",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "bun run build.ts",
+    "deploy": "bun run deploy.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
