@@ -1,4 +1,4 @@
-This deploys a `previews` stack from the compose file [here](https://github.com/lichess-org/lila-docker/blob/main/stacks/previews/compose.yml).
+This deploys a `previews` stack from the compose file [here](https://github.com/lichess-org/lila-docker/blob/main/stacks/lila-preview/compose.yml).
 
 ## Initial Setup
 
