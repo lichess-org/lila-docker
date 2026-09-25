@@ -1,4 +1,13 @@
-This deploys a `previews` stack from the compose file [here](https://github.com/lichess-org/lila-docker/blob/main/stacks/lila-preview/compose.yml).
+This deploys a complete `previews` stack from the compose file
+[here](https://github.com/lichess-org/lila-docker/blob/main/stacks/lila-preview/compose.yml),
+meaning `lila`, its dependencies, and some helpful tools, to a URL like
+https://preview.pr-21426.lichess.app.
+
+## Dependency
+
+[devenv](https://devenv.sh) is required. It provides the `preview` command and
+the tools used below (`bun`, `secretspec`, `depot`). Install it, then run
+`devenv shell` from the repo root.
 
 ## Initial Setup
 
@@ -6,7 +15,7 @@ This deploys a `previews` stack from the compose file [here](https://github.com/
 DEPOT_TOKEN=<your API token from https://depot.dev/settings>
 secretspec set DEPOT_TOKEN --profile previews --provider keyring $DEPOT_TOKEN
 
-PORTAINER_API_KEY="your portainer API key"
+PORTAINER_API_KEY="your access token from https://manage.lichess.app/#!/account"
 secretspec set PORTAINER_API_KEY --profile previews --provider keyring $PORTAINER_API_KEY
 ```
 
@@ -18,7 +27,7 @@ preview up <link to PR>
 preview down pr-{PR-number}
 ```
 
-## Advanced Usage 
+## Advanced Usage
 
 If you want to do steps individually or override defaults:
 
