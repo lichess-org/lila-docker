@@ -70,12 +70,34 @@ console.log("Building and publishing assets + server images with depot (in paral
 await Promise.all([
     runTagged(
         "assets",
-        ["depot", "build", "--save", "--save-tag", `${tag}-lila-assets`, "-f", "docker/assets.Dockerfile", "."],
+        [
+            "depot",
+            "build",
+            "--platform",
+            "linux/amd64",
+            "--save",
+            "--save-tag",
+            `${tag}-lila-assets`,
+            "-f",
+            "docker/assets.Dockerfile",
+            ".",
+        ],
         scriptDir,
     ),
     runTagged(
         "server",
-        ["depot", "build", "--save", "--save-tag", `${tag}-lila-server`, "-f", "docker/server.Dockerfile", "."],
+        [
+            "depot",
+            "build",
+            "--platform",
+            "linux/amd64",
+            "--save",
+            "--save-tag",
+            `${tag}-lila-server`,
+            "-f",
+            "docker/server.Dockerfile",
+            ".",
+        ],
         scriptDir,
     ),
 ]);
