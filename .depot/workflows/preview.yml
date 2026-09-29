@@ -1,4 +1,4 @@
-name: Preview
+name: Preview Deploy
 
 on:
   workflow_dispatch:
