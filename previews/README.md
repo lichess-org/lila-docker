@@ -1,4 +1,4 @@
-This deploys a complete `previews` stack from the compose file
+This deploys a complete `lila-preview` stack from the compose file
 [here](https://github.com/lichess-org/lila-docker/blob/main/stacks/lila-preview/compose.yml),
 meaning `lila`, its dependencies, and some helpful tools, to a URL like
 https://preview.pr-21426.lichess.app.
