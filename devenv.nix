@@ -87,7 +87,9 @@ in
               echo "Usage: preview down <tag>" >&2
               exit 1
             fi
-            secretspec run --provider keyring --profile previews -- bun run deploy.ts --tag "$tag" --remove
+            secretspec run --provider keyring --profile previews -- \
+              depot ci dispatch --repo lichess-org/lila-docker --workflow preview.yml --ref main \
+                --input action=down --input tag="$tag"
             ;;
           *)
             echo "Usage: preview up <github-pull-request-url>" >&2

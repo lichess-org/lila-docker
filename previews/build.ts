@@ -83,7 +83,7 @@ await Promise.all([
 console.log("Done.");
 
 if (values.deploy) {
-    console.log(`Deploying tag ${tag}...`);
-    const sourceArgs = values.pr ? ["--pr", values.pr] : ["--branch", values.branch as string];
-    await Bun.$`bun run ${join(scriptDir, "deploy.ts")} --tag ${tag} ${sourceArgs}`;
+    console.log(`Dispatching Depot CI deploy for tag ${tag}...`);
+    const sourceInput = values.pr ? `pr=${values.pr}` : `branch=${values.branch}`;
+    await Bun.$`depot ci dispatch --repo lichess-org/lila-docker --workflow preview.yml --ref main --input action=up --input tag=${tag} --input ${sourceInput}`;
 }

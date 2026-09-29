@@ -1,0 +1,65 @@
+name: Preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: up (deploy) or down (tear down)
+        type: choice
+        options:
+          - up
+          - down
+        default: up
+      tag:
+        description: image tag built by previews/build.ts (e.g. pr-21394, branch-master)
+        type: string
+        required: true
+      pr:
+        description: lichess-org/lila pull request URL (shown as the source link)
+        type: string
+      branch:
+        description: lichess-org/lila branch (shown as the source link)
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: depot-ubuntu-latest
+    defaults:
+      run:
+        working-directory: previews
+    env:
+      DEPOT_PROJECT_ID: jxm5r03mgs
+      DEPOT_REGISTRY: ft8xr42m62.registry.depot.dev
+      PORTAINER_URL: https://manage.lichess.app
+      PORTAINER_API_KEY: ${{ secrets.PORTAINER_API_KEY }}
+      TAG: ${{ inputs.tag }}
+      PR: ${{ inputs.pr }}
+      BRANCH: ${{ inputs.branch }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Validate tag
+        run: |
+          if ! [[ "$TAG" =~ ^[a-zA-Z0-9_.-]+$ ]]; then
+            echo "::error::invalid tag: $TAG"
+            exit 1
+          fi
+
+      - name: Deploy
+        if: inputs.action == 'up'
+        run: |
+          source=()
+          if [ -n "$PR" ]; then
+            source=(--pr "$PR")
+          elif [ -n "$BRANCH" ]; then
+            source=(--branch "$BRANCH")
+          fi
+          bun run deploy.ts --tag "$TAG" "${source[@]}"
+
+      - name: Tear down
+        if: inputs.action == 'down'
+        run: bun run deploy.ts --tag "$TAG" --remove

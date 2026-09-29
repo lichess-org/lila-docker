@@ -5,9 +5,6 @@ This deploys a `previews` stack from the compose file [here](https://github.com/
 ```bash
 DEPOT_TOKEN=<your API token from https://depot.dev/settings>
 secretspec set DEPOT_TOKEN --profile previews --provider keyring $DEPOT_TOKEN
-
-PORTAINER_API_KEY="your portainer API key"
-secretspec set PORTAINER_API_KEY --profile previews --provider keyring $PORTAINER_API_KEY
 ```
 
 ## Quick Usage
