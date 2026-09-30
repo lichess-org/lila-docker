@@ -48,11 +48,6 @@ in
   env = {
     PASSWORD_STORE_DIR = "${config.env.DEVENV_ROOT}/pass";
 
-    PORTAINER_URL = "https://manage.lichess.app";
-    DEPOT_PROJECT_ID = "jxm5r03mgs";
-    DEPOT_REGISTRY = "ft8xr42m62.registry.depot.dev";
-
-    PORTAINER_API_KEY = config.secretspec.secrets.PORTAINER_API_KEY or "";
     DEPOT_TOKEN = config.secretspec.secrets.DEPOT_TOKEN or "";
   };
 
@@ -69,34 +64,7 @@ in
   scripts = {
     preview = {
       exec = ''
-        set -euo pipefail
-        cd "${config.env.DEVENV_ROOT}/previews"
-
-        case "''${1:-}" in
-          up)
-            pr="''${2:-}"
-            if [ -z "$pr" ]; then
-              echo "Usage: preview up <github-pull-request-url>" >&2
-              exit 1
-            fi
-            secretspec run --provider keyring --profile previews -- bun run build.ts --pr "$pr" --deploy
-            ;;
-          down)
-            tag="''${2:-}"
-            if [ -z "$tag" ]; then
-              echo "Usage: preview down <tag>" >&2
-              exit 1
-            fi
-            secretspec run --provider keyring --profile previews -- \
-              depot ci dispatch --repo lichess-org/lila-docker --workflow preview.yml --ref main \
-                --input action=down --input tag="$tag"
-            ;;
-          *)
-            echo "Usage: preview up <github-pull-request-url>" >&2
-            echo "       preview down <tag>" >&2
-            exit 1
-            ;;
-        esac
+        secretspec run --provider keyring --profile previews -- bun run "${config.env.DEVENV_ROOT}/previews/preview.ts" "$@"
       '';
     };
   };

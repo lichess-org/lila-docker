@@ -4,62 +4,54 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: up (deploy) or down (tear down)
+        description: up (build + deploy) or down (tear down)
         type: choice
         options:
           - up
           - down
         default: up
-      tag:
-        description: image tag built by previews/build.ts (e.g. pr-21394, branch-master)
+      pr:
+        description: lichess-org/lila pull request number
         type: string
         required: true
-      pr:
-        description: lichess-org/lila pull request URL (shown as the source link)
-        type: string
-      branch:
-        description: lichess-org/lila branch (shown as the source link)
-        type: string
 
 permissions:
   contents: read
 
 jobs:
-  preview:
+  build:
+    if: inputs.action == 'up'
     runs-on: depot-ubuntu-latest
-    defaults:
-      run:
-        working-directory: previews
-    env:
-      DEPOT_PROJECT_ID: jxm5r03mgs
-      DEPOT_REGISTRY: ft8xr42m62.registry.depot.dev
-      PORTAINER_URL: https://manage.lichess.app
-      PORTAINER_API_KEY: ${{ secrets.PORTAINER_API_KEY }}
-      TAG: ${{ inputs.tag }}
-      PR: ${{ inputs.pr }}
-      BRANCH: ${{ inputs.branch }}
+    strategy:
+      matrix:
+        component: [server, assets]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: lichess-org/lila
+          ref: refs/pull/${{ inputs.pr }}/head
+          path: previews/lila
+      - uses: depot/setup-action@v1
+      - uses: depot/build-push-action@v1
+        with:
+          project: jxm5r03mgs
+          context: previews
+          file: previews/docker/${{ matrix.component }}.Dockerfile
+          platforms: linux/amd64
+          save: true
+          save-tags: pr-${{ inputs.pr }}-lila-${{ matrix.component }}
+
+  # Runs after the builds for `up`, or on its own for `down` (build is skipped).
+  deploy:
+    needs: build
+    if: ${{ !failure() && !cancelled() }}
+    runs-on: depot-ubuntu-latest
     steps:
       - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
-
-      - name: Validate tag
-        run: |
-          if ! [[ "$TAG" =~ ^[a-zA-Z0-9_.-]+$ ]]; then
-            echo "::error::invalid tag: $TAG"
-            exit 1
-          fi
-
-      - name: Deploy
-        if: inputs.action == 'up'
-        run: |
-          source=()
-          if [ -n "$PR" ]; then
-            source=(--pr "$PR")
-          elif [ -n "$BRANCH" ]; then
-            source=(--branch "$BRANCH")
-          fi
-          bun run deploy.ts --tag "$TAG" "${source[@]}"
-
-      - name: Tear down
-        if: inputs.action == 'down'
-        run: bun run deploy.ts --tag "$TAG" --remove
+      - run: bun run previews/deploy.ts "$ACTION" "$PR"
+        env:
+          ACTION: ${{ inputs.action }}
+          PR: ${{ inputs.pr }}
+          PORTAINER_API_KEY: ${{ secrets.PORTAINER_API_KEY }}

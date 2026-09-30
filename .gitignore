@@ -15,7 +15,6 @@ repos
 settings.env
 settings.toml
 
-previews/lila
 
 .metals
 

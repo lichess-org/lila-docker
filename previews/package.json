@@ -3,8 +3,6 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "bun run build.ts",
-    "deploy": "bun run deploy.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

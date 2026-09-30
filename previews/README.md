@@ -6,7 +6,7 @@ https://preview.pr-21426.lichess.app.
 ## Dependency
 
 [devenv](https://devenv.sh) is required. It provides the `preview` command and
-the tools used below (`bun`, `secretspec`, `depot`). Install it, then run
+the tools it uses (`bun`, `secretspec`, `depot`). Install it, then run
 `devenv shell` from the repo root.
 
 ## Initial Setup
@@ -16,61 +16,26 @@ DEPOT_TOKEN=<your API token from https://depot.dev/settings>
 secretspec set DEPOT_TOKEN --profile previews --provider keyring $DEPOT_TOKEN
 ```
 
-## Quick Usage
+## Usage
 
 ```bash
-preview up <link to PR>
+preview up <PR number or link>
 
-preview down pr-{PR-number}
+preview down <PR number or link>
 ```
 
-## Advanced Usage
+## How it works
 
-If you want to do steps individually or override defaults:
+`preview` ([preview.ts](preview.ts)) dispatches the
+[Depot CI workflow](../.depot/workflows/preview.yml), waits for it, and prints
+the site URL and test user passwords.
+
+The workflow builds the lila server and assets images from the PR
+([docker/](docker/)), then [deploy.ts](deploy.ts) creates or updates the
+Portainer stack pointing at them. `down` just removes the stack.
+
+The Portainer API key is a Depot CI secret:
 
 ```bash
-devenv shell
-
-cd previews
-```
-
-### Build + Deploy
-
-```sh
-bun run build.ts --pr https://github.com/lichess-org/lila/pull/21394 --deploy
-
-# or a branch
-
-bun run build.ts --branch master --deploy
-```
-
-### or just build/deploy
-
-```sh
-bun run build.ts --pr https://github.com/lichess-org/lila/pull/21394
-bun run build.ts --branch master
-
-bun run deploy.ts --tag pr-21394 --dry-run
-bun run deploy.ts --tag pr-21394
-```
-
-### Deploy with custom images (skip the build)
-
-Point the stack at already-built images (e.g. GHCR's `latest`) instead of
-depot-built ones, and override the subdomain / seed password:
-
-```sh
-bun run deploy.ts --tag preview \
-  --subdomain test \
-  --site-name "lila preview" \
-  --branch master \
-  --server-image ghcr.io/lichess-org/lila-server:latest \
-  --assets-image ghcr.io/lichess-org/lila-assets:latest \
-  --user-seed-password password
-```
-
-### Destroy
-
-```sh
-bun run deploy.ts --tag pr-21394 --remove
+depot ci secrets add PORTAINER_API_KEY --repo lichess-org/lila-docker
 ```
