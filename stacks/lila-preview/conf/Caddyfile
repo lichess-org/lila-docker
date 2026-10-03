@@ -2,6 +2,9 @@
 
 log
 
+@mjs path *.mjs
+header @mjs >Content-Type application/javascript
+
 @trailing_slash {
 	path_regexp reTrailingSlash ^/(.+)/$
 }
