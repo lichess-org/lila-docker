@@ -2,6 +2,9 @@
 
 log
 
+@mjs path *.mjs
+header @mjs >Content-Type application/javascript
+
 handle_path /oops* {
 	root * /lila/public/oops
 	file_server
