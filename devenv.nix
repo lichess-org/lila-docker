@@ -67,5 +67,10 @@ in
         secretspec run --provider keyring --profile previews -- bun run "${config.env.DEVENV_ROOT}/previews/preview.ts" "$@"
       '';
     };
+    preview-nokr = {
+      exec = ''
+        secretspec run --provider "''${SECRETSPEC_PROVIDER:-keyring}" --profile previews -- bun run "${config.env.DEVENV_ROOT}/previews/preview.ts" "$@"
+      '';
+    };
   };
 }

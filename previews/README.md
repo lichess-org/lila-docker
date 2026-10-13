@@ -16,12 +16,27 @@ DEPOT_TOKEN=<your API token from https://depot.dev/settings>
 secretspec set DEPOT_TOKEN --profile previews --provider keyring $DEPOT_TOKEN
 ```
 
+or (WSL2)
+
+```bash
+DEPOT_TOKEN=<your API token from https://depot.dev/settings>
+secretspec set DEPOT_TOKEN --profile previews --provider dotenv://.env $DEPOT_TOKEN
+```
+
 ## Usage
 
 ```bash
 preview up <PR number or link>
 
 preview down <PR number or link>
+```
+
+or (WSL2)
+
+```bash
+SECRETSPEC_PROVIDER=dotenv://.env preview-nokr up <PR number or link>
+
+SECRETSPEC_PROVIDER=dotenv://.env preview-nokr down <PR number or link>
 ```
 
 ## How it works
