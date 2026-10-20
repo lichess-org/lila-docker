@@ -8,6 +8,7 @@ RUN pip install --upgrade pip \
         pymongo \
         requests \
         termcolor \
-        faker
+        faker \
+        chess
 
 WORKDIR /lila-db-seed
