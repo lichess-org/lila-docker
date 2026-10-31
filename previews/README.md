@@ -12,7 +12,7 @@ the tools it uses (`bun`, `secretspec`, `depot`). Install it, then run
 ## Initial Setup
 
 ```bash
-DEPOT_TOKEN=<your API token from https://depot.dev/settings>
+export DEPOT_TOKEN=<your API token from https://depot.dev/settings>
 secretspec set DEPOT_TOKEN --profile previews --provider keyring $DEPOT_TOKEN
 ```
 
