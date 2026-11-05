@@ -41,7 +41,7 @@ services:
       - LILA_DOMAIN=${PREVIEW_DOMAIN:-preview.lichess.app}
       - LILA_URL=https://${PREVIEW_DOMAIN:-preview.lichess.app}
       - LILA_SITE_NAME=${LILA_SITE_NAME:-lichess preview}
-      - LILA_EXPLORER_ENDPOINT=https://preview.${SUBDOMAIN:-test}.explorer.lichess.app
+      - LILA_EXPLORER_ENDPOINT=https://${PREVIEW_EXPLORER_DOMAIN:-explorer.preview.lichess.app}
     volumes:
       - ./conf/lila.conf:/lila/conf/application.conf
       - lila-assets-data:/lila/public:ro
@@ -96,14 +96,14 @@ services:
       - traefik.enable=true
       - traefik.docker.network=frontend
       - traefik.http.services.lila-explorer-${SUBDOMAIN:-test}.loadbalancer.server.port=9002
-      - traefik.http.routers.lila-explorer-${SUBDOMAIN:-test}.rule=Host(`preview.${SUBDOMAIN:-test}.explorer.lichess.app`)
+      - traefik.http.routers.lila-explorer-${SUBDOMAIN:-test}.rule=Host(`${PREVIEW_EXPLORER_DOMAIN:-explorer.preview.lichess.app}`)
       - traefik.http.routers.lila-explorer-${SUBDOMAIN:-test}.entrypoints=websecure
       - traefik.http.routers.lila-explorer-${SUBDOMAIN:-test}.tls=true
       - traefik.http.routers.lila-explorer-${SUBDOMAIN:-test}.tls.certresolver=myresolver
       - traefik.http.routers.lila-explorer-${SUBDOMAIN:-test}.middlewares=explorer-cors-${SUBDOMAIN:-test}
       - traefik.http.middlewares.explorer-cors-${SUBDOMAIN:-test}.headers.accessControlAllowOriginList=https://${PREVIEW_DOMAIN:-preview.lichess.app}
       - traefik.http.middlewares.explorer-cors-${SUBDOMAIN:-test}.headers.accessControlAllowCredentials=true
-      - traefik.http.routers.lila-explorer-blocked-${SUBDOMAIN:-test}.rule=Host(`preview.${SUBDOMAIN:-test}.explorer.lichess.app`) && PathPrefix(`/import`)
+      - traefik.http.routers.lila-explorer-blocked-${SUBDOMAIN:-test}.rule=Host(`${PREVIEW_EXPLORER_DOMAIN:-explorer.preview.lichess.app}`) && PathPrefix(`/import`)
       - traefik.http.routers.lila-explorer-blocked-${SUBDOMAIN:-test}.entrypoints=websecure
       - traefik.http.routers.lila-explorer-blocked-${SUBDOMAIN:-test}.tls=true
       - traefik.http.routers.lila-explorer-blocked-${SUBDOMAIN:-test}.tls.certresolver=myresolver

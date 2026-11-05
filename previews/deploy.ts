@@ -89,13 +89,14 @@ if (existing) {
 const userPassword = isMaster ? "password" : (oldEnv.USER_SEED_PASSWORD ?? randomPassword());
 const privilegedPassword = isMaster ? "password" : (oldEnv.PRIVILEGED_SEED_PASSWORD ?? randomPassword());
 const domain = isMaster ? "preview.lichess.app" : `${tag}.preview.lichess.app`;
-const explorer = isMaster ? "preview.test.explorer.lichess.app" : `preview.${tag}.explorer.lichess.app`;
+const explorer = isMaster ? "explorer.preview.lichess.app" : `${tag}.explorer.preview.lichess.app`;
 const env = Object.entries(
     isMaster
         ? { LILA_SITE_NAME: "lila preview" }
         : {
               PREVIEW_NAMESPACE: name,
               PREVIEW_DOMAIN: domain,
+              PREVIEW_EXPLORER_DOMAIN: explorer,
               SUBDOMAIN: tag,
               LILA_SITE_NAME: tag,
               LILA_SERVER_IMAGE: `${IMAGE_REPO}:${tag}-lila-server`,
