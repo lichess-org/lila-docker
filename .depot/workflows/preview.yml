@@ -11,7 +11,7 @@ on:
           - down
         default: up
       pr:
-        description: lichess-org/lila pull request number
+        description: lichess-org/lila pull request number, or master (uses the published ghcr.io images)
         type: string
         required: true
 
@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   build:
-    if: inputs.action == 'up'
+    if: inputs.action == 'up' && inputs.pr != 'master'
     runs-on: depot-ubuntu-latest
     strategy:
       matrix:
@@ -42,7 +42,7 @@ jobs:
           save: true
           save-tags: pr-${{ inputs.pr }}-lila-${{ matrix.component }}
 
-  # Runs after the builds for `up`, or on its own for `down` (build is skipped).
+  # Runs after the builds for `up`, or on its own for `down` and master (build is skipped).
   deploy:
     needs: build
     if: ${{ !failure() && !cancelled() }}

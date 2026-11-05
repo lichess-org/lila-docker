@@ -1,9 +1,10 @@
 #!/usr/bin/env bun
 
-// Creates/updates or removes the Portainer stack for a lila PR preview.
+// Creates/updates or removes the Portainer stack for a lila PR preview,
+// or for `master`, which runs the published ghcr.io images with the compose defaults.
 // Runs in Depot CI (.depot/workflows/preview.yml), after the images are built.
 //
-// Usage: deploy.ts up|down <pr-number>
+// Usage: deploy.ts up|down <pr-number>|master
 
 import { appendFileSync } from "node:fs";
 
@@ -19,8 +20,8 @@ interface Stack {
 }
 
 const [action, pr] = Bun.argv.slice(2);
-if ((action !== "up" && action !== "down") || !/^\d+$/.test(pr ?? "")) {
-    console.error("Usage: deploy.ts up|down <pr-number>");
+if ((action !== "up" && action !== "down") || !/^(\d+|master)$/.test(pr ?? "")) {
+    console.error("Usage: deploy.ts up|down <pr-number>|master");
     process.exit(1);
 }
 
@@ -30,8 +31,10 @@ if (!apiKey) {
     process.exit(1);
 }
 
+const isMaster = pr === "master";
 const tag = `pr-${pr}`;
-const name = `lila-preview-${tag}`;
+// For master, the stack name must match the compose file's PREVIEW_NAMESPACE default.
+const name = isMaster ? "lila-preview" : `lila-preview-${tag}`;
 
 async function portainer<T>(method: string, path: string, body?: unknown): Promise<T> {
     const res = await fetch(`${PORTAINER_URL}/api${path}`, {
@@ -82,17 +85,25 @@ if (existing) {
     for (const { name, value } of details.Env ?? []) oldEnv[name] = value;
 }
 
-const userPassword = oldEnv.USER_SEED_PASSWORD ?? randomPassword();
-const privilegedPassword = oldEnv.PRIVILEGED_SEED_PASSWORD ?? randomPassword();
-const env = Object.entries({
-    PREVIEW_NAMESPACE: name,
-    SUBDOMAIN: tag,
-    LILA_SITE_NAME: tag,
-    LILA_SERVER_IMAGE: `${IMAGE_REPO}:${tag}-lila-server`,
-    LILA_ASSETS_IMAGE: `${IMAGE_REPO}:${tag}-lila-assets`,
-    USER_SEED_PASSWORD: userPassword,
-    PRIVILEGED_SEED_PASSWORD: privilegedPassword,
-}).map(([name, value]) => ({ name, value }));
+// master keeps the compose defaults for everything except the site name.
+const userPassword = isMaster ? "password" : (oldEnv.USER_SEED_PASSWORD ?? randomPassword());
+const privilegedPassword = isMaster ? "password" : (oldEnv.PRIVILEGED_SEED_PASSWORD ?? randomPassword());
+const domain = isMaster ? "preview.lichess.app" : `${tag}.preview.lichess.app`;
+const explorer = isMaster ? "preview.test.explorer.lichess.app" : `preview.${tag}.explorer.lichess.app`;
+const env = Object.entries(
+    isMaster
+        ? { LILA_SITE_NAME: "lila preview" }
+        : {
+              PREVIEW_NAMESPACE: name,
+              PREVIEW_DOMAIN: domain,
+              SUBDOMAIN: tag,
+              LILA_SITE_NAME: tag,
+              LILA_SERVER_IMAGE: `${IMAGE_REPO}:${tag}-lila-server`,
+              LILA_ASSETS_IMAGE: `${IMAGE_REPO}:${tag}-lila-assets`,
+              USER_SEED_PASSWORD: userPassword,
+              PRIVILEGED_SEED_PASSWORD: privilegedPassword,
+          },
+).map(([name, value]) => ({ name, value }));
 
 if (existing) {
     console.log(`Redeploying stack '${name}' (id=${existing.Id})`);
@@ -116,17 +127,17 @@ if (existing) {
     });
 }
 
-const site = `https://${tag}.preview.lichess.app`;
+const site = `https://${domain}`;
 report([
     `Site:                     ${site}`,
-    `Source:                   https://github.com/lichess-org/lila/pull/${pr}`,
+    `Source:                   ${isMaster ? "https://github.com/lichess-org/lila/tree/master" : `https://github.com/lichess-org/lila/pull/${pr}`}`,
     `Test users:               ${site}/page/test-users`,
     `Regular user password:    ${userPassword}`,
     `Privileged user password: ${privilegedPassword}`,
     `Logs:                     ${site}/logs`,
     `Mailpit:                  ${site}/mailpit`,
     `MongoDB:                  ${site}/mongodb`,
-    `Explorer:                 https://preview.${tag}.explorer.lichess.app/masters`,
+    `Explorer:                 https://${explorer}/masters`,
     `Portainer management:     ${PORTAINER_URL}/#!/${ENDPOINT_ID}/docker/stacks/${name}?type=1&external=true`,
     `Tear down:                $ preview down ${pr}`,
 ]);

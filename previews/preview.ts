@@ -3,7 +3,7 @@
 // Dispatches the Depot CI preview workflow (.depot/workflows/preview.yml),
 // waits for it to finish, and prints the result written by deploy.ts.
 //
-// Usage: preview.ts up|down <lila PR number or URL>
+// Usage: preview.ts up|down <lila PR number or URL>|master
 
 interface Run {
     status: "queued" | "running" | "finished" | "failed" | "cancelled";
@@ -11,9 +11,12 @@ interface Run {
 }
 
 const [action, prArg] = Bun.argv.slice(2);
-const pr = prArg?.match(/^(?:https:\/\/github\.com\/lichess-org\/lila\/pull\/)?(\d+)\/?$/)?.[1];
+const pr =
+    prArg === "master"
+        ? "master"
+        : prArg?.match(/^(?:https:\/\/github\.com\/lichess-org\/lila\/pull\/)?(\d+)\/?$/)?.[1];
 if ((action !== "up" && action !== "down") || !pr) {
-    console.error("Usage: preview up|down <lila PR number or URL>");
+    console.error("Usage: preview up|down <lila PR number or URL>|master");
     process.exit(1);
 }
 

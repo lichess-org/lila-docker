@@ -39,6 +39,10 @@ SECRETSPEC_PROVIDER=dotenv://.env preview-nokr up <PR number or link>
 SECRETSPEC_PROVIDER=dotenv://.env preview-nokr down <PR number or link>
 ```
 
+`preview up master` deploys lila's master branch to https://preview.lichess.app,
+using the published `ghcr.io/lichess-org/lila-*:latest` images and the compose
+file's defaults (test user password is `password`).
+
 ## How it works
 
 `preview` ([preview.ts](preview.ts)) dispatches the
