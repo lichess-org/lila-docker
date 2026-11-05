@@ -116,7 +116,7 @@ if (existing) {
     });
 }
 
-const site = `https://preview.${tag}.lichess.app`;
+const site = `https://${tag}.preview.lichess.app`;
 report([
     `Site:                     ${site}`,
     `Source:                   https://github.com/lichess-org/lila/pull/${pr}`,
