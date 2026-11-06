@@ -85,14 +85,14 @@ if (existing) {
     for (const { name, value } of details.Env ?? []) oldEnv[name] = value;
 }
 
-// master keeps the compose defaults for everything except the site name.
+// master keeps the compose defaults for everything except the site name and the daily re-seed.
 const userPassword = isMaster ? "password" : (oldEnv.USER_SEED_PASSWORD ?? randomPassword());
 const privilegedPassword = isMaster ? "password" : (oldEnv.PRIVILEGED_SEED_PASSWORD ?? randomPassword());
 const domain = isMaster ? "preview.lichess.app" : `${tag}.preview.lichess.app`;
 const explorer = isMaster ? "explorer.preview.lichess.app" : `${tag}.explorer.preview.lichess.app`;
 const env = Object.entries(
     isMaster
-        ? { LILA_SITE_NAME: "lila preview" }
+        ? { LILA_SITE_NAME: "lila preview", SEED_CRON: "0 6 * * *" }
         : {
               PREVIEW_NAMESPACE: name,
               PREVIEW_DOMAIN: domain,
