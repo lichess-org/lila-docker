@@ -90,7 +90,12 @@ const domain = isMaster ? "preview.lichess.app" : `${tag}.preview.lichess.app`;
 const explorer = isMaster ? "explorer.preview.lichess.app" : `${tag}.explorer.preview.lichess.app`;
 const envVars: Record<string, string> = isMaster
     ? // master keeps the compose defaults, and values set in Portainer win over ours.
-      { LILA_SITE_NAME: "lila preview", SEED_CRON: "0 6 * * *", ...oldEnv }
+      {
+          LILA_SITE_NAME: "preview",
+          SEED_CRON: "0 6 * * *",
+          FIREBASE_SERVICE_ACCOUNT_PATH: "/data/lila-preview/firebase-service-account.json",
+          ...oldEnv,
+      }
     : {
           ...oldEnv,
           PREVIEW_NAMESPACE: name,

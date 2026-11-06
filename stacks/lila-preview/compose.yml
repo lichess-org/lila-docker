@@ -45,8 +45,7 @@ services:
     volumes:
       - ./conf/lila.conf:/lila/conf/application.conf
       - lila-assets-data:/lila/public:ro
-    secrets:
-      - lila_preview_firebase_service_account
+      - ${FIREBASE_SERVICE_ACCOUNT_PATH:-/dev/null}:/opt/firebase-service-account.json:ro
     labels:
       - dev.dozzle.icon=lichess
 
@@ -240,10 +239,6 @@ volumes:
   lila-assets-data:
   openingexplorer-data:
     # external: true
-
-secrets:
-  lila_preview_firebase_service_account:
-    external: true
 
 networks:
   frontend:
