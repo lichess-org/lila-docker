@@ -78,33 +78,37 @@ if (action === "down") {
     process.exit(0);
 }
 
-// Keep the seed passwords of an existing stack so they don't change on redeploy.
+// Portainer replaces the stack's env wholesale on redeploy, so carry over the existing
+// env (e.g. passwords set in Portainer) and only layer our values on top of it.
 const oldEnv: Record<string, string> = {};
 if (existing) {
     const details = await portainer<Stack>("GET", `/stacks/${existing.Id}?endpointId=${ENDPOINT_ID}`);
     for (const { name, value } of details.Env ?? []) oldEnv[name] = value;
 }
 
-// master keeps the compose defaults for everything except the site name and the daily re-seed.
-const userPassword = isMaster ? "password" : (oldEnv.USER_SEED_PASSWORD ?? randomPassword());
-const privilegedPassword = isMaster ? "password" : (oldEnv.PRIVILEGED_SEED_PASSWORD ?? randomPassword());
 const domain = isMaster ? "preview.lichess.app" : `${tag}.preview.lichess.app`;
 const explorer = isMaster ? "explorer.preview.lichess.app" : `${tag}.explorer.preview.lichess.app`;
-const env = Object.entries(
-    isMaster
-        ? { LILA_SITE_NAME: "lila preview", SEED_CRON: "0 6 * * *" }
-        : {
-              PREVIEW_NAMESPACE: name,
-              PREVIEW_DOMAIN: domain,
-              PREVIEW_EXPLORER_DOMAIN: explorer,
-              SUBDOMAIN: tag,
-              LILA_SITE_NAME: tag,
-              LILA_SERVER_IMAGE: `${IMAGE_REPO}:${tag}-lila-server`,
-              LILA_ASSETS_IMAGE: `${IMAGE_REPO}:${tag}-lila-assets`,
-              USER_SEED_PASSWORD: userPassword,
-              PRIVILEGED_SEED_PASSWORD: privilegedPassword,
-          },
-).map(([name, value]) => ({ name, value }));
+const envVars: Record<string, string> = isMaster
+    ? // master keeps the compose defaults, and values set in Portainer win over ours.
+      { LILA_SITE_NAME: "lila preview", SEED_CRON: "0 6 * * *", ...oldEnv }
+    : {
+          ...oldEnv,
+          PREVIEW_NAMESPACE: name,
+          PREVIEW_DOMAIN: domain,
+          PREVIEW_EXPLORER_DOMAIN: explorer,
+          SUBDOMAIN: tag,
+          LILA_SITE_NAME: tag,
+          LILA_SERVER_IMAGE: `${IMAGE_REPO}:${tag}-lila-server`,
+          LILA_ASSETS_IMAGE: `${IMAGE_REPO}:${tag}-lila-assets`,
+          // Keep the seed passwords of an existing stack so they don't change on redeploy.
+          USER_SEED_PASSWORD: oldEnv.USER_SEED_PASSWORD || randomPassword(),
+          PRIVILEGED_SEED_PASSWORD: oldEnv.PRIVILEGED_SEED_PASSWORD || randomPassword(),
+      };
+const env = Object.entries(envVars).map(([name, value]) => ({ name, value }));
+
+// Mirror the compose / seed.sh defaults for the report.
+const userPassword = envVars.USER_SEED_PASSWORD || "password";
+const privilegedPassword = envVars.PRIVILEGED_SEED_PASSWORD || userPassword;
 
 if (existing) {
     console.log(`Redeploying stack '${name}' (id=${existing.Id})`);
