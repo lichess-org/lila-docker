@@ -159,7 +159,7 @@ services:
     image: ghcr.io/lichess-org/lila-db-seed:latest
     environment:
       - USER_SEED_PASSWORD=${USER_SEED_PASSWORD:-password}
-      - PRIVILEGED_SEED_PASSWORD=${PRIVILEGED_SEED_PASSWORD:-${USER_SEED_PASSWORD:-password}}
+      - PRIVILEGED_SEED_PASSWORD=${PRIVILEGED_SEED_PASSWORD:-}
       - SEED_CRON=${SEED_CRON:-}
     deploy:
       restart_policy:
