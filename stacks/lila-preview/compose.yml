@@ -74,6 +74,8 @@ services:
 
   mongodb:
     image: mongo:8.2-noble
+    volumes:
+      - mongodb-data:/data/db
     labels:
       - dev.dozzle.icon=mongodb
 
@@ -237,6 +239,7 @@ services:
 
 volumes:
   lila-assets-data:
+  mongodb-data:
   openingexplorer-data:
     # external: true
 
