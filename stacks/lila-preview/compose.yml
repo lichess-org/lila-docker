@@ -88,7 +88,7 @@ services:
     image: ghcr.io/lichess-org/lila-openingexplorer:latest
     environment:
       - LILA_URL=https://${PREVIEW_DOMAIN:-preview.lichess.app}
-      - EXPLORER_BEARER=lip_openingexplorer-${USER_SEED_PASSWORD:-password}
+      - EXPLORER_BEARER=lip_openingexplorer-${USER_SEED_PASSWORD:?USER_SEED_PASSWORD must be set}
     volumes:
       - openingexplorer-data:/app/_db
     networks: *public-networks
@@ -159,7 +159,7 @@ services:
   lila_db_seed:
     image: ghcr.io/lichess-org/lila-db-seed:latest
     environment:
-      - USER_SEED_PASSWORD=${USER_SEED_PASSWORD:-password}
+      - USER_SEED_PASSWORD=${USER_SEED_PASSWORD:?USER_SEED_PASSWORD must be set}
       - PRIVILEGED_SEED_PASSWORD=${PRIVILEGED_SEED_PASSWORD:-}
       - SEED_CRON=${SEED_CRON:-}
     deploy:

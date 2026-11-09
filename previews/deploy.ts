@@ -5,6 +5,9 @@
 // Runs in Depot CI (.depot/workflows/preview.yml), after the images are built.
 //
 // Usage: deploy.ts up|down <pr-number>|master
+//
+// USER_SEED_PASSWORD / PRIVILEGED_SEED_PASSWORD set the test user passwords.
+// `up master` requires USER_SEED_PASSWORD; PR stacks otherwise keep their existing or get random ones.
 
 import { appendFileSync } from "node:fs";
 
@@ -32,6 +35,12 @@ if (!apiKey) {
 }
 
 const isMaster = pr === "master";
+const givenPassword = process.env.USER_SEED_PASSWORD ?? "";
+const givenPrivilegedPassword = process.env.PRIVILEGED_SEED_PASSWORD ?? "";
+if (action === "up" && isMaster && !givenPassword) {
+    console.error("USER_SEED_PASSWORD must be set to deploy master");
+    process.exit(1);
+}
 const tag = `pr-${pr}`;
 // For master, the stack name must match the compose file's PREVIEW_NAMESPACE default.
 const name = isMaster ? "lila-preview" : `lila-preview-${tag}`;
@@ -89,12 +98,14 @@ if (existing) {
 const domain = isMaster ? "preview.lichess.app" : `${tag}.preview.lichess.app`;
 const explorer = isMaster ? "explorer.preview.lichess.app" : `${tag}.explorer.preview.lichess.app`;
 const envVars: Record<string, string> = isMaster
-    ? // master keeps the compose defaults, and values set in Portainer win over ours.
+    ? // master keeps the compose defaults, and values set in Portainer win over ours (except the passwords).
       {
           LILA_SITE_NAME: "preview",
           SEED_CRON: "0 6 * * *",
           FIREBASE_SERVICE_ACCOUNT_PATH: "/data/lila-preview/firebase-service-account.json",
           ...oldEnv,
+          USER_SEED_PASSWORD: givenPassword,
+          PRIVILEGED_SEED_PASSWORD: givenPrivilegedPassword || givenPassword,
       }
     : {
           ...oldEnv,
@@ -105,15 +116,14 @@ const envVars: Record<string, string> = isMaster
           LILA_SITE_NAME: tag,
           LILA_SERVER_IMAGE: `${IMAGE_REPO}:${tag}-lila-server`,
           LILA_ASSETS_IMAGE: `${IMAGE_REPO}:${tag}-lila-assets`,
-          // Keep the seed passwords of an existing stack so they don't change on redeploy.
-          USER_SEED_PASSWORD: oldEnv.USER_SEED_PASSWORD || randomPassword(),
-          PRIVILEGED_SEED_PASSWORD: oldEnv.PRIVILEGED_SEED_PASSWORD || randomPassword(),
+          // Unless given, keep the seed passwords of an existing stack so they don't change on redeploy.
+          USER_SEED_PASSWORD: givenPassword || oldEnv.USER_SEED_PASSWORD || randomPassword(),
+          PRIVILEGED_SEED_PASSWORD: givenPrivilegedPassword || oldEnv.PRIVILEGED_SEED_PASSWORD || randomPassword(),
       };
 const env = Object.entries(envVars).map(([name, value]) => ({ name, value }));
 
-// Mirror the compose / seed.sh defaults for the report.
-const userPassword = envVars.USER_SEED_PASSWORD || "password";
-const privilegedPassword = envVars.PRIVILEGED_SEED_PASSWORD || userPassword;
+const userPassword = envVars.USER_SEED_PASSWORD!;
+const privilegedPassword = envVars.PRIVILEGED_SEED_PASSWORD!;
 
 if (existing) {
     console.log(`Redeploying stack '${name}' (id=${existing.Id})`);

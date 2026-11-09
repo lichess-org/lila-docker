@@ -3,25 +3,35 @@
 // Dispatches the Depot CI preview workflow (.depot/workflows/preview.yml),
 // waits for it to finish, and prints the result written by deploy.ts.
 //
-// Usage: preview.ts up|down <lila PR number or URL>|master
+// Usage: preview.ts up|down <lila PR number or URL>|master [password] [privileged password]
+//
+// `up master` requires a password. For a PR, passwords are optional: by default the
+// stack keeps the ones it already has, or gets random ones.
 
 interface Run {
     status: "queued" | "running" | "finished" | "failed" | "cancelled";
     workflows: { jobs: { job_id: string; job_key: string }[] }[];
 }
 
-const [action, prArg] = Bun.argv.slice(2);
+const [action, prArg, password = "", privilegedPassword = ""] = Bun.argv.slice(2);
 const pr =
     prArg === "master"
         ? "master"
         : prArg?.match(/^(?:https:\/\/github\.com\/lichess-org\/lila\/pull\/)?(\d+)\/?$/)?.[1];
 if ((action !== "up" && action !== "down") || !pr) {
-    console.error("Usage: preview up|down <lila PR number or URL>|master");
+    console.error("Usage: preview up|down <lila PR number or URL>|master [password] [privileged password]");
+    process.exit(1);
+}
+if (action === "up" && pr === "master" && !password) {
+    console.error("Usage: preview up master <password> [privileged password]");
     process.exit(1);
 }
 
+const inputs = [`action=${action}`, `pr=${pr}`];
+if (password) inputs.push(`password=${password}`);
+if (privilegedPassword) inputs.push(`privileged_password=${privilegedPassword}`);
 const dispatched =
-    await Bun.$`depot ci dispatch --repo lichess-org/lila-docker --workflow preview.yml --ref main --input action=${action} --input pr=${pr}`.text();
+    await Bun.$`depot ci dispatch --repo lichess-org/lila-docker --workflow preview.yml --ref main ${inputs.flatMap((i) => ["--input", i])}`.text();
 process.stdout.write(dispatched);
 
 const runId = dispatched.match(/run (\S+) queued/)?.[1];

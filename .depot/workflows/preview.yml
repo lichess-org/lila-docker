@@ -14,6 +14,14 @@ on:
         description: lichess-org/lila pull request number, or master (uses the published ghcr.io images)
         type: string
         required: true
+      password:
+        description: Test user password. Required for master; PRs keep their existing or get a random one when empty.
+        type: string
+        default: ""
+      privileged_password:
+        description: Password for privileged test users (admin etc). Defaults to the test user password for master, or random for PRs.
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -54,4 +62,6 @@ jobs:
         env:
           ACTION: ${{ inputs.action }}
           PR: ${{ inputs.pr }}
+          USER_SEED_PASSWORD: ${{ inputs.password }}
+          PRIVILEGED_SEED_PASSWORD: ${{ inputs.privileged_password }}
           PORTAINER_API_KEY: ${{ secrets.PORTAINER_API_KEY }}

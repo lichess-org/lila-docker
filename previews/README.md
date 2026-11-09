@@ -39,9 +39,14 @@ SECRETSPEC_PROVIDER=dotenv://.env preview-nokr up <PR number or link>
 SECRETSPEC_PROVIDER=dotenv://.env preview-nokr down <PR number or link>
 ```
 
-`preview up master` deploys lila's master branch to https://preview.lichess.app,
-using the published `ghcr.io/lichess-org/lila-*:latest` images and the compose
-file's defaults (test user password is `password`).
+`preview up master <password> [privileged password]` deploys lila's master branch
+to https://preview.lichess.app, using the published `ghcr.io/lichess-org/lila-*:latest`
+images and the compose file's defaults. The password is required for master; the
+privileged test users (admin etc) get the same one unless a second is given.
+
+For a PR, `preview up <PR> [password] [privileged password]` sets the test user
+passwords too. Without them, a new preview gets random passwords and an existing
+one keeps its current ones.
 
 ## How it works
 
