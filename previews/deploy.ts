@@ -114,6 +114,7 @@ const envVars: Record<string, string> = isMaster
           PREVIEW_EXPLORER_DOMAIN: explorer,
           SUBDOMAIN: tag,
           LILA_SITE_NAME: tag,
+          LILA_SESSION_COOKIE: `lila2_${tag}`,
           LILA_SERVER_IMAGE: `${IMAGE_REPO}:${tag}-lila-server`,
           LILA_ASSETS_IMAGE: `${IMAGE_REPO}:${tag}-lila-assets`,
           // Unless given, keep the seed passwords of an existing stack so they don't change on redeploy.

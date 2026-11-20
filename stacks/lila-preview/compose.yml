@@ -41,6 +41,7 @@ services:
       - LILA_DOMAIN=${PREVIEW_DOMAIN:-preview.lichess.app}
       - LILA_URL=https://${PREVIEW_DOMAIN:-preview.lichess.app}
       - LILA_SITE_NAME=${LILA_SITE_NAME:-lichess preview}
+      - LILA_SESSION_COOKIE=${LILA_SESSION_COOKIE:-lila2}
       - LILA_EXPLORER_ENDPOINT=https://${PREVIEW_EXPLORER_DOMAIN:-explorer.preview.lichess.app}
     volumes:
       - ./conf/lila.conf:/lila/conf/application.conf
@@ -63,6 +64,7 @@ services:
       - CONFIG_FORCE_csrf.origin=https://${PREVIEW_DOMAIN:-preview.lichess.app}
       - CONFIG_FORCE_mongo_uri=mongodb://mongodb:27017/lichess?appName=lila-ws
       - CONFIG_FORCE_redis.uri=redis://redis
+      - CONFIG_FORCE_cookie.name=${LILA_SESSION_COOKIE:-lila2}
     healthcheck:
       test: ["CMD-SHELL", "bash -c '(exec 3<>/dev/tcp/127.0.0.1/9664) 2>/dev/null'"]
       interval: 10s
