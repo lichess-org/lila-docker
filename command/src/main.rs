@@ -91,9 +91,8 @@ impl Config {
             lila_url,
         } = self;
         let compose_profiles_string = compose_profiles
-            .clone()
-            .map(|v| v.join(","))
-            .unwrap_or_default();
+            .as_ref()
+            .map_or_else(String::new, |profiles| profiles.join(","));
 
         vec![
             to_env!(quick_setup),
@@ -723,7 +722,7 @@ mod tests {
 
         assert_eq!(
             contents,
-            vec![
+            [
                 "COMPOSE_PROFILES=",
                 "LILA_DOMAIN=baz:8080",
                 "LILA_URL=http://baz:8080"
