@@ -98,7 +98,7 @@ setup_database() {
 
     echo "Resetting and seeding the database with test data (with options: ${params[*]})..."
 
-    docker compose run --rm python python /lila-db-seed/spamdb/spamdb.py \
+    docker compose run --build --rm python python /lila-db-seed/spamdb/spamdb.py \
         --uri=mongodb://mongodb/lichess \
         --drop-db \
         --password=$PASSWORD \
